@@ -7,6 +7,7 @@
 """Top-level package for mermaid_timeline."""
 
 from .cycle_raw import iter_cycle_events
+from .discovery import iter_cycle_files, iter_mer_files, iter_raw_inputs
 from .models import (
     AcquisitionWindow,
     CycleLogEntry,
@@ -24,8 +25,11 @@ __all__ = [
     "MerFileMetadata",
     "ProductCoverage",
     "TimelineStatus",
+    "iter_cycle_files",
     "iter_cycle_events",
+    "iter_mer_files",
     "iter_mer_data_blocks",
+    "iter_raw_inputs",
     "parse_mer_file",
 ]
 
