@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from mermaid_timeline.discovery import (
+    iter_bin_files,
     iter_cycle_files,
     iter_mer_env_files,
     iter_mer_files,
@@ -16,6 +17,14 @@ def test_iter_cycle_files_recurses(tmp_path: Path) -> None:
     paths = list(iter_cycle_files(tmp_path))
 
     assert {path.name for path in paths} == {"0088_68E2D462.CYCLE.h", "0099_ABCDEF01.CYCLE.h"}
+
+
+def test_iter_bin_files_recurses(tmp_path: Path) -> None:
+    _build_tree(tmp_path)
+
+    paths = list(iter_bin_files(tmp_path))
+
+    assert {path.name for path in paths} == {"0088_68E2D462.BIN", "0100_685864F3.BIN"}
 
 
 def test_iter_mer_files_recurses(tmp_path: Path) -> None:
@@ -102,6 +111,9 @@ def _build_tree(root: Path) -> None:
     (root / "467.164-T-0102" / "0088_20251005-20h26m10s" / "0088_68E2D462.MER").write_bytes(
         b""
     )
+    (root / "467.164-T-0102" / "0088_20251005-20h26m10s" / "0088_68E2D462.BIN").write_bytes(
+        b""
+    )
     (root / "467.164-T-0102" / "0088_20251005-20h26m10s" / "0088_68E2D462.C.csv").write_text(
         "",
         encoding="utf-8",
@@ -118,6 +130,7 @@ def _build_tree(root: Path) -> None:
     ).write_text("", encoding="utf-8")
     (root / "other" / "nested" / "0099_ABCDEF01.CYCLE.h").write_text("", encoding="utf-8")
     (root / "other" / "nested" / "0100_685864F3.MER").write_bytes(b"")
+    (root / "other" / "nested" / "0100_685864F3.BIN").write_bytes(b"")
     (root / "other" / "nested" / "0099_ABCDEF01.LOG.0100_685864F3.MER.env").write_text(
         "",
         encoding="utf-8",

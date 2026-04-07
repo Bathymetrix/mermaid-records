@@ -6,10 +6,17 @@ from pathlib import Path
 from typing import Iterator
 
 RAW_PATTERNS = {
+    "bin": "*.BIN",
     "cycle": "*.CYCLE.h",
     "mer": "*.MER",
     "mer_env": "*.MER.env",
 }
+
+
+def iter_bin_files(root: Path) -> Iterator[Path]:
+    """Recursively yield all upstream raw .BIN files under root."""
+
+    yield from iter_raw_inputs(root, kinds=("bin",))
 
 
 def iter_cycle_files(root: Path) -> Iterator[Path]:
@@ -37,7 +44,7 @@ def iter_server_mer(root: Path) -> Iterator[Path]:
 
 
 def iter_processed_cycle(root: Path) -> Iterator[Path]:
-    """Semantic alias for iterating processed .CYCLE.h files."""
+    """Semantic alias for iterating processed .CYCLE.h reference files."""
 
     yield from iter_cycle_files(root)
 

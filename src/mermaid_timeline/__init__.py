@@ -8,7 +8,9 @@
 
 from .audit import CycleCorpusStats, MerCorpusStats, audit_processed_cycle, audit_server_mer
 from .cycle_raw import iter_cycle_events
+from .decode import iter_decoded_cycle_lines
 from .discovery import (
+    iter_bin_files,
     iter_cycle_files,
     iter_mer_env_files,
     iter_mer_files,
@@ -37,8 +39,10 @@ __all__ = [
     "TimelineStatus",
     "audit_processed_cycle",
     "audit_server_mer",
+    "iter_bin_files",
     "iter_cycle_files",
     "iter_cycle_events",
+    "iter_decoded_cycle_lines",
     "iter_mer_env_files",
     "iter_mer_files",
     "iter_processed_cycle",
