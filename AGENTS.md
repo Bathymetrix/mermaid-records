@@ -11,6 +11,8 @@
 - Add the exact Bathymetrix header only to `src/mermaid_timeline/__init__.py` and `src/mermaid_timeline/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
 - When referring to an output cycle file, call it `CYCLE` (parallel to `BIN`, `LOG`, and `MER`).
+- Never delete a source `.BIN` from its original path during decode; any external decode step must operate on a copied file in temporary workspace.
+- Never delete source raw files from their original path. This includes `.MER`, `.BIN`, and future raw formats such as `.vit`.
 
 ## Project Purpose
 
