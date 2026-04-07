@@ -8,6 +8,7 @@ from typing import Iterator
 RAW_PATTERNS = {
     "cycle": "*.CYCLE.h",
     "mer": "*.MER",
+    "mer_env": "*.MER.env",
 }
 
 
@@ -21,6 +22,24 @@ def iter_mer_files(root: Path) -> Iterator[Path]:
     """Recursively yield all .MER files under root."""
 
     yield from iter_raw_inputs(root, kinds=("mer",))
+
+
+def iter_mer_env_files(root: Path) -> Iterator[Path]:
+    """Recursively yield all .MER.env files under root."""
+
+    yield from iter_raw_inputs(root, kinds=("mer_env",))
+
+
+def iter_server_mer(root: Path) -> Iterator[Path]:
+    """Semantic alias for iterating raw .MER files from a server corpus."""
+
+    yield from iter_mer_files(root)
+
+
+def iter_processed_cycle(root: Path) -> Iterator[Path]:
+    """Semantic alias for iterating processed .CYCLE.h files."""
+
+    yield from iter_cycle_files(root)
 
 
 def iter_raw_inputs(
