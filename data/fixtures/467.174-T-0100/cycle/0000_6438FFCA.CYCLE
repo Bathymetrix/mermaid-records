@@ -1,0 +1,2784 @@
+1681457098:[PREPROCESS]Create 0100_6438FFCA.LOG
+1681457098:[MAIN  ,0007]buoy 467.174-T-0100
+1681457098:[MAIN  ,0055]soft pilotage 467.174.300_V2.63-20230412
+1681457098:[MAIN  ,0010]cycle 11
+1681457098:[SURF  ,0225]surface2
+1681457111:[SURF  ,0022]GPS fix...
+1681457131:[SURF  ,0015]10 PPS detected...
+1681457132:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681457142:[MRMAID,0052]$GPSOFF:3686332;
+1681457144:[GPSFIX,0179]-1s diff
+1681457145:[SURF  ,0222]2023-04-14T07:25:45
+1681457145:[SURF  ,0082]N43deg40.937mn, E007deg19.182mn
+1681457145:[SURF  ,0084]hdop 0.590, vdop 0.860
+1681457155:[SURF  ,0025]Iridium...
+1681457200:[SURF  ,0009]connected in 45s, signal quality 5
+1681457303:[SURF  ,0218]prompt received, remote cmd end
+1681457303:[SURF  ,0012]17 cmd(s) received
+1681457328:[UPLOAD,0248]Upload data files...
+1681457388:[UPLOAD,0231]"0100/6438FB59.S61" uploaded at 83bytes/s
+1681457440:[UPLOAD,0231]"0100/6438FF6C.MER" uploaded at 148bytes/s
+1681457624:[UPLOAD,0231]"0100/6438E33A.BIN" uploaded at 145bytes/s
+1681457641:[MAIN  ,0013]3 file(s) uploaded
+1681457677:[SURF  ,0014]disconnected after 522s
+1681457682:[SURF  ,0227]1st complete transfer
+1681457727:[SURF  ,0022]GPS fix...
+1681457747:[SURF  ,0015]10 PPS detected...
+1681457748:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681457758:[MRMAID,0052]$GPSOFF:3686332;
+1681457760:[GPSFIX,0179]-1s diff
+1681457761:[SURF  ,0222]2023-04-14T07:36:01
+1681457761:[SURF  ,0082]N43deg40.937mn, E007deg19.181mn
+1681457761:[SURF  ,0084]hdop 0.580, vdop 0.880
+1681457771:[SURF  ,0025]Iridium...
+1681457772:[MODEM ,0347]<ERR>ping error
+1681457772:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1681457830:[SURF  ,0009]connected in 59s, signal quality 2
+1681457877:[SURF  ,0218]prompt received, remote cmd end
+1681457877:[SURF  ,0012]8 cmd(s) received
+1681457917:[SURF  ,0014]disconnected after 146s
+1681457922:[SURF  ,0226]Go dive
+1681457934:[SURF  ,0022]GPS fix...
+1681457954:[SURF  ,0015]10 PPS detected...
+1681457955:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681457965:[MRMAID,0052]$GPSOFF:3686332;
+1681457967:[GPSFIX,0179]-1s diff
+1681457968:[SURF  ,0222]2023-04-14T07:39:28
+1681457968:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681457968:[SURF  ,0084]hdop 0.540, vdop 0.840
+1681457985:[MAIN  ,0024]internal pressure 76493Pa
+1681457986:[MAIN  ,0041]<WARN>mission empty
+1681457986:[MAIN  ,0065]surfacing
+1681457988:[PRESS ,0038]P    -41mbar,T+32767mdegC
+1681458012:[SURFIN,0036]P    -51mbar
+1681458014:[SURFIN,0020]filling external bladder
+1681458016:[PUMP  ,0016]pump during 30000ms
+1681458017:[PUMP  ,0019]external bladder full
+1681458018:[PRESS ,0038]P   +290mbar,T+32767mdegC
+1681458079:[MAIN  ,0272]Vbat 15021mV (min 14591mV)
+1681458081:[MAIN  ,0024]internal pressure 76431Pa
+1681458081:[MAIN  ,0043]Pext 256mbar (rng 50mbar)
+1681458081:[MAIN  ,0064]surface
+1681458093:[SURF  ,0022]GPS fix...
+1681458113:[SURF  ,0015]10 PPS detected...
+1681458114:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681458124:[MRMAID,0052]$GPSOFF:3686332;
+1681458126:[GPSFIX,0179]-1s diff
+1681458127:[SURF  ,0222]2023-04-14T07:42:07
+1681458127:[SURF  ,0082]N43deg40.938mn, E007deg19.182mn
+1681458127:[SURF  ,0084]hdop 0.550, vdop 0.840
+1681458137:[SURF  ,0274]last almanac : 70809
+1681458150:[MRMAID,0026]1550 bytes in 0100/643903DE.MER
+1681458155:[MAIN  ,0320]New pressure offset: 256mbar
+1681458155:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681458217:[SBE   ,0339]new offset = -1.24 received after 63s
+1681458217:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681458218:[SURF  ,0225]surface2
+1681458231:[SURF  ,0022]GPS fix...
+1681458251:[SURF  ,0015]10 PPS detected...
+1681458252:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681458262:[MRMAID,0052]$GPSOFF:3686331;
+1681458264:[GPSFIX,0179]-1s diff
+1681458265:[SURF  ,0222]2023-04-14T07:44:25
+1681458265:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681458265:[SURF  ,0084]hdop 0.540, vdop 0.850
+1681458275:[SURF  ,0025]Iridium...
+1681458311:[SURF  ,0009]connected in 36s, signal quality 5
+1681458361:[SURF  ,0218]prompt received, remote cmd end
+1681458361:[SURF  ,0012]8 cmd(s) received
+1681458383:[UPLOAD,0248]Upload data files...
+1681458402:[UPLOAD,0231]"0100/643903DE.MER" uploaded at 129bytes/s
+1681458419:[MAIN  ,0013]1 file(s) uploaded
+1681458450:[SURF  ,0014]disconnected after 175s
+1681458455:[SURF  ,0227]1st complete transfer
+1681458846:[SURF  ,0022]GPS fix...
+1681458867:[SURF  ,0015]10 PPS detected...
+1681458868:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1681458878:[MRMAID,0052]$GPSOFF:3686331;
+1681458880:[GPSFIX,0179]-1s diff
+1681458881:[SURF  ,0222]2023-04-14T07:54:41
+1681458881:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681458881:[SURF  ,0084]hdop 0.550, vdop 0.870
+1681458891:[SURF  ,0025]Iridium...
+1681458947:[SURF  ,0009]connected in 56s, signal quality 4
+1681458999:[SURF  ,0218]prompt received, remote cmd end
+1681458999:[SURF  ,0012]8 cmd(s) received
+1681459040:[SURF  ,0014]disconnected after 149s
+1681459045:[SURF  ,0226]Go dive
+1681459056:[SURF  ,0022]GPS fix...
+1681459076:[SURF  ,0015]10 PPS detected...
+1681459077:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681459087:[MRMAID,0052]$GPSOFF:3686331;
+1681459089:[GPSFIX,0179]-1s diff
+1681459090:[SURF  ,0222]2023-04-14T07:58:10
+1681459090:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681459090:[SURF  ,0084]hdop 0.590, vdop 0.890
+1681459107:[MAIN  ,0024]internal pressure 76510Pa
+1681459108:[MAIN  ,0041]<WARN>mission empty
+1681459108:[MAIN  ,0065]surfacing
+1681459110:[PRESS ,0038]P     +4mbar,T+32767mdegC
+1681459134:[SURFIN,0036]P    +14mbar
+1681459136:[SURFIN,0020]filling external bladder
+1681459138:[PUMP  ,0019]external bladder full
+1681459139:[PRESS ,0038]P   +240mbar,T+32767mdegC
+1681459200:[MAIN  ,0272]Vbat 15108mV (min 14591mV)
+1681459202:[MAIN  ,0024]internal pressure 76525Pa
+1681459202:[MAIN  ,0043]Pext 263mbar (rng 30mbar)
+1681459202:[MAIN  ,0064]surface
+1681459214:[SURF  ,0022]GPS fix...
+1681459234:[SURF  ,0015]10 PPS detected...
+1681459235:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681459245:[MRMAID,0052]$GPSOFF:3686332;
+1681459248:[GPSFIX,0179]+0s diff
+1681459248:[SURF  ,0222]2023-04-14T08:00:48
+1681459248:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681459248:[SURF  ,0084]hdop 0.560, vdop 0.810
+1681459258:[SURF  ,0274]last almanac : 71930
+1681459271:[MRMAID,0026]1556 bytes in 0100/6439083F.MER
+1681459276:[MAIN  ,0320]New pressure offset: 263mbar
+1681459276:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681459338:[SBE   ,0339]new offset = -1.22 received after 63s
+1681459338:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681459339:[SURF  ,0225]surface2
+1681459352:[SURF  ,0022]GPS fix...
+1681459372:[SURF  ,0015]10 PPS detected...
+1681459373:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681459383:[MRMAID,0052]$GPSOFF:3686331;
+1681459385:[GPSFIX,0179]-1s diff
+1681459386:[SURF  ,0222]2023-04-14T08:03:06
+1681459386:[SURF  ,0082]N43deg40.938mn, E007deg19.180mn
+1681459386:[SURF  ,0084]hdop 0.560, vdop 0.880
+1681459396:[SURF  ,0025]Iridium...
+1681459431:[SURF  ,0009]connected in 35s, signal quality 5
+1681459487:[SURF  ,0218]prompt received, remote cmd end
+1681459487:[SURF  ,0012]8 cmd(s) received
+1681459510:[UPLOAD,0248]Upload data files...
+1681459526:[UPLOAD,0231]"0100/6439083F.MER" uploaded at 141bytes/s
+1681459542:[MAIN  ,0013]1 file(s) uploaded
+1681459572:[SURF  ,0014]disconnected after 176s
+1681459577:[SURF  ,0227]1st complete transfer
+1681459967:[SURF  ,0022]GPS fix...
+1681459987:[SURF  ,0015]10 PPS detected...
+1681459988:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1681459998:[MRMAID,0052]$GPSOFF:3686332;
+1681460001:[GPSFIX,0179]+0s diff
+1681460001:[SURF  ,0222]2023-04-14T08:13:21
+1681460001:[SURF  ,0082]N43deg40.937mn, E007deg19.182mn
+1681460001:[SURF  ,0084]hdop 0.510, vdop 0.740
+1681460011:[SURF  ,0025]Iridium...
+1681460041:[SURF  ,0009]connected in 30s, signal quality 5
+1681460107:[SURF  ,0218]prompt received, remote cmd end
+1681460107:[SURF  ,0012]8 cmd(s) received
+1681460144:[SURF  ,0014]disconnected after 133s
+1681460149:[SURF  ,0226]Go dive
+1681460161:[SURF  ,0022]GPS fix...
+1681460181:[SURF  ,0015]10 PPS detected...
+1681460182:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681460192:[MRMAID,0052]$GPSOFF:3686332;
+1681460194:[GPSFIX,0179]-1s diff
+1681460195:[SURF  ,0222]2023-04-14T08:16:35
+1681460195:[SURF  ,0082]N43deg40.939mn, E007deg19.181mn
+1681460195:[SURF  ,0084]hdop 0.530, vdop 0.760
+1681460212:[MAIN  ,0024]internal pressure 76606Pa
+1681460213:[MAIN  ,0041]<WARN>mission empty
+1681460213:[MAIN  ,0065]surfacing
+1681460215:[PRESS ,0038]P    -23mbar,T+32767mdegC
+1681460239:[SURFIN,0036]P    -33mbar
+1681460241:[SURFIN,0020]filling external bladder
+1681460243:[PUMP  ,0019]external bladder full
+1681460244:[PRESS ,0038]P   +250mbar,T+32767mdegC
+1681460305:[MAIN  ,0272]Vbat 15113mV (min 14591mV)
+1681460307:[MAIN  ,0024]internal pressure 76579Pa
+1681460307:[MAIN  ,0043]Pext 261mbar (rng 20mbar)
+1681460307:[MAIN  ,0064]surface
+1681460319:[SURF  ,0022]GPS fix...
+1681460339:[SURF  ,0015]10 PPS detected...
+1681460340:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1681460350:[MRMAID,0052]$GPSOFF:3686331;
+1681460352:[GPSFIX,0179]-1s diff
+1681460353:[SURF  ,0222]2023-04-14T08:19:13
+1681460353:[SURF  ,0082]N43deg40.938mn, E007deg19.181mn
+1681460353:[SURF  ,0084]hdop 0.510, vdop 0.790
+1681460363:[SURF  ,0274]last almanac : 73035
+1681460376:[MRMAID,0026]1552 bytes in 0100/64390C90.MER
+1681460381:[MAIN  ,0320]New pressure offset: 261mbar
+1681460381:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681460443:[SBE   ,0339]new offset = -1.21 received after 63s
+1681460443:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681460444:[SURF  ,0225]surface2
+1681460457:[SURF  ,0022]GPS fix...
+1681460477:[SURF  ,0015]10 PPS detected...
+1681460478:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681460488:[MRMAID,0052]$GPSOFF:3686331;
+1681460490:[GPSFIX,0179]-1s diff
+1681460491:[SURF  ,0222]2023-04-14T08:21:31
+1681460491:[SURF  ,0082]N43deg40.939mn, E007deg19.181mn
+1681460491:[SURF  ,0084]hdop 0.500, vdop 0.820
+1681460501:[SURF  ,0025]Iridium...
+1681460547:[SURF  ,0009]connected in 46s, signal quality 5
+1681460598:[SURF  ,0218]prompt received, remote cmd end
+1681460598:[SURF  ,0012]8 cmd(s) received
+1681460623:[UPLOAD,0248]Upload data files...
+1681460665:[UPLOAD,0231]"0100/64390C90.MER" uploaded at 82bytes/s
+1681460685:[MAIN  ,0013]1 file(s) uploaded
+1681460718:[SURF  ,0014]disconnected after 217s
+1681460723:[SURF  ,0227]1st complete transfer
+1681461073:[SURF  ,0022]GPS fix...
+1681461093:[SURF  ,0015]10 PPS detected...
+1681461094:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1681461104:[MRMAID,0052]$GPSOFF:3686331;
+1681461106:[GPSFIX,0179]-1s diff
+1681461107:[SURF  ,0222]2023-04-14T08:31:47
+1681461107:[SURF  ,0082]N43deg40.939mn, E007deg19.183mn
+1681461107:[SURF  ,0084]hdop 0.550, vdop 0.910
+1681461117:[SURF  ,0025]Iridium...
+1681461152:[SURF  ,0009]connected in 35s, signal quality 5
+1681461183:[SURF  ,0071]<WARN>timeout
+1681461183:[SURF  ,0056]<WARN>peer mute
+1681461193:[SURF  ,0014]disconnected after 76s
+1681461198:[SURFIN,0020]filling external bladder
+1681461199:[PUMP  ,0019]external bladder full
+1681461199:[SURF  ,0227]1st complete transfer
+1681461199:[SURF  ,0226]Go dive
+1681461210:[SURF  ,0022]GPS fix...
+1681461231:[SURF  ,0015]10 PPS detected...
+1681461232:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681461242:[MRMAID,0052]$GPSOFF:3686331;
+1681461245:[GPSFIX,0179]+0s diff
+1681461245:[SURF  ,0222]2023-04-14T08:34:05
+1681461245:[SURF  ,0082]N43deg40.938mn, E007deg19.183mn
+1681461245:[SURF  ,0084]hdop 0.560, vdop 0.960
+1681461262:[MAIN  ,0024]internal pressure 76629Pa
+1681461263:[MAIN  ,0041]<WARN>mission empty
+1681461263:[MAIN  ,0065]surfacing
+1681461265:[PRESS ,0038]P    -11mbar,T+32767mdegC
+1681461289:[SURFIN,0036]P    -11mbar
+1681461291:[SURFIN,0020]filling external bladder
+1681461293:[PUMP  ,0019]external bladder full
+1681461294:[PRESS ,0038]P   +250mbar,T+32767mdegC
+1681461355:[MAIN  ,0272]Vbat 15115mV (min 14591mV)
+1681461357:[MAIN  ,0024]internal pressure 76647Pa
+1681461357:[MAIN  ,0043]Pext 255mbar (rng 30mbar)
+1681461357:[MAIN  ,0064]surface
+1681461369:[SURF  ,0022]GPS fix...
+1681461389:[SURF  ,0015]10 PPS detected...
+1681461390:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681461400:[MRMAID,0052]$GPSOFF:3686331;
+1681461402:[GPSFIX,0179]-1s diff
+1681461403:[SURF  ,0222]2023-04-14T08:36:43
+1681461403:[SURF  ,0082]N43deg40.940mn, E007deg19.184mn
+1681461403:[SURF  ,0084]hdop 0.550, vdop 0.920
+1681461413:[SURF  ,0274]last almanac : 74085
+1681461426:[MRMAID,0026]1558 bytes in 0100/643910AA.MER
+1681461431:[MAIN  ,0320]New pressure offset: 255mbar
+1681461431:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681461493:[SBE   ,0339]new offset = -1.17 received after 63s
+1681461493:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681461494:[SURF  ,0225]surface2
+1681461507:[SURF  ,0022]GPS fix...
+1681461527:[SURF  ,0015]10 PPS detected...
+1681461528:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681461538:[MRMAID,0052]$GPSOFF:3686331;
+1681461540:[GPSFIX,0179]-1s diff
+1681461541:[SURF  ,0222]2023-04-14T08:39:01
+1681461541:[SURF  ,0082]N43deg40.940mn, E007deg19.184mn
+1681461541:[SURF  ,0084]hdop 0.530, vdop 0.940
+1681461551:[SURF  ,0025]Iridium...
+1681461591:[SURF  ,0009]connected in 40s, signal quality 5
+1681461639:[SURF  ,0218]prompt received, remote cmd end
+1681461639:[SURF  ,0012]9 cmd(s) received
+1681461661:[UPLOAD,0248]Upload data files...
+1681461680:[UPLOAD,0231]"0100/643910AA.MER" uploaded at 111bytes/s
+1681461695:[MAIN  ,0013]1 file(s) uploaded
+1681461729:[SURF  ,0014]disconnected after 178s
+1681461734:[SURF  ,0227]1st complete transfer
+1681462122:[SURF  ,0022]GPS fix...
+1681462143:[SURF  ,0015]10 PPS detected...
+1681462144:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1681462154:[MRMAID,0052]$GPSOFF:3686331;
+1681462156:[GPSFIX,0179]-1s diff
+1681462157:[SURF  ,0222]2023-04-14T08:49:17
+1681462157:[SURF  ,0082]N43deg40.940mn, E007deg19.184mn
+1681462157:[SURF  ,0084]hdop 0.580, vdop 0.910
+1681462167:[SURF  ,0025]Iridium...
+1681462209:[SURF  ,0009]connected in 42s, signal quality 5
+1681462261:[SURF  ,0218]prompt received, remote cmd end
+1681462261:[SURF  ,0012]8 cmd(s) received
+1681462302:[SURF  ,0014]disconnected after 135s
+1681462307:[SURF  ,0226]Go dive
+1681462319:[SURF  ,0022]GPS fix...
+1681462339:[SURF  ,0015]10 PPS detected...
+1681462340:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681462350:[MRMAID,0052]$GPSOFF:3686331;
+1681462352:[GPSFIX,0179]-1s diff
+1681462353:[SURF  ,0222]2023-04-14T08:52:33
+1681462353:[SURF  ,0082]N43deg40.941mn, E007deg19.185mn
+1681462353:[SURF  ,0084]hdop 0.640, vdop 1.140
+1681462370:[MAIN  ,0024]internal pressure 76668Pa
+1681462371:[MAIN  ,0041]<WARN>mission empty
+1681462371:[MAIN  ,0065]surfacing
+1681462373:[PRESS ,0038]P     +5mbar,T+32767mdegC
+1681462397:[SURFIN,0036]P     +5mbar
+1681462399:[SURFIN,0020]filling external bladder
+1681462401:[PUMP  ,0019]external bladder full
+1681462402:[PRESS ,0038]P   +260mbar,T+32767mdegC
+1681462463:[MAIN  ,0272]Vbat 15109mV (min 14591mV)
+1681462465:[MAIN  ,0024]internal pressure 76647Pa
+1681462465:[MAIN  ,0043]Pext 251mbar (rng 20mbar)
+1681462465:[MAIN  ,0064]surface
+1681462477:[SURF  ,0022]GPS fix...
+1681462497:[SURF  ,0015]10 PPS detected...
+1681462498:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681462508:[MRMAID,0052]$GPSOFF:3686331;
+1681462510:[GPSFIX,0179]-1s diff
+1681462511:[SURF  ,0222]2023-04-14T08:55:11
+1681462511:[SURF  ,0082]N43deg40.940mn, E007deg19.185mn
+1681462511:[SURF  ,0084]hdop 0.560, vdop 0.950
+1681462521:[SURF  ,0274]last almanac : 75193
+1681462534:[MRMAID,0026]1558 bytes in 0100/643914FE.MER
+1681462539:[MAIN  ,0320]New pressure offset: 251mbar
+1681462539:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681462601:[SBE   ,0339]new offset = -1.16 received after 63s
+1681462601:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681462602:[SURF  ,0225]surface2
+1681462615:[SURF  ,0022]GPS fix...
+1681462635:[SURF  ,0015]10 PPS detected...
+1681462636:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681462646:[MRMAID,0052]$GPSOFF:3686331;
+1681462648:[GPSFIX,0179]-1s diff
+1681462649:[SURF  ,0222]2023-04-14T08:57:29
+1681462649:[SURF  ,0082]N43deg40.941mn, E007deg19.184mn
+1681462649:[SURF  ,0084]hdop 0.560, vdop 0.950
+1681462659:[SURF  ,0025]Iridium...
+1681462660:[MODEM ,0347]<ERR>ping error
+1681462660:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1681462687:[SURF  ,0023]<WARN>failed to connect #2, code -5, net 4, qual -1, dial -1
+1681462767:[SURF  ,0009]connected in 108s, signal quality 4
+1681462821:[SURF  ,0218]prompt received, remote cmd end
+1681462821:[SURF  ,0012]8 cmd(s) received
+1681462845:[UPLOAD,0248]Upload data files...
+1681462876:[UPLOAD,0231]"0100/643914FE.MER" uploaded at 74bytes/s
+1681462898:[MAIN  ,0013]1 file(s) uploaded
+1681462932:[SURF  ,0014]disconnected after 273s
+1681462937:[SURF  ,0227]1st complete transfer
+1681463231:[SURF  ,0022]GPS fix...
+1681463251:[SURF  ,0015]10 PPS detected...
+1681463252:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1681463262:[MRMAID,0052]$GPSOFF:3686331;
+1681463264:[GPSFIX,0179]-1s diff
+1681463265:[SURF  ,0222]2023-04-14T09:07:45
+1681463265:[SURF  ,0082]N43deg40.941mn, E007deg19.183mn
+1681463265:[SURF  ,0084]hdop 0.600, vdop 0.930
+1681463275:[SURF  ,0025]Iridium...
+1681463315:[SURF  ,0009]connected in 40s, signal quality 5
+1681463371:[SURF  ,0218]prompt received, remote cmd end
+1681463371:[SURF  ,0012]8 cmd(s) received
+1681463411:[SURF  ,0014]disconnected after 136s
+1681463416:[SURF  ,0226]Go dive
+1681463428:[SURF  ,0022]GPS fix...
+1681463448:[SURF  ,0015]10 PPS detected...
+1681463449:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681463459:[MRMAID,0052]$GPSOFF:3686331;
+1681463461:[GPSFIX,0179]-1s diff
+1681463462:[SURF  ,0222]2023-04-14T09:11:02
+1681463462:[SURF  ,0082]N43deg40.941mn, E007deg19.182mn
+1681463462:[SURF  ,0084]hdop 0.570, vdop 0.890
+1681463479:[MAIN  ,0024]internal pressure 76686Pa
+1681463480:[MAIN  ,0041]<WARN>mission empty
+1681463480:[MAIN  ,0065]surfacing
+1681463482:[PRESS ,0038]P     +9mbar,T+32767mdegC
+1681463506:[SURFIN,0036]P     +9mbar
+1681463508:[SURFIN,0020]filling external bladder
+1681463510:[PUMP  ,0019]external bladder full
+1681463511:[PRESS ,0038]P   +240mbar,T+32767mdegC
+1681463571:[MAIN  ,0272]Vbat 15092mV (min 14591mV)
+1681463573:[MAIN  ,0024]internal pressure 76632Pa
+1681463573:[MAIN  ,0043]Pext 252mbar (rng 50mbar)
+1681463573:[MAIN  ,0064]surface
+1681463585:[SURF  ,0022]GPS fix...
+1681463605:[SURF  ,0015]10 PPS detected...
+1681463606:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681463616:[MRMAID,0052]$GPSOFF:3686331;
+1681463618:[GPSFIX,0179]-1s diff
+1681463619:[SURF  ,0222]2023-04-14T09:13:39
+1681463619:[SURF  ,0082]N43deg40.942mn, E007deg19.184mn
+1681463619:[SURF  ,0084]hdop 0.560, vdop 0.840
+1681463629:[SURF  ,0274]last almanac : 76301
+1681463642:[MRMAID,0026]1558 bytes in 0100/64391952.MER
+1681463647:[MAIN  ,0320]New pressure offset: 252mbar
+1681463647:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681463709:[SBE   ,0339]new offset = -1.17 received after 63s
+1681463709:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681463710:[SURF  ,0225]surface2
+1681463723:[SURF  ,0022]GPS fix...
+1681463743:[SURF  ,0015]10 PPS detected...
+1681463744:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681463754:[MRMAID,0052]$GPSOFF:3686331;
+1681463756:[GPSFIX,0179]-1s diff
+1681463757:[SURF  ,0222]2023-04-14T09:15:57
+1681463757:[SURF  ,0082]N43deg40.942mn, E007deg19.182mn
+1681463757:[SURF  ,0084]hdop 0.560, vdop 0.850
+1681463767:[SURF  ,0025]Iridium...
+1681463808:[SURF  ,0009]connected in 41s, signal quality 3
+1681463861:[SURF  ,0218]prompt received, remote cmd end
+1681463861:[SURF  ,0012]8 cmd(s) received
+1681463883:[UPLOAD,0248]Upload data files...
+1681463911:[UPLOAD,0231]"0100/64391952.MER" uploaded at 111bytes/s
+1681463933:[MAIN  ,0013]1 file(s) uploaded
+1681463965:[SURF  ,0014]disconnected after 198s
+1681463970:[SURF  ,0227]1st complete transfer
+1681464339:[SURF  ,0022]GPS fix...
+1681464359:[SURF  ,0015]10 PPS detected...
+1681464360:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1681464370:[MRMAID,0052]$GPSOFF:3686331;
+1681464372:[GPSFIX,0179]-1s diff
+1681464373:[SURF  ,0222]2023-04-14T09:26:13
+1681464373:[SURF  ,0082]N43deg40.940mn, E007deg19.184mn
+1681464373:[SURF  ,0084]hdop 0.570, vdop 0.830
+1681464383:[SURF  ,0025]Iridium...
+1681464412:[SURF  ,0009]connected in 29s, signal quality 5
+1681464462:[SURF  ,0218]prompt received, remote cmd end
+1681464462:[SURF  ,0012]8 cmd(s) received
+1681464504:[SURF  ,0014]disconnected after 121s
+1681464509:[SURF  ,0226]Go dive
+1681464520:[SURF  ,0022]GPS fix...
+1681464540:[SURF  ,0015]10 PPS detected...
+1681464541:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681464551:[MRMAID,0052]$GPSOFF:3686331;
+1681464552:[GPSFIX,0179]-1s diff
+1681464553:[SURF  ,0222]2023-04-14T09:29:13
+1681464553:[SURF  ,0082]N43deg40.940mn, E007deg19.185mn
+1681464553:[SURF  ,0084]hdop 0.580, vdop 0.850
+1681464570:[MAIN  ,0024]internal pressure 76725Pa
+1681464571:[MAIN  ,0041]<WARN>mission empty
+1681464571:[MAIN  ,0065]surfacing
+1681464573:[PRESS ,0038]P    -12mbar,T+32767mdegC
+1681464597:[SURFIN,0036]P    +18mbar
+1681464599:[SURFIN,0020]filling external bladder
+1681464601:[PUMP  ,0019]external bladder full
+1681464602:[PRESS ,0038]P   +270mbar,T+32767mdegC
+1681464663:[MAIN  ,0272]Vbat 15114mV (min 14591mV)
+1681464665:[MAIN  ,0024]internal pressure 76660Pa
+1681464665:[MAIN  ,0043]Pext 253mbar (rng 50mbar)
+1681464665:[MAIN  ,0064]surface
+1681464677:[SURF  ,0022]GPS fix...
+1681464697:[SURF  ,0015]10 PPS detected...
+1681464698:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681464708:[MRMAID,0052]$GPSOFF:3686331;
+1681464710:[GPSFIX,0179]+0s diff
+1681464710:[SURF  ,0222]2023-04-14T09:31:50
+1681464710:[SURF  ,0082]N43deg40.940mn, E007deg19.184mn
+1681464710:[SURF  ,0084]hdop 0.600, vdop 0.840
+1681464720:[SURF  ,0274]last almanac : 77392
+1681464733:[MRMAID,0026]1558 bytes in 0100/64391D95.MER
+1681464738:[MAIN  ,0320]New pressure offset: 253mbar
+1681464738:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681464799:[SBE   ,0339]new offset = -1.16 received after 63s
+1681464800:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681464801:[SURF  ,0225]surface2
+1681464814:[SURF  ,0022]GPS fix...
+1681464834:[SURF  ,0015]10 PPS detected...
+1681464835:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681464845:[MRMAID,0052]$GPSOFF:3686331;
+1681464847:[GPSFIX,0179]-1s diff
+1681464848:[SURF  ,0222]2023-04-14T09:34:08
+1681464848:[SURF  ,0082]N43deg40.939mn, E007deg19.186mn
+1681464848:[SURF  ,0084]hdop 0.610, vdop 0.800
+1681464858:[SURF  ,0025]Iridium...
+1681464890:[SURF  ,0009]connected in 32s, signal quality 5
+1681464938:[SURF  ,0218]prompt received, remote cmd end
+1681464938:[SURF  ,0012]8 cmd(s) received
+1681464961:[UPLOAD,0248]Upload data files...
+1681464978:[UPLOAD,0231]"0100/64391D95.MER" uploaded at 142bytes/s
+1681464996:[MAIN  ,0013]1 file(s) uploaded
+1681465026:[SURF  ,0014]disconnected after 168s
+1681465031:[SURF  ,0227]1st complete transfer
+1681465430:[SURF  ,0022]GPS fix...
+1681465450:[SURF  ,0015]10 PPS detected...
+1681465451:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1681465461:[MRMAID,0052]$GPSOFF:3686331;
+1681465463:[GPSFIX,0179]-1s diff
+1681465464:[SURF  ,0222]2023-04-14T09:44:24
+1681465464:[SURF  ,0082]N43deg40.940mn, E007deg19.186mn
+1681465464:[SURF  ,0084]hdop 0.610, vdop 0.840
+1681465474:[SURF  ,0025]Iridium...
+1681465522:[SURF  ,0009]connected in 48s, signal quality 5
+1681465581:[SURF  ,0218]prompt received, remote cmd end
+1681465581:[SURF  ,0012]8 cmd(s) received
+1681465623:[SURF  ,0014]disconnected after 149s
+1681465628:[SURF  ,0226]Go dive
+1681465639:[SURF  ,0022]GPS fix...
+1681465659:[SURF  ,0015]10 PPS detected...
+1681465660:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681465670:[MRMAID,0052]$GPSOFF:3686331;
+1681465673:[GPSFIX,0179]+0s diff
+1681465673:[SURF  ,0222]2023-04-14T09:47:53
+1681465673:[SURF  ,0082]N43deg40.940mn, E007deg19.185mn
+1681465673:[SURF  ,0084]hdop 0.570, vdop 0.740
+1681465690:[MAIN  ,0024]internal pressure 76738Pa
+1681465691:[MAIN  ,0041]<WARN>mission empty
+1681465691:[MAIN  ,0065]surfacing
+1681465693:[PRESS ,0038]P     +7mbar,T+32767mdegC
+1681465717:[SURFIN,0036]P    -13mbar
+1681465719:[SURFIN,0020]filling external bladder
+1681465721:[PUMP  ,0019]external bladder full
+1681465722:[PRESS ,0038]P   +240mbar,T+32767mdegC
+1681465782:[MAIN  ,0272]Vbat 15110mV (min 14591mV)
+1681465784:[MAIN  ,0024]internal pressure 76703Pa
+1681465784:[MAIN  ,0043]Pext 251mbar (rng 30mbar)
+1681465784:[MAIN  ,0064]surface
+1681465796:[SURF  ,0022]GPS fix...
+1681465816:[SURF  ,0015]10 PPS detected...
+1681465817:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681465827:[MRMAID,0052]$GPSOFF:3686331;
+1681465829:[GPSFIX,0179]-1s diff
+1681465830:[SURF  ,0222]2023-04-14T09:50:30
+1681465830:[SURF  ,0082]N43deg40.939mn, E007deg19.186mn
+1681465830:[SURF  ,0084]hdop 0.580, vdop 0.810
+1681465840:[SURF  ,0274]last almanac : 78512
+1681465853:[MRMAID,0026]1558 bytes in 0100/643921F5.MER
+1681465858:[MAIN  ,0320]New pressure offset: 251mbar
+1681465858:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1681465920:[SBE   ,0339]new offset = -1.19 received after 63s
+1681465920:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1681465921:[SURF  ,0225]surface2
+1681465934:[SURF  ,0022]GPS fix...
+1681465954:[SURF  ,0015]10 PPS detected...
+1681465955:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1681465965:[MRMAID,0052]$GPSOFF:3686331;
+1681465967:[GPSFIX,0179]-1s diff
+1681465968:[SURF  ,0222]2023-04-14T09:52:48
+1681465968:[SURF  ,0082]N43deg40.940mn, E007deg19.186mn
+1681465968:[SURF  ,0084]hdop 0.590, vdop 0.720
+1681465978:[SURF  ,0025]Iridium...
+1681466178:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1681466227:[SURF  ,0009]connected in 249s, signal quality 5
+1681466278:[SURF  ,0218]prompt received, remote cmd end
+1681466279:[SURF  ,0012]8 cmd(s) received
+1681466301:[UPLOAD,0248]Upload data files...
+1681466320:[UPLOAD,0231]"0100/643921F5.MER" uploaded at 142bytes/s
+1681466338:[MAIN  ,0013]1 file(s) uploaded
+1681466371:[SURF  ,0014]disconnected after 393s
+1681466376:[SURF  ,0227]1st complete transfer
+1681466550:[SURF  ,0022]GPS fix...
+1681466570:[SURF  ,0015]10 PPS detected...
+1681466571:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1681466581:[MRMAID,0052]$GPSOFF:3686331;
+1681466583:[GPSFIX,0179]-1s diff
+1681466584:[SURF  ,0222]2023-04-14T10:03:04
+1681466584:[SURF  ,0082]N43deg40.944mn, E007deg19.191mn
+1681466584:[SURF  ,0084]hdop 0.670, vdop 0.930
+1681466594:[SURF  ,0025]Iridium...
+1681466624:[SURF  ,0009]connected in 30s, signal quality 5
+1681466672:[SURF  ,0218]prompt received, remote cmd end
+1681466672:[SURF  ,0012]8 cmd(s) received
+1681466712:[SURF  ,0014]disconnected after 118s
+1681466717:[SURF  ,0226]Go dive
+1682685817:[PREPROCESS]Create 0100_644BBF79.LOG
+1682685817:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1682685817:[MAIN  ,0007]buoy 467.174-T-0100
+1682685817:[MAIN  ,0055]soft pilotage 467.174.300_V2.66-20230428
+1682685817:[MAIN  ,0011]date 2023-04-28T12:43:37
+1682685823:[MAIN  ,0006]battery 15473mV,   13176uA
+1682685825:[MAIN  ,0024]internal pressure 78671Pa
+1682685827:[PRESS ,0038]P    -71mbar,T+32767mdegC
+1682685827:[MRMAID,0182]thread started
+1682685828:[MRMAID,0186]no wake-up
+1682685829:[MRMAID,0188]acq already stopped
+1682685830:[MRMAID,0052]$BOARD:452116600-A0;
+1682685830:[MRMAID,0052]$SOFT:2.1344;
+1682685831:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1682685832:[SBE   ,0391]Mode changed from SLEEP to INIT
+1682685835:[SBE   ,0391]Mode changed from INIT to SLEEP
+1682685836:[SCIENT,0392]CTD SBE61 INIT: OK
+1682685838:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1682685838:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1682685838:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1682685838:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1682685838:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1682685838:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1682685838:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1682685838:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1682685838:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1682685838:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1682685838:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1682685839:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1682685839:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1682685839:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1682685839:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1682685839:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1682685839:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1682685839:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1682685839:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1682685839:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1682685839:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1682685839:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1682685839:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1682685839:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1682685839:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1682685839:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1682685839:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1682685839:[SBE   ,0430]  <poffset>-1.190000e+00</poffset>
+1682685839:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1682685839:[SBE   ,0432]  <prange>10153</prange>
+1682685839:[TESTMD,0053]Enter in test mode? yes/no
+1682685839:[TESTMD,0252]0100>
+1682685869:[BYCMD ,0120]    bypass 10000ms 60000ms (10000ms 60000ms stored)
+1682685869:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1682685869:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1682685869:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1682685869:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1682685869:[BYCMD ,0173]    near 1500mbar 3:2:3mbar/s (1500mbar 3:2:3mbar/s stored)
+1682685870:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1682685870:[BYCMD ,0126]    far 2500mbar 4mbar/s (2500mbar 4mbar/s stored)
+1682685870:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1682685870:[BYCMD ,0128]    dead 60s (60s stored)
+1682685870:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1682685870:[BYCMD ,0130]    stab 10 (10 stored)
+1682685870:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1682685870:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1682685870:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1682685870:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1682685870:[BYCMD ,0379]    cycle nb 7 (7 stored)
+1682685870:[P2TCMD,0150]    p2t37: 15x2000ms, offset 251mbar
+1682685870:[P2TCMD,0151]    p2t37: dp 50mbar, dt 1000000mdegC
+1682685870:[STACMD,0077]    mission empty
+1682685870:[MAIN  ,0065]surfacing
+1682685895:[SURFIN,0036]P   -101mbar
+1682685897:[SURFIN,0020]filling external bladder
+1682685898:[PUMP  ,0019]external bladder full
+1682685900:[PRESS ,0038]P   +180mbar,T+32767mdegC
+1682685959:[MAIN  ,0272]Vbat 15462mV (min 15453mV)
+1682685962:[MAIN  ,0024]internal pressure 78647Pa
+1682685962:[MAIN  ,0043]Pext 174mbar (rng 30mbar)
+1682685962:[MAIN  ,0064]surface
+1682685962:[CMD   ,0276]0100>
+1682685974:[SURF  ,0022]GPS fix...
+1682686118:[GPSFIX,0123]<WARN>GPRMC ms=400 #1
+1682686118:[GPSFIX,0121]<WARN>GPRMC #2
+1682686154:[GPSFIX,0046]<WARN>no fix after 180s
+1682686154:[SURF  ,0028]<WARN>GPS fix ret 0
+1682686334:[GPSFIX,0046]<WARN>no fix after 180s
+1682686334:[SURF  ,0049]<WARN>no MRMD GPS
+1682686494:[GPSFIX,0055]<ERR>960 rounds, 160s
+1682686494:[SURF  ,0028]<WARN>GPS fix ret -1
+1682686504:[SURF  ,0274]last almanac : 1299176
+1682686516:[MRMAID,0026]1101 bytes in 0100/644BC22E.MER
+1682686521:[MAIN  ,0031]<WARN>incomplete surface1
+1682686522:[MAIN  ,0078]*** switching to 0100/644BC23A ***
+1682686522:[PREPROCESS]Create 0100_644BC23A.LOG
+1682686522:[MAIN  ,0007]buoy 467.174-T-0100
+1682686522:[MAIN  ,0055]soft pilotage 467.174.300_V2.66-20230428
+1682686522:[MAIN  ,0010]cycle 1
+1682686522:[SURF  ,0225]surface2
+1682686535:[SURF  ,0022]GPS fix...
+1682686555:[GPSFIX,0121]<WARN>GPRMC #1
+1682686715:[GPSFIX,0046]<WARN>no fix after 180s
+1682686715:[SURF  ,0028]<WARN>GPS fix ret 0
+1683036438:[PREPROCESS]Create 0100_64511916.LOG
+1683036438:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1683036438:[MAIN  ,0007]buoy 467.174-T-0100
+1683036438:[MAIN  ,0055]soft pilotage 467.174.300_V2.66-20230428
+1683036438:[MAIN  ,0011]date 2023-05-02T14:07:18
+1683036444:[MAIN  ,0006]battery 15512mV,   14640uA
+1683036446:[MAIN  ,0024]internal pressure 83310Pa
+1683036448:[PRESS ,0038]P   -101mbar,T+32767mdegC
+1683036448:[MRMAID,0182]thread started
+1683036450:[MRMAID,0186]no wake-up
+1683036450:[MRMAID,0188]acq already stopped
+1683036451:[MRMAID,0052]$BOARD:452116600-A0;
+1683036452:[MRMAID,0052]$SOFT:2.1344;
+1683036452:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1683036453:[SBE   ,0391]Mode changed from SLEEP to INIT
+1683036456:[SBE   ,0391]Mode changed from INIT to SLEEP
+1683036457:[SCIENT,0392]CTD SBE61 INIT: OK
+1683036459:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1683036459:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1683036459:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1683036459:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1683036459:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1683036459:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1683036459:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1683036460:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1683036460:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1683036460:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1683036460:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1683036460:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1683036460:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1683036460:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1683036460:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1683036460:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1683036460:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1683036460:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1683036460:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1683036460:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1683036460:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1683036460:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1683036460:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1683036460:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1683036460:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1683036460:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1683036460:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1683036460:[SBE   ,0430]  <poffset>-1.190000e+00</poffset>
+1683036460:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1683036460:[SBE   ,0432]  <prange>10153</prange>
+1683036460:[TESTMD,0053]Enter in test mode? yes/no
+1683036460:[TESTMD,0252]0100>
+1683036462:[TESTMD,0050]"yes"
+1683036462:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1683036462:[TESTMD,0252]0100>
+1683036471:[TESTMD,0050]"iridium"
+1683036482:[SURF  ,0025]Iridium...
+1683036517:[SURF  ,0009]connected in 35s, signal quality 4
+1683036600:[SURF  ,0218]prompt received, remote cmd end
+1683036600:[SURF  ,0012]30 cmd(s) received
+1683036623:[UPLOAD,0248]Upload data files...
+1683036695:[UPLOAD,0231]"0100/644BBF79.BIN" uploaded at 38bytes/s
+1683036715:[UPLOAD,0231]"0100/644BC22E.MER" uploaded at 100bytes/s
+1683036819:[SURF  ,0014]disconnected after 337s
+1683036824:[TESTMD,0252]0100>
+1683107300:[PREPROCESS]Create 0100_64522DE4.LOG
+1683107300:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1683107300:[MAIN  ,0007]buoy 467.174-T-0100
+1683107300:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1683107300:[MAIN  ,0011]date 2023-05-03T09:48:20
+1683107306:[MAIN  ,0006]battery 15477mV,   15128uA
+1683107308:[MAIN  ,0024]internal pressure 79416Pa
+1683107310:[PRESS ,0038]P   -121mbar,T+32767mdegC
+1683107310:[MRMAID,0182]thread started
+1683107311:[MRMAID,0186]no wake-up
+1683107312:[MRMAID,0188]acq already stopped
+1683107313:[MRMAID,0052]$BOARD:452116600-A0;
+1683107313:[MRMAID,0052]$SOFT:2.1344;
+1683107314:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1683107315:[SBE   ,0391]Mode changed from SLEEP to INIT
+1683107318:[SBE   ,0391]Mode changed from INIT to SLEEP
+1683107319:[SCIENT,0392]CTD SBE61 INIT: OK
+1683107319:[SBE   ,0385]<ERR>Read <xml> format return -2
+1683107319:[TESTMD,0053]Enter in test mode? yes/no
+1683107319:[TESTMD,0252]0100>
+1683107321:[TESTMD,0050]"yes"
+1683107321:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1683107321:[TESTMD,0252]0100>
+1683107326:[TESTMD,0050]"pint"
+1683107329:[TESTMD,0029]79399Pa
+1683107329:[TESTMD,0252]0100>
+1683107333:[TESTMD,0050]"pext"
+1683107338:[PRESS ,0038]P   -101mbar,T+32767mdegC
+1683107338:[TESTMD,0252]0100>
+1683107342:[TESTMD,0050]"gps"
+1683107353:[SURF  ,0022]GPS fix...
+1683107366:[GPSFIX,0123]<WARN>GPRMC ms=10 #1
+1683107411:[SURF  ,0015]10 PPS detected...
+1683107413:[MRMAID,0052]$GPSACK:+53,+4,+2,+9,+48,-41,-381378;
+1683107423:[MRMAID,0052]$GPSOFF:3686328;
+1683107424:[GPSFIX,0179]-4s diff
+1683107428:[SURF  ,0222]2023-05-03T09:50:28
+1683107428:[SURF  ,0082]N43deg06.495mn, E006deg02.276mn
+1683107428:[SURF  ,0084]hdop 1.190, vdop 1.790
+1683107443:[TESTMD,0252]0100>
+1683107455:[TESTMD,0050]"gps"
+1683107467:[SURF  ,0022]GPS fix...
+1683107487:[SURF  ,0015]10 PPS detected...
+1683107488:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1683107498:[MRMAID,0052]$GPSOFF:3686328;
+1683107499:[GPSFIX,0179]-1s diff
+1683107500:[SURF  ,0222]2023-05-03T09:51:40
+1683107500:[SURF  ,0082]N43deg06.493mn, E006deg02.276mn
+1683107500:[SURF  ,0084]hdop 1.030, vdop 1.410
+1683107515:[TESTMD,0252]0100>
+1683107516:[TESTMD,0050]"pint"
+1683107519:[TESTMD,0029]79515Pa
+1683107519:[TESTMD,0252]0100>
+1683107523:[TESTMD,0050]"pext"
+1683107528:[PRESS ,0038]P   -101mbar,T+32767mdegC
+1683107528:[TESTMD,0252]0100>
+1683107540:[TESTMD,0050]"ui"
+1683107543:[MAIN  ,0006]battery 15421mV,   12444uA
+1683107543:[TESTMD,0252]0100>
+1683107559:[TESTMD,0050]"iridium"
+1683107570:[SURF  ,0025]Iridium...
+1683107571:[MODEM ,0347]<ERR>ping error
+1683107571:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1683107652:[SURF  ,0023]<WARN>failed to connect #2, code -1, net 1, qual 4, dial 4
+1683107703:[SURF  ,0009]connected in 133s, signal quality 5
+1683107762:[SURF  ,0071]<WARN>timeout
+1683107762:[SURF  ,0056]<WARN>peer mute
+1683107767:[SURF  ,0014]disconnected after 197s
+1683107772:[TESTMD,0252]0100>
+1683107774:[TESTMD,0050]"iridium"
+1683107786:[SURF  ,0025]Iridium...
+1683107941:[SURF  ,0009]connected in 155s, signal quality 3
+1683108272:[SURF  ,0197]<ERR>Timeout when receive cmds
+1683108272:[SURF  ,0012]47 cmd(s) received
+1683108295:[UPLOAD,0248]Upload data files...
+1683108368:[ZIO   ,0240]"NO CARRIER" received, aborting
+1683108389:[SURF  ,0014]disconnected after 603s
+1683108394:[TESTMD,0252]0100>
+1683108559:[TESTMD,0050]""
+1683108559:[TESTMD,0008]command not supported
+1683108559:[TESTMD,0252]0100>
+1683108567:[TESTMD,0050]"iridium"
+1683108579:[SURF  ,0025]Iridium...
+1683108612:[SURF  ,0009]connected in 33s, signal quality 2
+1683108917:[SURF  ,0058]<WARN>read error -1
+1683108917:[SURF  ,0071]<WARN>timeout
+1683108917:[SURF  ,0056]<WARN>peer mute
+1683108923:[SURF  ,0014]disconnected after 344s
+1683108928:[TESTMD,0252]0100>
+1683114708:[PREPROCESS]Create 0100_64524AD4.LOG
+1683114708:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1683114708:[MAIN  ,0007]buoy 467.174-T-0100
+1683114708:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1683114708:[MAIN  ,0011]date 2023-05-03T11:51:48
+1683114714:[MAIN  ,0006]battery 15495mV,   15128uA
+1683114716:[MAIN  ,0024]internal pressure 80111Pa
+1683114718:[PRESS ,0038]P   -101mbar,T+32767mdegC
+1683114718:[MRMAID,0182]thread started
+1683114719:[MRMAID,0186]no wake-up
+1683114720:[MRMAID,0188]acq already stopped
+1683114721:[MRMAID,0052]$BOARD:452116600-A0;
+1683114721:[MRMAID,0052]$SOFT:2.1344;
+1683114722:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1683114723:[SBE   ,0391]Mode changed from SLEEP to INIT
+1683114726:[SBE   ,0391]Mode changed from INIT to SLEEP
+1683114727:[SCIENT,0392]CTD SBE61 INIT: OK
+1683114729:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1683114729:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1683114729:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1683114729:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1683114729:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1683114729:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1683114729:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1683114729:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1683114729:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1683114729:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1683114729:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1683114729:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1683114729:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1683114730:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1683114730:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1683114730:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1683114730:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1683114730:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1683114730:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1683114730:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1683114730:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1683114730:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1683114730:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1683114730:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1683114730:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1683114730:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1683114730:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1683114730:[SBE   ,0430]  <poffset>-1.190000e+00</poffset>
+1683114730:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1683114730:[SBE   ,0432]  <prange>10153</prange>
+1683114730:[TESTMD,0053]Enter in test mode? yes/no
+1683114730:[TESTMD,0252]0100>
+1683114732:[TESTMD,0050]"yes"
+1683114732:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1683114732:[TESTMD,0252]0100>
+1683114742:[TESTMD,0050]"iridium"
+1683114753:[SURF  ,0025]Iridium...
+1683114754:[MODEM ,0347]<ERR>ping error
+1683114754:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1683114761:[MODEM ,0347]<ERR>ping error
+1683114762:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1683115025:[SURF  ,0023]<WARN>failed to connect #3, code -8, net 1, qual 2, dial 1
+1683115052:[SURF  ,0023]<WARN>failed to connect #4, code -5, net 4, qual -1, dial -1
+1683115060:[MODEM ,0347]<ERR>ping error
+1683115060:[SURF  ,0023]<WARN>failed to connect #5, code -1, net -1, qual -1, dial -1
+1683115065:[SURF  ,0117]<ERR>no connection after 312s
+1683115070:[TESTMD,0252]0100>
+1683115072:[TESTMD,0050]"iridium"
+1683115083:[SURF  ,0025]Iridium...
+1683115103:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1683115161:[SURF  ,0009]connected in 78s, signal quality 1
+1683115380:[SURF  ,0197]<ERR>Timeout when receive cmds
+1683115380:[SURF  ,0012]47 cmd(s) received
+1683115398:[UPLOAD,0248]Upload data files...
+1683115428:[ZIO   ,0240]"NO CARRIER" received, aborting
+1683115449:[SURF  ,0014]disconnected after 366s
+1683115454:[TESTMD,0252]0100>
+1683115459:[TESTMD,0050]"iridium"
+1683115471:[SURF  ,0025]Iridium...
+1683115519:[SURF  ,0009]connected in 48s, signal quality 4
+1683115627:[SURF  ,0071]<WARN>timeout
+1683115628:[SURF  ,0056]<WARN>peer mute
+1683115633:[SURF  ,0014]disconnected after 162s
+1683115638:[TESTMD,0252]0100>
+1683115639:[TESTMD,0050]"iridium"
+1683115651:[SURF  ,0025]Iridium...
+1683115708:[SURF  ,0009]connected in 57s, signal quality 5
+1683115960:[SURF  ,0058]<WARN>read error -1
+1683115960:[SURF  ,0071]<WARN>timeout
+1683115960:[SURF  ,0056]<WARN>peer mute
+1683115965:[SURF  ,0014]disconnected after 314s
+1683115970:[TESTMD,0252]0100>
+1683115974:[TESTMD,0050]"iridium"
+1683115985:[SURF  ,0025]Iridium...
+1683116005:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1683116053:[SURF  ,0009]connected in 68s, signal quality 5
+1683116266:[SURF  ,0218]prompt received, remote cmd end
+1683116266:[SURF  ,0012]82 cmd(s) received
+1683116286:[UPLOAD,0248]Upload data files...
+1683116308:[UPLOAD,0231]"0100/64522DE4.BIN" uploaded at 112bytes/s
+1683116432:[UPLOAD,0231]"0100/6438FFCA.BIN" uploaded at 88bytes/s
+1683116440:[UPLOAD,0231]"0100/644BC23A.BIN" uploaded at 28bytes/s
+1683116456:[UPLOAD,0231]"0100/64511916.BIN" uploaded at 101bytes/s
+1683116472:[MAIN  ,0013]4 file(s) uploaded
+1683116502:[SURF  ,0014]disconnected after 517s
+1683116507:[TESTMD,0252]0100>
+1685599489:[PREPROCESS]Create 0100_64783501.LOG
+1685599489:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685599489:[MAIN  ,0007]buoy 467.174-T-0100
+1685599489:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685599489:[MAIN  ,0011]date 2023-06-01T06:04:49
+1685599495:[MAIN  ,0006]battery 15458mV,   13908uA
+1685599497:[MAIN  ,0024]internal pressure 78981Pa
+1685599499:[PRESS ,0038]P    -91mbar,T+32767mdegC
+1685599499:[MRMAID,0182]thread started
+1685599500:[MRMAID,0186]no wake-up
+1685599501:[MRMAID,0188]acq already stopped
+1685599502:[MRMAID,0052]$BOARD:452116600-A0;
+1685599502:[MRMAID,0052]$SOFT:2.1344;
+1685599503:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685599504:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685599507:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685599508:[SCIENT,0392]CTD SBE61 INIT: OK
+1685599508:[SBE   ,0385]<ERR>Read <xml> format return -2
+1685599508:[TESTMD,0053]Enter in test mode? yes/no
+1685599509:[TESTMD,0252]0100>
+1685599538:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1685599539:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1685599539:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1685599539:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1685599539:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1685599539:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1685599539:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1685599539:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1685599539:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1685599539:[BYCMD ,0128]    dead 300s (300s stored)
+1685599539:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1685599539:[BYCMD ,0130]    stab 10 (10 stored)
+1685599539:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1685599539:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1685599539:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1685599539:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1685599539:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1685599539:[P2TCMD,0150]    p2t37: 15x2000ms, offset 251mbar
+1685599539:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1685599539:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1685599539:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1685599539:[PROFIL,0302]    manual_profil=1
+1685599539:[PROFIL,0303]    manual_profil_rate=1 hours
+1685599539:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1685599539:[PROFIL,0284]    speed_detection=1
+1685599539:[PROFIL,0285]    bin_average_output=1
+1685599540:[PROFIL,0287]    include_transition_bin=0
+1685599540:[PROFIL,0304]    include_nbin=0
+1685599540:[PROFIL,0301]    load_test_sample=0
+1685599540:[PROFIL,0288]    p_cut_off=2dbar
+1685599540:[PROFIL,0289]    top_bin_interval=5dbar
+1685599540:[PROFIL,0290]    top_bin_size=5dbar
+1685599540:[PROFIL,0291]    top_bin_max=1000dbar
+1685599540:[PROFIL,0292]    middle_bin_interval=10dbar
+1685599540:[PROFIL,0293]    middle_bin_size=10dbar
+1685599540:[PROFIL,0294]    middle_bin_max=2000dbar
+1685599540:[PROFIL,0295]    bottom_bin_interval=50dbar
+1685599540:[PROFIL,0296]    bottom_bin_size=50dbar
+1685599540:[PROFIL,0297]    pump_time=10s
+1685599540:[PROFIL,0298]    speed_start=2mbar/s
+1685599540:[PROFIL,0299]    speed_control=10mbar/s
+1685599540:[MAIN  ,0065]surfacing
+1685599565:[SURFIN,0036]P   -101mbar
+1685599567:[SURFIN,0020]filling external bladder
+1685599568:[PUMP  ,0019]external bladder full
+1685599629:[MAIN  ,0272]Vbat 15449mV (min 15435mV)
+1685599632:[MAIN  ,0024]internal pressure 79006Pa
+1685599632:[MAIN  ,0043]Pext 155mbar (rng 50mbar)
+1685599632:[MAIN  ,0064]surface
+1685599632:[CMD   ,0276]0100>
+1685599644:[SURF  ,0022]GPS fix...
+1685599697:[SURF  ,0015]10 PPS detected...
+1685599699:[MRMAID,0052]$GPSACK:+53,+5,+0,+6,+1,+1,-625854;
+1685599709:[MRMAID,0052]$GPSOFF:3686328;
+1685599711:[GPSFIX,0179]-5s diff
+1685599716:[SURF  ,0222]2023-06-01T06:08:36
+1685599716:[SURF  ,0082]N35deg19.259mn, E139deg39.040mn
+1685599716:[SURF  ,0084]hdop 3.060, vdop 7.890
+1685599726:[SURF  ,0274]last almanac : 4212398
+1685599737:[MRMAID,0026]1254 bytes in 0100/647835F3.MER
+1685599743:[MAIN  ,0320]New pressure offset: 155mbar
+1685599744:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1685599966:[PREPROCESS]Create 0100_647836DE.LOG
+1685599966:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685599966:[MAIN  ,0007]buoy 467.174-T-0100
+1685599966:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685599966:[MAIN  ,0011]date 2023-06-01T06:12:46
+1685599972:[MAIN  ,0006]battery 15407mV,    9028uA
+1685599974:[MAIN  ,0024]internal pressure 79022Pa
+1685599976:[PRESS ,0038]P    -91mbar,T+32767mdegC
+1685599976:[MRMAID,0182]thread started
+1685599977:[MRMAID,0186]no wake-up
+1685599978:[MRMAID,0188]acq already stopped
+1685599979:[MRMAID,0052]$BOARD:452116600-A0;
+1685599979:[MRMAID,0052]$SOFT:2.1344;
+1685599980:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685599981:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685599984:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685599985:[SCIENT,0392]CTD SBE61 INIT: OK
+1685599987:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1685599987:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1685599987:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1685599987:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1685599987:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1685599987:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1685599987:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1685599987:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1685599987:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1685599987:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1685599987:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1685599987:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1685599988:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1685599988:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1685599988:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1685599988:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1685599988:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1685599988:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1685599988:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1685599988:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1685599988:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1685599988:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1685599988:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1685599988:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1685599988:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1685599988:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1685599988:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1685599988:[SBE   ,0430]  <poffset>-1.190000e+00</poffset>
+1685599988:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1685599988:[SBE   ,0432]  <prange>10153</prange>
+1685599988:[TESTMD,0053]Enter in test mode? yes/no
+1685599988:[TESTMD,0252]0100>
+1685600018:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1685600018:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1685600018:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1685600018:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1685600018:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1685600018:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1685600018:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1685600019:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1685600019:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1685600019:[BYCMD ,0128]    dead 300s (300s stored)
+1685600019:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1685600019:[BYCMD ,0130]    stab 10 (10 stored)
+1685600019:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1685600019:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1685600019:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1685600019:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1685600019:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1685600019:[P2TCMD,0150]    p2t37: 15x2000ms, offset 251mbar
+1685600019:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1685600019:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1685600019:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1685600019:[PROFIL,0302]    manual_profil=1
+1685600019:[PROFIL,0303]    manual_profil_rate=1 hours
+1685600019:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1685600019:[PROFIL,0284]    speed_detection=1
+1685600019:[PROFIL,0285]    bin_average_output=1
+1685600019:[PROFIL,0287]    include_transition_bin=0
+1685600019:[PROFIL,0304]    include_nbin=0
+1685600019:[PROFIL,0301]    load_test_sample=0
+1685600019:[PROFIL,0288]    p_cut_off=2dbar
+1685600019:[PROFIL,0289]    top_bin_interval=5dbar
+1685600019:[PROFIL,0290]    top_bin_size=5dbar
+1685600019:[PROFIL,0291]    top_bin_max=1000dbar
+1685600020:[PROFIL,0292]    middle_bin_interval=10dbar
+1685600020:[PROFIL,0293]    middle_bin_size=10dbar
+1685600020:[PROFIL,0294]    middle_bin_max=2000dbar
+1685600020:[PROFIL,0295]    bottom_bin_interval=50dbar
+1685600020:[PROFIL,0296]    bottom_bin_size=50dbar
+1685600020:[PROFIL,0297]    pump_time=10s
+1685600020:[PROFIL,0298]    speed_start=2mbar/s
+1685600020:[PROFIL,0299]    speed_control=10mbar/s
+1685600020:[MAIN  ,0065]surfacing
+1685600045:[SURFIN,0036]P    -91mbar
+1685600046:[SURFIN,0020]filling external bladder
+1685600048:[PUMP  ,0019]external bladder full
+1685600110:[MAIN  ,0272]Vbat 15372mV (min 15368mV)
+1685600112:[MAIN  ,0024]internal pressure 79006Pa
+1685600112:[MAIN  ,0043]Pext 157mbar (rng 40mbar)
+1685600112:[MAIN  ,0064]surface
+1685600113:[CMD   ,0276]0100>
+1685600125:[SURF  ,0022]GPS fix...
+1685600161:[CMD   ,0276]0100>
+1685600179:[SURF  ,0015]10 PPS detected...
+1685600181:[MRMAID,0052]$GPSACK:+53,+5,+0,+6,+11,-6,-62530;
+1685600191:[MRMAID,0052]$GPSOFF:3686328;
+1685600192:[GPSFIX,0179]-1s diff
+1685600193:[SURF  ,0222]2023-06-01T06:16:33
+1685600193:[SURF  ,0082]N35deg19.258mn, E139deg39.043mn
+1685600193:[SURF  ,0084]hdop 1.690, vdop 2.490
+1685600203:[SURF  ,0274]last almanac : 4212875
+1685600214:[MRMAID,0026]1255 bytes in 0100/647837D0.MER
+1685600220:[MAIN  ,0320]New pressure offset: 157mbar
+1685600221:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1685600237:[CMD   ,0276]0100>
+1685600244:[CMD   ,0276]0100>
+1685600282:[SBE   ,0339]new offset = -0.98 received after 63s
+1685600282:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1685600283:[MAIN  ,0078]*** switching to 0100/6478381B ***
+1685600283:[PREPROCESS]Create 0100_6478381B.LOG
+1685600283:[MAIN  ,0007]buoy 467.174-T-0100
+1685600283:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685600283:[MAIN  ,0010]cycle 1
+1685600283:[SURF  ,0225]surface2
+1685600439:[PREPROCESS]Create 0100_647838B7.LOG
+1685600439:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685600439:[MAIN  ,0007]buoy 467.174-T-0100
+1685600439:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685600439:[MAIN  ,0011]date 2023-06-01T06:20:39
+1685600445:[MAIN  ,0006]battery 15357mV,    9150uA
+1685600447:[MAIN  ,0024]internal pressure 79062Pa
+1685600449:[PRESS ,0038]P     +3mbar,T+32767mdegC
+1685600449:[MRMAID,0182]thread started
+1685600450:[MRMAID,0186]no wake-up
+1685600451:[MRMAID,0188]acq already stopped
+1685600452:[MRMAID,0052]$BOARD:452116600-A0;
+1685600452:[MRMAID,0052]$SOFT:2.1344;
+1685600453:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685600454:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685600457:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685600458:[SCIENT,0392]CTD SBE61 INIT: OK
+1685600460:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1685600460:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1685600460:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1685600460:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1685600460:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1685600460:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1685600460:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1685600460:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1685600460:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1685600460:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1685600460:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1685600460:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1685600461:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1685600461:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1685600461:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1685600461:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1685600461:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1685600461:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1685600461:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1685600461:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1685600461:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1685600461:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1685600461:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1685600461:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1685600461:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1685600461:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1685600461:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1685600461:[SBE   ,0430]  <poffset>-9.800000e-01</poffset>
+1685600461:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1685600461:[SBE   ,0432]  <prange>10153</prange>
+1685600461:[TESTMD,0053]Enter in test mode? yes/no
+1685600461:[TESTMD,0252]0100>
+1685600491:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1685600491:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1685600491:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1685600491:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1685600491:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1685600491:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1685600492:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1685600492:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1685600492:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1685600492:[BYCMD ,0128]    dead 300s (300s stored)
+1685600492:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1685600492:[BYCMD ,0130]    stab 10 (10 stored)
+1685600492:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1685600492:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1685600492:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1685600492:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1685600492:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1685600492:[P2TCMD,0150]    p2t37: 15x2000ms, offset 157mbar
+1685600492:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1685600492:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1685600492:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1685600492:[PROFIL,0302]    manual_profil=1
+1685600492:[PROFIL,0303]    manual_profil_rate=1 hours
+1685600492:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1685600492:[PROFIL,0284]    speed_detection=1
+1685600492:[PROFIL,0285]    bin_average_output=1
+1685600492:[PROFIL,0287]    include_transition_bin=0
+1685600492:[PROFIL,0304]    include_nbin=0
+1685600492:[PROFIL,0301]    load_test_sample=0
+1685600492:[PROFIL,0288]    p_cut_off=2dbar
+1685600492:[PROFIL,0289]    top_bin_interval=5dbar
+1685600492:[PROFIL,0290]    top_bin_size=5dbar
+1685600493:[PROFIL,0291]    top_bin_max=1000dbar
+1685600493:[PROFIL,0292]    middle_bin_interval=10dbar
+1685600493:[PROFIL,0293]    middle_bin_size=10dbar
+1685600493:[PROFIL,0294]    middle_bin_max=2000dbar
+1685600493:[PROFIL,0295]    bottom_bin_interval=50dbar
+1685600493:[PROFIL,0296]    bottom_bin_size=50dbar
+1685600493:[PROFIL,0297]    pump_time=10s
+1685600493:[PROFIL,0298]    speed_start=2mbar/s
+1685600493:[PROFIL,0299]    speed_control=10mbar/s
+1685600493:[MAIN  ,0065]surfacing
+1685600518:[SURFIN,0036]P     +3mbar
+1685601401:[PREPROCESS]Create 0100_64783C79.LOG
+1685601401:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685601401:[MAIN  ,0007]buoy 467.174-T-0100
+1685601401:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685601401:[MAIN  ,0011]date 2023-06-01T06:36:41
+1685601407:[MAIN  ,0006]battery 15403mV,    8540uA
+1685601409:[MAIN  ,0024]internal pressure 79175Pa
+1685601411:[PRESS ,0038]P    +23mbar,T+32767mdegC
+1685601411:[MRMAID,0182]thread started
+1685601412:[MRMAID,0186]no wake-up
+1685601413:[MRMAID,0188]acq already stopped
+1685601414:[MRMAID,0052]$BOARD:452116600-A0;
+1685601414:[MRMAID,0052]$SOFT:2.1344;
+1685601415:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685601416:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685601419:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685601420:[SCIENT,0392]CTD SBE61 INIT: OK
+1685601422:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1685601422:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1685601422:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1685601422:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1685601422:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1685601422:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1685601422:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1685601422:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1685601422:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1685601422:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1685601422:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1685601423:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1685601423:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1685601423:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1685601423:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1685601423:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1685601423:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1685601423:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1685601423:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1685601423:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1685601423:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1685601423:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1685601423:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1685601423:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1685601423:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1685601423:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1685601423:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1685601423:[SBE   ,0430]  <poffset>-9.800000e-01</poffset>
+1685601423:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1685601423:[SBE   ,0432]  <prange>10153</prange>
+1685601423:[TESTMD,0053]Enter in test mode? yes/no
+1685601423:[TESTMD,0252]0100>
+1685601453:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1685601453:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1685601453:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1685601453:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1685601453:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1685601453:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1685601454:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1685601454:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1685601454:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1685601454:[BYCMD ,0128]    dead 300s (300s stored)
+1685601454:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1685601454:[BYCMD ,0130]    stab 10 (10 stored)
+1685601454:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1685601454:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1685601454:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1685601454:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1685601454:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1685601454:[P2TCMD,0150]    p2t37: 15x2000ms, offset 157mbar
+1685601454:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1685601454:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1685601454:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1685601454:[PROFIL,0302]    manual_profil=1
+1685601454:[PROFIL,0303]    manual_profil_rate=1 hours
+1685601454:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1685601454:[PROFIL,0284]    speed_detection=1
+1685601454:[PROFIL,0285]    bin_average_output=1
+1685601454:[PROFIL,0287]    include_transition_bin=0
+1685601454:[PROFIL,0304]    include_nbin=0
+1685601454:[PROFIL,0301]    load_test_sample=0
+1685601454:[PROFIL,0288]    p_cut_off=2dbar
+1685601454:[PROFIL,0289]    top_bin_interval=5dbar
+1685601455:[PROFIL,0290]    top_bin_size=5dbar
+1685601455:[PROFIL,0291]    top_bin_max=1000dbar
+1685601455:[PROFIL,0292]    middle_bin_interval=10dbar
+1685601455:[PROFIL,0293]    middle_bin_size=10dbar
+1685601455:[PROFIL,0294]    middle_bin_max=2000dbar
+1685601455:[PROFIL,0295]    bottom_bin_interval=50dbar
+1685601455:[PROFIL,0296]    bottom_bin_size=50dbar
+1685601455:[PROFIL,0297]    pump_time=10s
+1685601455:[PROFIL,0298]    speed_start=2mbar/s
+1685601455:[PROFIL,0299]    speed_control=10mbar/s
+1685601455:[MAIN  ,0065]surfacing
+1685601480:[SURFIN,0036]P     -7mbar
+1685601481:[SURFIN,0020]filling external bladder
+1685601483:[PUMP  ,0019]external bladder full
+1685601545:[MAIN  ,0272]Vbat 15366mV (min 15365mV)
+1685601547:[MAIN  ,0024]internal pressure 79190Pa
+1685601547:[MAIN  ,0043]Pext 159mbar (rng 50mbar)
+1685601548:[MAIN  ,0064]surface
+1685601548:[CMD   ,0276]0100>
+1685601554:[CMD   ,0276]0100>
+1685601554:[CMD   ,0276]0100>
+1685601555:[CMD   ,0276]0100>
+1685601556:[CMD   ,0276]0100>
+1685601560:[SURF  ,0022]GPS fix...
+1685601565:[CMD   ,0276]0100>
+1685601608:[CMD   ,0276]0100>
+1685601618:[CMD   ,0276]0100>
+1685601619:[SURF  ,0015]10 PPS detected...
+1685601621:[MRMAID,0052]$GPSACK:+53,+5,+0,+6,+33,-11,-643859;
+1685601630:[CMD   ,0276]0100>
+1685601631:[MRMAID,0052]$GPSOFF:3686328;
+1685601633:[GPSFIX,0179]-1s diff
+1685601634:[SURF  ,0222]2023-06-01T06:40:34
+1685601634:[SURF  ,0082]N35deg19.260mn, E139deg39.042mn
+1685601634:[SURF  ,0084]hdop 3.450, vdop 5.720
+1685601644:[SURF  ,0274]last almanac : 4214316
+1685601655:[MRMAID,0026]1257 bytes in 0100/64783D71.MER
+1685601661:[MAIN  ,0320]New pressure offset: 159mbar
+1685601662:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1685601672:[CMD   ,0276]0100>
+1685601723:[SBE   ,0339]new offset = -0.91 received after 63s
+1685601723:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1685601724:[MAIN  ,0078]*** switching to 0100/64783DBC ***
+1685601724:[PREPROCESS]Create 0100_64783DBC.LOG
+1685601724:[MAIN  ,0007]buoy 467.174-T-0100
+1685601724:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685601724:[MAIN  ,0010]cycle 1
+1685601724:[SURF  ,0225]surface2
+1685601737:[SURF  ,0022]GPS fix...
+1685601757:[SURF  ,0015]10 PPS detected...
+1685601758:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1685601768:[MRMAID,0052]$GPSOFF:3686328;
+1685601771:[GPSFIX,0179]+0s diff
+1685601771:[SURF  ,0222]2023-06-01T06:42:51
+1685601771:[SURF  ,0082]N35deg19.261mn, E139deg39.045mn
+1685601771:[SURF  ,0084]hdop 2.860, vdop 5.160
+1685601781:[SURF  ,0025]Iridium...
+1685601783:[MODEM ,0347]<ERR>ping error
+1685601783:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1685601811:[SURF  ,0023]<WARN>failed to connect #2, code -5, net 4, qual -1, dial -1
+1685601827:[CMD   ,0276]0100>
+1685601831:[CMD   ,0276]0100>
+1685601838:[SURF  ,0023]<WARN>failed to connect #3, code -5, net 4, qual -1, dial -1
+1685601858:[MONITR,0007]<WARN>battery  6857mV, -2147483648uA
+1685602171:[PREPROCESS]Create 0100_64783F7B.LOG
+1685602171:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685602171:[MAIN  ,0007]buoy 467.174-T-0100
+1685602171:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685602171:[MAIN  ,0011]date 2023-06-01T06:49:31
+1685602177:[MAIN  ,0006]battery 15327mV,    8906uA
+1685602179:[MAIN  ,0024]internal pressure 79243Pa
+1685602181:[PRESS ,0038]P     +1mbar,T+32767mdegC
+1685602181:[MRMAID,0182]thread started
+1685602182:[MRMAID,0186]no wake-up
+1685602183:[MRMAID,0188]acq already stopped
+1685602184:[MRMAID,0052]$BOARD:452116600-A0;
+1685602184:[MRMAID,0052]$SOFT:2.1344;
+1685602185:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685602186:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685602188:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685602189:[SCIENT,0392]CTD SBE61 INIT: OK
+1685602191:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1685602191:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1685602191:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1685602191:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1685602191:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1685602191:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1685602191:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1685602191:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1685602191:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1685602191:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1685602191:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1685602191:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1685602192:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1685602192:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1685602192:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1685602192:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1685602192:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1685602192:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1685602192:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1685602192:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1685602192:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1685602192:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1685602192:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1685602192:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1685602192:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1685602192:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1685602192:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1685602192:[SBE   ,0430]  <poffset>-9.100000e-01</poffset>
+1685602192:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1685602192:[SBE   ,0432]  <prange>10153</prange>
+1685602192:[TESTMD,0053]Enter in test mode? yes/no
+1685602192:[TESTMD,0252]0100>
+1685602204:[TESTMD,0050]"yes"
+1685602204:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1685602204:[TESTMD,0252]0100>
+1685602250:[TESTMD,0050]"pext"
+1685602255:[PRESS ,0038]P    -29mbar,T+32767mdegC
+1685602255:[TESTMD,0252]0100>
+1685602301:[TESTMD,0050]"pint"
+1685602304:[TESTMD,0029]79205Pa
+1685602304:[TESTMD,0252]0100>
+1685602319:[TESTMD,0050]"ui"
+1685602321:[MAIN  ,0006]battery 15318mV,   12322uA
+1685602321:[TESTMD,0252]0100>
+1685602356:[TESTMD,0050]"act"
+1685602356:[SURFIN,0020]filling external bladder
+1685602357:[PUMP  ,0019]external bladder full
+1685602362:[VALVE ,0034]valve opening 60000ms
+1685602427:[SURFIN,0020]filling external bladder
+1685602429:[PUMP  ,0016]pump during 30000ms
+1685602475:[PUMP  ,0016]pump during 30000ms
+1685602521:[PUMP  ,0016]pump during 30000ms
+1685602528:[PUMP  ,0019]external bladder full
+1685602528:[TESTMD,0401]pump deep run 66s
+1685602533:[BYPASS,0035]bypass opening 30000ms
+1685602578:[SURFIN,0020]filling external bladder
+1685602579:[PUMP  ,0016]pump during 30000ms
+1685602591:[PUMP  ,0019]external bladder full
+1685602591:[TESTMD,0402]pump surface run 12s
+1685602596:[TESTMD,0066]test done
+1685602596:[TESTMD,0252]0100>
+1685602613:[TESTMD,0050]"gps"
+1685602624:[SURF  ,0022]GPS fix...
+1685602669:[SURF  ,0015]10 PPS detected...
+1685602671:[MRMAID,0052]$GPSACK:+53,+5,+0,+6,+45,+35,-839294;
+1685602681:[MRMAID,0052]$GPSOFF:3686327;
+1685602683:[GPSFIX,0179]-1s diff
+1685602684:[SURF  ,0222]2023-06-01T06:58:04
+1685602684:[SURF  ,0082]N35deg19.254mn, E139deg39.058mn
+1685602684:[SURF  ,0084]hdop 1.320, vdop 1.450
+1685602699:[TESTMD,0252]0100>
+1685602740:[TESTMD,0050]"date"
+1685602740:[MAIN  ,0011]date 2023-06-01T06:59:00
+1685602740:[TESTMD,0252]0100>
+1685602805:[TESTMD,0050]"iridium"
+1685602816:[SURF  ,0025]Iridium...
+1685602836:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1685602844:[MODEM ,0347]<ERR>ping error
+1685602844:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1685602871:[SURF  ,0023]<WARN>failed to connect #3, code -5, net 4, qual -1, dial -1
+1685602982:[SURF  ,0009]connected in 166s, signal quality 3
+1685603044:[SURF  ,0071]<WARN>timeout
+1685603044:[SURF  ,0056]<WARN>peer mute
+1685603049:[SURF  ,0014]disconnected after 233s
+1685603054:[TESTMD,0252]0100>
+1685603099:[TESTMD,0050]"mstart"
+1685603101:[MRMAID,0002]acq started
+1685603101:[TESTMD,0252]0100>
+1685603179:[TESTMD,0050]"mstop"
+1685603179:[MRMAID,0003]acq stopped
+1685603180:[TESTMD,0252]0100>
+1685603192:[TESTMD,0050]"mdata"
+1685603198:[MRMAID,0026]1253 bytes in 0100/64784378.MER
+1685603204:[TESTMD,0252]0100>
+1685603249:[TESTMD,0050]"mchecksd"
+1685603260:[SURF  ,0022]GPS fix...
+1685603280:[SURF  ,0015]10 PPS detected...
+1685603281:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1685603291:[MRMAID,0052]$GPSOFF:3686327;
+1685603294:[GPSFIX,0179]+0s diff
+1685603294:[SURF  ,0222]2023-06-01T07:08:14
+1685603294:[SURF  ,0082]N35deg19.260mn, E139deg39.043mn
+1685603294:[SURF  ,0084]hdop 0.760, vdop 1.100
+1685603310:[MRMAID,0002]acq started
+1685603761:[MRMAID,0027]0dbar, 33degC
+1685603900:[MERCMD,0006]<WARN>ascent request while not in mission
+1685603900:[MRMAID,0003]acq stopped
+1685603969:[MRMAID,0188]acq already stopped
+1685603969:[MRMAID,0052]$REQUEST:2023-06-01T07_09_30,600,-1;
+1685603971:[MRMAID,0002]acq started
+1685604032:[MRMAID,0003]acq stopped
+1685604302:[MRMAID,0026]105328 bytes in 0100/647846C1.MER
+1685604308:[TESTMD,0252]0100>
+1685604410:[TESTMD,0050]"q"
+1685604410:[MAIN  ,0018]end of test mode
+1685604410:[MAIN  ,0048]reboot MERMAID board
+1685604412:[MAIN  ,0047]reboot float
+1685604412:[MONITR,0198]rebooting with code 0x0000, data "src/monitor.c@520             "
+1685604656:[PREPROCESS]Create 0100_64784930.LOG
+1685604656:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1685604656:[MAIN  ,0007]buoy 467.174-T-0100
+1685604656:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1685604656:[MAIN  ,0011]date 2023-06-01T07:30:56
+1685604662:[MAIN  ,0006]battery 15323mV,   12932uA
+1685604664:[MAIN  ,0024]internal pressure 79774Pa
+1685604666:[PRESS ,0038]P     -9mbar,T+32767mdegC
+1685604666:[MRMAID,0182]thread started
+1685604667:[MRMAID,0186]no wake-up
+1685604668:[MRMAID,0188]acq already stopped
+1685604669:[MRMAID,0052]$BOARD:452116600-A0;
+1685604669:[MRMAID,0052]$SOFT:2.1344;
+1685604670:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1685604671:[SBE   ,0391]Mode changed from SLEEP to INIT
+1685604673:[SBE   ,0391]Mode changed from INIT to SLEEP
+1685604674:[SCIENT,0392]CTD SBE61 INIT: OK
+1685604674:[SBE   ,0385]<ERR>Read <xml> format return -2
+1685604674:[TESTMD,0053]Enter in test mode? yes/no
+1685604674:[TESTMD,0252]0100>
+1686201654:[PREPROCESS]Create 0100_64816536.LOG
+1686201654:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1686201654:[MAIN  ,0007]buoy 467.174-T-0100
+1686201654:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1686201654:[MAIN  ,0011]date 2023-06-08T05:20:54
+1686201660:[MAIN  ,0006]battery 15478mV,    9272uA
+1686201662:[MAIN  ,0024]internal pressure 79856Pa
+1686201664:[PRESS ,0038]P    -29mbar,T+32767mdegC
+1686201664:[MRMAID,0182]thread started
+1686201665:[MRMAID,0186]no wake-up
+1686201666:[MRMAID,0188]acq already stopped
+1686201667:[MRMAID,0052]$BOARD:452116600-A0;
+1686201667:[MRMAID,0052]$SOFT:2.1344;
+1686201668:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1686201669:[SBE   ,0391]Mode changed from SLEEP to INIT
+1686201672:[SBE   ,0391]Mode changed from INIT to SLEEP
+1686201673:[SCIENT,0392]CTD SBE61 INIT: OK
+1686201675:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1686201675:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1686201675:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1686201675:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1686201675:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1686201675:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1686201675:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1686201675:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1686201675:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1686201676:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1686201676:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1686201676:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1686201676:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1686201676:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1686201676:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1686201676:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1686201676:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1686201676:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1686201676:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1686201676:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1686201676:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1686201676:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1686201676:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1686201676:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1686201676:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1686201676:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1686201676:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1686201676:[SBE   ,0430]  <poffset>-9.100000e-01</poffset>
+1686201676:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1686201676:[SBE   ,0432]  <prange>10153</prange>
+1686201677:[TESTMD,0053]Enter in test mode? yes/no
+1686201677:[TESTMD,0252]0100>
+1686201707:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1686201707:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1686201707:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1686201707:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1686201707:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1686201707:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1686201707:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1686201707:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1686201707:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1686201707:[BYCMD ,0128]    dead 300s (300s stored)
+1686201707:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1686201707:[BYCMD ,0130]    stab 10 (10 stored)
+1686201707:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1686201707:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1686201707:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1686201707:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1686201707:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1686201707:[P2TCMD,0150]    p2t37: 15x2000ms, offset 159mbar
+1686201707:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1686201707:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1686201708:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1686201708:[PROFIL,0302]    manual_profil=1
+1686201708:[PROFIL,0303]    manual_profil_rate=1 hours
+1686201708:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1686201708:[PROFIL,0284]    speed_detection=1
+1686201708:[PROFIL,0285]    bin_average_output=1
+1686201708:[PROFIL,0287]    include_transition_bin=0
+1686201708:[PROFIL,0304]    include_nbin=0
+1686201708:[PROFIL,0301]    load_test_sample=0
+1686201708:[PROFIL,0288]    p_cut_off=2dbar
+1686201708:[PROFIL,0289]    top_bin_interval=5dbar
+1686201708:[PROFIL,0290]    top_bin_size=5dbar
+1686201708:[PROFIL,0291]    top_bin_max=1000dbar
+1686201708:[PROFIL,0292]    middle_bin_interval=10dbar
+1686201708:[PROFIL,0293]    middle_bin_size=10dbar
+1686201708:[PROFIL,0294]    middle_bin_max=2000dbar
+1686201708:[PROFIL,0295]    bottom_bin_interval=50dbar
+1686201708:[PROFIL,0296]    bottom_bin_size=50dbar
+1686201708:[PROFIL,0297]    pump_time=10s
+1686201708:[PROFIL,0298]    speed_start=2mbar/s
+1686201708:[PROFIL,0299]    speed_control=10mbar/s
+1686201709:[MAIN  ,0065]surfacing
+1686201733:[SURFIN,0036]P     -9mbar
+1686201735:[SURFIN,0020]filling external bladder
+1686201736:[PUMP  ,0019]external bladder full
+1686201798:[MAIN  ,0272]Vbat 15456mV (min 15441mV)
+1686201800:[MAIN  ,0024]internal pressure 79870Pa
+1686201800:[MAIN  ,0043]Pext 127mbar (rng 30mbar)
+1686201800:[MAIN  ,0064]surface
+1686201800:[CMD   ,0276]0100>
+1686202506:[PREPROCESS]Create 0100_6481688A.LOG
+1686202506:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1686202506:[MAIN  ,0007]buoy 467.174-T-0100
+1686202506:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1686202506:[MAIN  ,0011]date 2023-06-08T05:35:06
+1686202512:[MAIN  ,0006]battery 15453mV,    9028uA
+1686202514:[MAIN  ,0024]internal pressure 79907Pa
+1686202516:[PRESS ,0038]P    -29mbar,T+32767mdegC
+1686202516:[MRMAID,0182]thread started
+1686202517:[MRMAID,0186]no wake-up
+1686202518:[MRMAID,0188]acq already stopped
+1686202519:[MRMAID,0052]$BOARD:452116600-A0;
+1686202519:[MRMAID,0052]$SOFT:2.1344;
+1686202520:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1686202521:[SBE   ,0391]Mode changed from SLEEP to INIT
+1686202523:[SBE   ,0391]Mode changed from INIT to SLEEP
+1686202524:[SCIENT,0392]CTD SBE61 INIT: OK
+1686202526:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1686202526:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1686202526:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1686202526:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1686202526:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1686202526:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1686202526:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1686202526:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1686202527:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1686202527:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1686202527:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1686202527:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1686202527:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1686202527:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1686202527:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1686202527:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1686202527:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1686202527:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1686202527:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1686202527:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1686202527:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1686202527:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1686202527:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1686202527:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1686202527:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1686202527:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1686202527:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1686202527:[SBE   ,0430]  <poffset>-9.100000e-01</poffset>
+1686202527:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1686202528:[SBE   ,0432]  <prange>10153</prange>
+1686202528:[TESTMD,0053]Enter in test mode? yes/no
+1686202528:[TESTMD,0252]0100>
+1686202536:[TESTMD,0050]"no"
+1686202536:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1686202536:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1686202536:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1686202536:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1686202537:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1686202537:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1686202537:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1686202537:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1686202537:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1686202537:[BYCMD ,0128]    dead 300s (300s stored)
+1686202537:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1686202537:[BYCMD ,0130]    stab 10 (10 stored)
+1686202537:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1686202537:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1686202537:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1686202537:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1686202537:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1686202537:[P2TCMD,0150]    p2t37: 15x2000ms, offset 159mbar
+1686202537:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1686202537:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1686202537:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1686202537:[PROFIL,0302]    manual_profil=1
+1686202537:[PROFIL,0303]    manual_profil_rate=1 hours
+1686202537:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1686202537:[PROFIL,0284]    speed_detection=1
+1686202538:[PROFIL,0285]    bin_average_output=1
+1686202538:[PROFIL,0287]    include_transition_bin=0
+1686202538:[PROFIL,0304]    include_nbin=0
+1686202538:[PROFIL,0301]    load_test_sample=0
+1686202538:[PROFIL,0288]    p_cut_off=2dbar
+1686202538:[PROFIL,0289]    top_bin_interval=5dbar
+1686202538:[PROFIL,0290]    top_bin_size=5dbar
+1686202538:[PROFIL,0291]    top_bin_max=1000dbar
+1686202538:[PROFIL,0292]    middle_bin_interval=10dbar
+1686202538:[PROFIL,0293]    middle_bin_size=10dbar
+1686202538:[PROFIL,0294]    middle_bin_max=2000dbar
+1686202538:[PROFIL,0295]    bottom_bin_interval=50dbar
+1686202538:[PROFIL,0296]    bottom_bin_size=50dbar
+1686202538:[PROFIL,0297]    pump_time=10s
+1686202538:[PROFIL,0298]    speed_start=2mbar/s
+1686202538:[PROFIL,0299]    speed_control=10mbar/s
+1686202538:[MAIN  ,0065]surfacing
+1686202563:[SURFIN,0036]P    -39mbar
+1686202565:[SURFIN,0020]filling external bladder
+1686202566:[PUMP  ,0019]external bladder full
+1686202628:[MAIN  ,0272]Vbat 15418mV (min 15416mV)
+1686202630:[MAIN  ,0024]internal pressure 79934Pa
+1686202630:[MAIN  ,0043]Pext 129mbar (rng 30mbar)
+1686202630:[MAIN  ,0064]surface
+1686202630:[CMD   ,0276]0100>
+1686202642:[SURF  ,0022]GPS fix...
+1686202678:[GPSFIX,0123]<WARN>GPRMC ms=10 #1
+1686202698:[SURF  ,0015]10 PPS detected...
+1686202700:[MRMAID,0052]$GPSACK:+53,+5,+7,+5,+31,+15,-559600;
+1686202710:[MRMAID,0052]$GPSOFF:3686327;
+1686202712:[GPSFIX,0179]-2s diff
+1686202714:[SURF  ,0222]2023-06-08T05:38:34
+1686202714:[SURF  ,0082]N35deg19.259mn, E139deg39.044mn
+1686202714:[SURF  ,0084]hdop 1.300, vdop 2.330
+1686202724:[SURF  ,0274]last almanac : 4815396
+1686202735:[MRMAID,0026]1262 bytes in 0100/64816969.MER
+1686202741:[MAIN  ,0320]New pressure offset: 129mbar
+1686202741:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1686202803:[SBE   ,0339]new offset = -0.87 received after 63s
+1686202803:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1686202804:[MAIN  ,0078]*** switching to 0100/648169B4 ***
+1686202804:[PREPROCESS]Create 0100_648169B4.LOG
+1686202804:[MAIN  ,0007]buoy 467.174-T-0100
+1686202804:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1686202804:[MAIN  ,0010]cycle 1
+1686202804:[SURF  ,0225]surface2
+1686202817:[SURF  ,0022]GPS fix...
+1686202837:[SURF  ,0015]10 PPS detected...
+1686202838:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1686202848:[MRMAID,0052]$GPSOFF:3686327;
+1686202851:[GPSFIX,0179]+0s diff
+1686202851:[SURF  ,0222]2023-06-08T05:40:51
+1686202851:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn
+1686202851:[SURF  ,0084]hdop 0.820, vdop 1.180
+1686202861:[SURF  ,0025]Iridium...
+1686202892:[SURF  ,0009]connected in 31s, signal quality 5
+1686203059:[SURF  ,0071]<WARN>timeout
+1686203059:[SURF  ,0056]<WARN>peer mute
+1686203065:[SURF  ,0014]disconnected after 204s
+1686203070:[SURFIN,0020]filling external bladder
+1686203071:[PUMP  ,0019]external bladder full
+1686203071:[SURF  ,0069]transfer interrupted , retry
+1686203082:[SURF  ,0022]GPS fix...
+1686203102:[SURF  ,0015]10 PPS detected...
+1686203103:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1686203113:[MRMAID,0052]$GPSOFF:3686327;
+1686203116:[GPSFIX,0179]+0s diff
+1686203116:[SURF  ,0222]2023-06-08T05:45:16
+1686203116:[SURF  ,0082]N35deg19.260mn, E139deg39.046mn
+1686203116:[SURF  ,0084]hdop 0.730, vdop 1.020
+1686203126:[SURF  ,0025]Iridium...
+1686203127:[MODEM ,0347]<ERR>ping error
+1686203127:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1686203174:[SURF  ,0009]connected in 48s, signal quality 5
+1686203235:[SURF  ,0058]<WARN>read error -1
+1686203275:[SURF  ,0071]<WARN>timeout
+1686203275:[SURF  ,0056]<WARN>peer mute
+1686203280:[SURF  ,0014]disconnected after 154s
+1686203285:[SURFIN,0020]filling external bladder
+1686203286:[PUMP  ,0019]external bladder full
+1686203286:[SURF  ,0069]transfer interrupted , retry
+1686203298:[SURF  ,0022]GPS fix...
+1686203318:[SURF  ,0015]10 PPS detected...
+1686203319:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1686203329:[MRMAID,0052]$GPSOFF:3686327;
+1686203331:[GPSFIX,0179]-1s diff
+1686203332:[SURF  ,0222]2023-06-08T05:48:52
+1686203332:[SURF  ,0082]N35deg19.260mn, E139deg39.046mn
+1686203332:[SURF  ,0084]hdop 0.650, vdop 0.960
+1686203342:[SURF  ,0025]Iridium...
+1686203539:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1686203589:[SURF  ,0009]connected in 247s, signal quality 5
+1686203701:[SURF  ,0218]prompt received, remote cmd end
+1686203701:[SURF  ,0012]21 cmd(s) received
+1686203723:[UPLOAD,0248]Upload data files...
+1686203778:[UPLOAD,0231]"0100/64783501.BIN" uploaded at 47bytes/s
+1686203834:[UPLOAD,0231]"0100/64524AD4.BIN" uploaded at 47bytes/s
+1686203844:[UPLOAD,0231]"0100/647835F3.MER" uploaded at 139bytes/s
+1686203889:[UPLOAD,0231]"0100/647836DE.BIN" uploaded at 62bytes/s
+1686203899:[UPLOAD,0231]"0100/647837D0.MER" uploaded at 139bytes/s
+1686203904:[UPLOAD,0231]"0100/6478381B.BIN" uploaded at 38bytes/s
+1686203928:[UPLOAD,0231]"0100/647838B7.BIN" uploaded at 90bytes/s
+1686203963:[UPLOAD,0231]"0100/64783C79.BIN" uploaded at 82bytes/s
+1686203974:[UPLOAD,0231]"0100/64783D71.MER" uploaded at 140bytes/s
+1686204006:[ZIO   ,0240]"NO CARRIER" received, aborting
+1686204022:[SURF  ,0014]disconnected after 680s
+1686204027:[SURFIN,0020]filling external bladder
+1686204028:[PUMP  ,0019]external bladder full
+1686204028:[SURF  ,0069]transfer interrupted , retry
+1686204039:[SURF  ,0022]GPS fix...
+1686204059:[SURF  ,0015]10 PPS detected...
+1686204060:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999969;
+1686204070:[MRMAID,0052]$GPSOFF:3686327;
+1686204072:[GPSFIX,0179]-1s diff
+1686204073:[SURF  ,0222]2023-06-08T06:01:13
+1686204073:[SURF  ,0082]N35deg19.258mn, E139deg39.048mn
+1686204073:[SURF  ,0084]hdop 0.890, vdop 1.280
+1686204083:[SURF  ,0025]Iridium...
+1686204102:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1686204110:[MODEM ,0347]<ERR>ping error
+1686204110:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1686204172:[SURF  ,0009]connected in 89s, signal quality 4
+1686204232:[SURF  ,0071]<WARN>timeout
+1686204232:[SURF  ,0056]<WARN>peer mute
+1686204237:[SURF  ,0014]disconnected after 154s
+1686204242:[SURFIN,0020]filling external bladder
+1686204243:[PUMP  ,0019]external bladder full
+1686204244:[SURF  ,0069]transfer interrupted , retry
+1686204255:[SURF  ,0022]GPS fix...
+1686204275:[SURF  ,0015]10 PPS detected...
+1686204276:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1686204286:[MRMAID,0052]$GPSOFF:3686326;
+1686204288:[GPSFIX,0179]-1s diff
+1686204289:[SURF  ,0222]2023-06-08T06:04:49
+1686204289:[SURF  ,0082]N35deg19.261mn, E139deg39.046mn
+1686204289:[SURF  ,0084]hdop 0.600, vdop 0.780
+1686204299:[SURF  ,0025]Iridium...
+1686204510:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 3, dial 1
+1686204669:[SURF  ,0009]connected in 370s, signal quality 1
+1686204730:[SURF  ,0071]<WARN>timeout
+1686204730:[SURF  ,0056]<WARN>peer mute
+1686204736:[SURF  ,0014]disconnected after 437s
+1686204741:[SURFIN,0020]filling external bladder
+1686204743:[PUMP  ,0019]external bladder full
+1686204743:[SURF  ,0069]transfer interrupted , retry
+1686204754:[SURF  ,0022]GPS fix...
+1686204774:[SURF  ,0015]10 PPS detected...
+1686204775:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1686204785:[MRMAID,0052]$GPSOFF:3686326;
+1686204787:[GPSFIX,0179]-1s diff
+1686204788:[SURF  ,0222]2023-06-08T06:13:08
+1686204788:[SURF  ,0082]N35deg19.261mn, E139deg39.047mn
+1686204788:[SURF  ,0084]hdop 0.900, vdop 1.550
+1686204798:[SURF  ,0025]Iridium...
+1686204852:[SURF  ,0009]connected in 54s, signal quality 5
+1686204931:[SURF  ,0071]<WARN>timeout
+1686204931:[SURF  ,0056]<WARN>peer mute
+1686204936:[SURF  ,0014]disconnected after 138s
+1686204941:[SURFIN,0020]filling external bladder
+1686204943:[PUMP  ,0019]external bladder full
+1686204943:[SURF  ,0069]transfer interrupted , retry
+1686204954:[SURF  ,0022]GPS fix...
+1686204974:[SURF  ,0015]10 PPS detected...
+1686204975:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1686204985:[MRMAID,0052]$GPSOFF:3686326;
+1686204986:[GPSFIX,0179]-1s diff
+1686204987:[SURF  ,0222]2023-06-08T06:16:27
+1686204987:[SURF  ,0082]N35deg19.260mn, E139deg39.046mn
+1686204987:[SURF  ,0084]hdop 0.720, vdop 1.400
+1686204997:[SURF  ,0025]Iridium...
+1686205257:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1686205265:[MODEM ,0347]<ERR>ping error
+1686205265:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1686205272:[MODEM ,0347]<ERR>ping error
+1686205273:[SURF  ,0023]<WARN>failed to connect #3, code -1, net -1, qual -1, dial -1
+1686205318:[SURF  ,0009]connected in 321s, signal quality 5
+1686205407:[SURF  ,0071]<WARN>timeout
+1686205407:[SURF  ,0056]<WARN>peer mute
+1686205412:[SURF  ,0014]disconnected after 415s
+1686205417:[SURFIN,0020]filling external bladder
+1686205419:[PUMP  ,0019]external bladder full
+1686205419:[SURF  ,0069]transfer interrupted , retry
+1686205430:[SURF  ,0022]GPS fix...
+1686205450:[SURF  ,0015]10 PPS detected...
+1686205451:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1686205461:[MRMAID,0052]$GPSOFF:3686326;
+1686205463:[GPSFIX,0179]-1s diff
+1686205464:[SURF  ,0222]2023-06-08T06:24:24
+1686205464:[SURF  ,0082]N35deg19.260mn, E139deg39.046mn
+1686205464:[SURF  ,0084]hdop 0.670, vdop 1.130
+1686205474:[SURF  ,0025]Iridium...
+1686205695:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 4, dial 1
+1686205703:[MODEM ,0347]<ERR>ping error
+1686205703:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1686205730:[SURF  ,0023]<WARN>failed to connect #3, code -5, net 4, qual -1, dial -1
+1686205810:[SURF  ,0009]connected in 336s, signal quality 1
+1686206177:[SURF  ,0071]<WARN>timeout
+1686206177:[SURF  ,0056]<WARN>peer mute
+1686206182:[SURF  ,0014]disconnected after 708s
+1686206187:[SURFIN,0020]filling external bladder
+1686206189:[PUMP  ,0019]external bladder full
+1686206189:[SURF  ,0069]transfer interrupted , retry
+1686206200:[SURF  ,0022]GPS fix...
+1686206220:[SURF  ,0015]10 PPS detected...
+1686206221:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1686206231:[MRMAID,0052]$GPSOFF:3686326;
+1686206233:[GPSFIX,0179]-1s diff
+1686206234:[SURF  ,0222]2023-06-08T06:37:14
+1686206234:[SURF  ,0082]N35deg19.261mn, E139deg39.047mn
+1686206234:[SURF  ,0084]hdop 0.610, vdop 1.080
+1686206244:[SURF  ,0025]Iridium...
+1686206445:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 3, dial 1
+1686206496:[SURF  ,0009]connected in 252s, signal quality 5
+1686206564:[SURF  ,0071]<WARN>timeout
+1686206564:[SURF  ,0056]<WARN>peer mute
+1686206569:[SURF  ,0014]disconnected after 325s
+1686206574:[SURFIN,0020]filling external bladder
+1686206575:[PUMP  ,0019]external bladder full
+1686206575:[SURF  ,0069]transfer interrupted , retry
+1686206575:[SURF  ,0228]Go dive (Maximum surface delay expired)
+1686206587:[SURF  ,0022]GPS fix...
+1686206607:[SURF  ,0015]10 PPS detected...
+1686206608:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1686206618:[MRMAID,0052]$GPSOFF:3686326;
+1686206621:[GPSFIX,0179]+0s diff
+1686206621:[SURF  ,0222]2023-06-08T06:43:41
+1686206621:[SURF  ,0082]N35deg19.259mn, E139deg39.045mn
+1686206621:[SURF  ,0084]hdop 0.640, vdop 1.060
+1686206638:[MAIN  ,0024]internal pressure 80322Pa
+1686206639:[BYCMD ,0120]    bypass 20000ms 120000ms (20000ms 60000ms stored)
+1686206639:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1686206639:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1686206639:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1686206639:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1686206639:[BYCMD ,0173]    near 7000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1686206639:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1686206639:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1686206639:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1686206639:[BYCMD ,0128]    dead 300s (300s stored)
+1686206639:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1686206639:[BYCMD ,0130]    stab 10 (10 stored)
+1686206639:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1686206640:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1686206640:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1686206640:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1686206640:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1686206640:[P2TCMD,0150]    p2t37: 15x2000ms, offset 129mbar
+1686206640:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1686206640:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 32400s (<32400s) 
+1686206640:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 46800s (<79200s) MERMAID SBE61 
+1686206640:[PROFIL,0302]    manual_profil=1
+1686206640:[PROFIL,0303]    manual_profil_rate=1 hours
+1686206640:[STAGE ,0091]Stage [2] surfacing 43200s (<122400s) SBE61 
+1686206640:[PROFIL,0284]    speed_detection=1
+1686206640:[PROFIL,0285]    bin_average_output=1
+1686206640:[PROFIL,0287]    include_transition_bin=0
+1686206640:[PROFIL,0304]    include_nbin=0
+1686206640:[PROFIL,0301]    load_test_sample=0
+1686206640:[PROFIL,0288]    p_cut_off=2dbar
+1686206640:[PROFIL,0289]    top_bin_interval=5dbar
+1686206640:[PROFIL,0290]    top_bin_size=5dbar
+1686206640:[PROFIL,0291]    top_bin_max=1000dbar
+1686206640:[PROFIL,0292]    middle_bin_interval=10dbar
+1686206641:[PROFIL,0293]    middle_bin_size=10dbar
+1686206641:[PROFIL,0294]    middle_bin_max=2000dbar
+1686206641:[PROFIL,0295]    bottom_bin_interval=50dbar
+1686206641:[PROFIL,0296]    bottom_bin_size=50dbar
+1686206641:[PROFIL,0297]    pump_time=10s
+1686206641:[PROFIL,0298]    speed_start=2mbar/s
+1686206641:[PROFIL,0299]    speed_control=10mbar/s
+1686206641:[MAIN  ,0070]turn off bluetooth
+1686206668:[DIVING,0141]diving from 11mbar, +0mbar/s
+1686206668:[BYPASS,0035]bypass opening 120000ms
+1686206674:[BYPASS,0104]battery 14892mV,  256688uA (bypass opening), P    +11mbar
+1686206798:[BYPASS,0106]battery 14901mV,  295728uA (bypass closing), P    +11mbar
+1686206825:[BYPASS,0035]bypass opening 20000ms
+1686206830:[BYPASS,0104]battery 14945mV,  245464uA (bypass opening), P   -129mbar
+1686206951:[PREPROCESS]Create 0100_648179E7.LOG
+1686206951:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1686206951:[MAIN  ,0007]buoy 467.174-T-0100
+1686206951:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1686206951:[MAIN  ,0011]date 2023-06-08T06:49:11
+1686206957:[MAIN  ,0006]battery 15238mV,    9028uA
+1686206959:[MAIN  ,0024]internal pressure 82311Pa
+1686206961:[PRESS ,0038]P   -129mbar,T+32767mdegC
+1686206961:[MRMAID,0182]thread started
+1686206962:[MRMAID,0186]no wake-up
+1686206963:[MRMAID,0188]acq already stopped
+1686206964:[MRMAID,0052]$BOARD:452116600-A0;
+1686206964:[MRMAID,0052]$SOFT:2.1344;
+1686206965:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1686206966:[SBE   ,0391]Mode changed from SLEEP to INIT
+1686206969:[SBE   ,0391]Mode changed from INIT to SLEEP
+1686206970:[SCIENT,0392]CTD SBE61 INIT: OK
+1686206972:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1686206972:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1686206972:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1686206972:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1686206972:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1686206972:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1686206972:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1686206972:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1686206972:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1686206972:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1686206972:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1686206973:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1686206973:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1686206973:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1686206973:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1686206973:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1686206973:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1686206973:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1686206973:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1686206973:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1686206973:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1686206973:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1686206973:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1686206973:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1686206973:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1686206973:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1686206973:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1686206973:[SBE   ,0430]  <poffset>-8.700000e-01</poffset>
+1686206973:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1686206973:[SBE   ,0432]  <prange>10153</prange>
+1686206973:[TESTMD,0053]Enter in test mode? yes/no
+1686206973:[TESTMD,0252]0100>
+1686206988:[TESTMD,0050]"yes"
+1686206988:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1686206988:[TESTMD,0252]0100>
+1686207006:[TESTMD,0050]"fillb"
+1686207006:[SURFIN,0020]filling external bladder
+1686207007:[PUMP  ,0016]pump during 30000ms
+1686207054:[PUMP  ,0016]pump during 30000ms
+1686207061:[PUMP  ,0019]external bladder full
+1686207061:[TESTMD,0252]0100>
+1686207065:[TESTMD,0050]"q"
+1686207065:[MAIN  ,0018]end of test mode
+1686207065:[MAIN  ,0048]reboot MERMAID board
+1686207067:[MAIN  ,0047]reboot float
+1686207068:[MONITR,0198]rebooting with code 0x0000, data "src/monitor.c@520             "
+1686723325:[PREPROCESS]Create 0100_64895AFD.LOG
+1686723325:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1686723325:[MAIN  ,0007]buoy 467.174-T-0100
+1686723325:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1686723325:[MAIN  ,0011]date 2023-06-14T06:15:25
+1686723331:[MAIN  ,0006]battery 15452mV,   15494uA
+1686723333:[MAIN  ,0024]internal pressure 79467Pa
+1686723335:[PRESS ,0038]P     +1mbar,T+32767mdegC
+1686723335:[MRMAID,0182]thread started
+1686723336:[MRMAID,0186]no wake-up
+1686723337:[MRMAID,0188]acq already stopped
+1686723338:[MRMAID,0052]$BOARD:452116600-A0;
+1686723338:[MRMAID,0052]$SOFT:2.1344;
+1686723339:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1686723340:[SBE   ,0391]Mode changed from SLEEP to INIT
+1686723343:[SBE   ,0391]Mode changed from INIT to SLEEP
+1686723344:[SCIENT,0392]CTD SBE61 INIT: OK
+1686723346:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1686723346:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1686723346:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1686723346:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1686723346:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1686723346:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1686723346:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1686723346:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1686723346:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1686723346:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1686723346:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1686723346:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1686723347:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1686723347:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1686723347:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1686723347:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1686723347:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1686723347:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1686723347:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1686723347:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1686723347:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1686723347:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1686723347:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1686723347:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1686723347:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1686723347:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1686723347:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1686723347:[SBE   ,0430]  <poffset>-8.700000e-01</poffset>
+1686723347:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1686723347:[SBE   ,0432]  <prange>10153</prange>
+1686723347:[TESTMD,0053]Enter in test mode? yes/no
+1686723347:[TESTMD,0252]0100>
+1686723360:[TESTMD,0050]"yes"
+1686723360:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1686723360:[TESTMD,0252]0100>
+1686723393:[TESTMD,0050]"fillb"
+1686723393:[SURFIN,0020]filling external bladder
+1686723395:[PUMP  ,0019]external bladder full
+1686723395:[TESTMD,0252]0100>
+1686723405:[TESTMD,0050]"q"
+1686723405:[MAIN  ,0018]end of test mode
+1686723405:[MAIN  ,0048]reboot MERMAID board
+1686723407:[MAIN  ,0047]reboot float
+1686723408:[MONITR,0198]rebooting with code 0x0000, data "src/monitor.c@520             "
+1687133594:[PREPROCESS]Create 0100_648F9D9A.LOG
+1687133594:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1687133594:[MAIN  ,0007]buoy 467.174-T-0100
+1687133594:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1687133594:[MAIN  ,0011]date 2023-06-19T00:13:14
+1687133600:[MAIN  ,0006]battery 15471mV,   15128uA
+1687133602:[MAIN  ,0024]internal pressure 80352Pa
+1687133604:[PRESS ,0038]P     -9mbar,T+32767mdegC
+1687133604:[MRMAID,0182]thread started
+1687133605:[MRMAID,0186]no wake-up
+1687133606:[MRMAID,0188]acq already stopped
+1687133607:[MRMAID,0052]$BOARD:452116600-A0;
+1687133607:[MRMAID,0052]$SOFT:2.1344;
+1687133608:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1687133609:[SBE   ,0391]Mode changed from SLEEP to INIT
+1687133612:[SBE   ,0391]Mode changed from INIT to SLEEP
+1687133613:[SCIENT,0392]CTD SBE61 INIT: OK
+1687133615:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1687133615:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1687133615:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1687133615:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1687133615:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1687133615:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1687133615:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1687133615:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1687133615:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1687133615:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1687133615:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1687133615:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1687133616:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1687133616:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1687133616:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1687133616:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1687133616:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1687133616:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1687133616:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1687133616:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1687133616:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1687133616:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1687133616:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1687133616:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1687133616:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1687133616:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1687133616:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1687133616:[SBE   ,0430]  <poffset>-8.700000e-01</poffset>
+1687133616:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1687133616:[SBE   ,0432]  <prange>10153</prange>
+1687133616:[TESTMD,0053]Enter in test mode? yes/no
+1687133616:[TESTMD,0252]0100>
+1687133622:[TESTMD,0050]"yes"
+1687133623:[TESTMD,0382]
+
+Command list for MOBY 4000m
+pext          : Get external pressure
+pint          : Get internal vacuum
+ui            : Get voltage/current
+act           : Test actuators with pump deep and pump surface
+fillb         : Surface pump until filling the bladder
+bpopen        : Open bypass
+bpclose       : Close bypass
+date          : Get date
+gps           : GPS synchronization
+iridium       : Iridium transfer
+mstart        : Start mermaid acq
+mstop         : Stop mermaid acq
+mdata         : Get mermaid datas
+mchecksd      : Check mermaid sd card
+mdump         : Send data REQUEST command with date and duration
+scstart       : Start all scientifics board configured for stage[0]
+scstop        : Stop all scientifics board configured for stage[0]
+ls            : List files
+cp            : Copy file or directory content on the desktop
+rm            : Remove a file (rm all -> delete all files)
+h             : Print command list
+q             : Quit
+
+Advanced
+pumpdeep X    : Deep pump during Xs (low speed)
+pumpsurface X : Surface pump during Xs (fast speed)
+evh           : Open hydraulic electrovanne during 30s
+bypass        : Open bypass during 30s
+dvmine        : Devermine
+nominal       : Nominal mode for consumption
+cychydr       : Hydraulic cicuit test
+mkdir         : Create folder
+mv            : Move file
+ps            : Process list
+
+Set params
+stage         : Stage settings
+profil        : Profils parameters
+buoy          : Buoy settings
+p2t           : Pressure sensor settings
+mermaid       : Mermaid cfg
+upload        : On/Off Irid transfer
+
+
+1687133623:[TESTMD,0252]0100>
+1687133644:[TESTMD,0050]"gps"
+1687133655:[SURF  ,0022]GPS fix...
+1687133742:[GPSFIX,0123]<WARN>GPRMC ms=500 #1
+1687133808:[SURF  ,0015]10 PPS detected...
+1687133809:[MRMAID,0052]$GPSACK:+53,+5,+18,+0,+11,+32,-818176;
+1687133819:[MRMAID,0052]$GPSOFF:3686327;
+1687133821:[GPSFIX,0179]-3s diff
+1687133824:[SURF  ,0222]2023-06-19T00:17:04
+1687133824:[SURF  ,0082]N34deg13.285mn, E139deg56.485mn
+1687133824:[SURF  ,0084]hdop 2.360, vdop 1.850
+1687133839:[TESTMD,0252]0100>
+1687133852:[TESTMD,0050]"iridium"
+1687133864:[SURF  ,0025]Iridium...
+1687133918:[SURF  ,0009]connected in 54s, signal quality 5
+1687134050:[SURF  ,0071]<WARN>timeout
+1687134050:[SURF  ,0056]<WARN>peer mute
+1687134055:[SURF  ,0014]disconnected after 191s
+1687134061:[TESTMD,0252]0100>
+1687134073:[TESTMD,0050]"iridium"
+1687134085:[SURF  ,0025]Iridium...
+1687134105:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1687134133:[SURF  ,0023]<WARN>failed to connect #2, code -5, net 4, qual -1, dial -1
+1687134160:[SURF  ,0023]<WARN>failed to connect #3, code -5, net 4, qual -1, dial -1
+1687134187:[SURF  ,0023]<WARN>failed to connect #4, code -5, net 4, qual -1, dial -1
+1687134195:[MODEM ,0347]<ERR>ping error
+1687134195:[SURF  ,0023]<WARN>failed to connect #5, code -1, net -1, qual -1, dial -1
+1687134200:[SURF  ,0117]<ERR>no connection after 115s
+1687134205:[TESTMD,0252]0100>
+1687134212:[TESTMD,0050]""
+1687134212:[TESTMD,0008]command not supported
+1687134212:[TESTMD,0252]0100>
+1687134215:[TESTMD,0050]"iridium"
+1687134227:[SURF  ,0025]Iridium...
+1687134259:[SURF  ,0009]connected in 32s, signal quality 4
+1687134583:[SURF  ,0058]<WARN>read error -1
+1687134583:[SURF  ,0071]<WARN>timeout
+1687134583:[SURF  ,0056]<WARN>peer mute
+1687134588:[SURF  ,0014]disconnected after 361s
+1687134593:[TESTMD,0252]0100>
+1687134596:[TESTMD,0050]"iridium"
+1687134607:[SURF  ,0025]Iridium...
+1687134627:[SURF  ,0023]<WARN>failed to connect #1, code -5, net 4, qual -1, dial -1
+1687134654:[SURF  ,0023]<WARN>failed to connect #2, code -5, net 4, qual -1, dial -1
+1687134681:[SURF  ,0023]<WARN>failed to connect #3, code -5, net 4, qual -1, dial -1
+1687134709:[SURF  ,0023]<WARN>failed to connect #4, code -5, net 4, qual -1, dial -1
+1687134776:[SURF  ,0009]connected in 169s, signal quality 3
+1687134865:[SURF  ,0218]prompt received, remote cmd end
+1687134865:[SURF  ,0012]16 cmd(s) received
+1687134889:[UPLOAD,0248]Upload data files...
+1687134954:[UPLOAD,0231]"0100/648179E7.BIN" uploaded at 48bytes/s
+1687135046:[UPLOAD,0231]"0100/64895AFD.BIN" uploaded at 16bytes/s
+1687135117:[ZIO   ,0240]"NO CARRIER" received, aborting
+1687135138:[SURF  ,0014]disconnected after 531s
+1687135143:[TESTMD,0252]0100>
+1687135190:[TESTMD,0050]"fillb"
+1687135190:[SURFIN,0020]filling external bladder
+1687135192:[PUMP  ,0019]external bladder full
+1687135192:[TESTMD,0252]0100>
+1687135201:[TESTMD,0050]"q"
+1687135201:[MAIN  ,0018]end of test mode
+1687135201:[MAIN  ,0048]reboot MERMAID board
+1687135203:[MAIN  ,0047]reboot float
+1687135204:[MONITR,0198]rebooting with code 0x0000, data "src/monitor.c@520             "
+1687241727:[PREPROCESS]Create 0100_649143FF.LOG
+1687241727:[MONITR,0197]reboot code 0x0000, src/monitor.c@520               
+1687241727:[MAIN  ,0007]buoy 467.174-T-0100
+1687241727:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1687241727:[MAIN  ,0011]date 2023-06-20T06:15:27
+1687241733:[MAIN  ,0006]battery 15475mV,   15128uA
+1687241735:[MAIN  ,0024]internal pressure 80170Pa
+1687241737:[PRESS ,0038]P     -9mbar,T+32767mdegC
+1687241737:[MRMAID,0182]thread started
+1687241738:[MRMAID,0186]no wake-up
+1687241739:[MRMAID,0188]acq already stopped
+1687241740:[MRMAID,0052]$BOARD:452116600-A0;
+1687241740:[MRMAID,0052]$SOFT:2.1344;
+1687241741:[SBE   ,0391]Mode changed from FORBIDDEN to SLEEP
+1687241742:[SBE   ,0391]Mode changed from SLEEP to INIT
+1687241745:[SBE   ,0391]Mode changed from INIT to SLEEP
+1687241746:[SCIENT,0392]CTD SBE61 INIT: OK
+1687241748:[SBE   ,0403]<CalibrationCoefficients DeviceType='SBE 61'>
+1687241748:[SBE   ,0404]  <SerialNum>5277839</SerialNum>
+1687241748:[SBE   ,0405]  <ta0>-8.765894e-04</ta0>
+1687241748:[SBE   ,0406]  <ta1>2.907761e-04</ta1>
+1687241748:[SBE   ,0407]  <ta2>-3.557937e-06</ta2>
+1687241748:[SBE   ,0408]  <ta3>1.466044e-07</ta3>
+1687241748:[SBE   ,0409]  <tcaldate>25-Nov-22</tcaldate>
+1687241748:[SBE   ,0410]  <cg>-1.022081e+00</cg>
+1687241748:[SBE   ,0411]  <ch>1.594611e-01</ch>
+1687241748:[SBE   ,0412]  <ci>-5.065958e-04</ci>
+1687241748:[SBE   ,0413]  <cj>6.686884e-05</cj>
+1687241748:[SBE   ,0414]  <wbotc>5.908460e-07</wbotc>
+1687241748:[SBE   ,0415]  <ctcor>3.250000e-06</ctcor>
+1687241749:[SBE   ,0416]  <cpcor>-9.570000e-08</cpcor>
+1687241749:[SBE   ,0417]  <ccaldate>25-Nov-22</ccaldate>
+1687241749:[SBE   ,0418]  <pa0>-5.538576e+02</pa0>
+1687241749:[SBE   ,0419]  <pa1>1.327794e-03</pa1>
+1687241749:[SBE   ,0420]  <pa2>4.765601e-12</pa2>
+1687241749:[SBE   ,0421]  <ptha0>1.713231e+02</ptha0>
+1687241749:[SBE   ,0422]  <ptha1>4.113683e-02</ptha1>
+1687241749:[SBE   ,0423]  <ptha2>1.316278e-06</ptha2>
+1687241749:[SBE   ,0424]  <ptca0>-1.130142e+05</ptca0>
+1687241749:[SBE   ,0425]  <ptca1>-2.330563e+03</ptca1>
+1687241749:[SBE   ,0426]  <ptca2>3.024365e+00</ptca2>
+1687241749:[SBE   ,0427]  <ptcb0>1.018072e+02</ptcb0>
+1687241749:[SBE   ,0428]  <ptcb1>-2.571048e-03</ptcb1>
+1687241749:[SBE   ,0429]  <ptcb2>0.000000e+00</ptcb2>
+1687241749:[SBE   ,0430]  <poffset>-8.700000e-01</poffset>
+1687241749:[SBE   ,0431]  <pcaldate>26-Dec-22</pcaldate>
+1687241749:[SBE   ,0432]  <prange>10153</prange>
+1687241749:[TESTMD,0053]Enter in test mode? yes/no
+1687241749:[TESTMD,0252]0100>
+1687241756:[TESTMD,0050]"no"
+1687241756:[BYCMD ,0120]    bypass 20000ms 60000ms (20000ms 60000ms stored)
+1687241756:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1687241756:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1687241756:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1687241756:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1687241756:[BYCMD ,0173]    near 15000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1687241756:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1687241756:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1687241756:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1687241756:[BYCMD ,0128]    dead 300s (300s stored)
+1687241756:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1687241757:[BYCMD ,0130]    stab 10 (10 stored)
+1687241757:[BYCMD ,0131]    delay 900s 3600s (900s 3600s stored)
+1687241757:[BYCMD ,0132]    mmtime 2880min (2880min stored)
+1687241757:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1687241757:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1687241757:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1687241757:[P2TCMD,0150]    p2t37: 15x2000ms, offset 129mbar
+1687241757:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1687241757:[STAGE ,0080]Stage [0] 400000mbar (+/-5000mbar) 50400s (<50400s) 
+1687241757:[STAGE ,0091]Stage [1] surfacing 43200s (<93600s) SBE61 
+1687241757:[PROFIL,0284]    speed_detection=1
+1687241757:[PROFIL,0285]    bin_average_output=1
+1687241757:[PROFIL,0287]    include_transition_bin=1
+1687241757:[PROFIL,0304]    include_nbin=1
+1687241757:[PROFIL,0301]    load_test_sample=0
+1687241757:[PROFIL,0288]    p_cut_off=2dbar
+1687241757:[PROFIL,0289]    top_bin_interval=2dbar
+1687241757:[PROFIL,0290]    top_bin_size=2dbar
+1687241757:[PROFIL,0291]    top_bin_max=100dbar
+1687241757:[PROFIL,0292]    middle_bin_interval=10dbar
+1687241757:[PROFIL,0293]    middle_bin_size=10dbar
+1687241757:[PROFIL,0294]    middle_bin_max=4000dbar
+1687241757:[PROFIL,0295]    bottom_bin_interval=50dbar
+1687241757:[PROFIL,0296]    bottom_bin_size=50dbar
+1687241757:[PROFIL,0297]    pump_time=0s
+1687241757:[PROFIL,0298]    speed_start=2mbar/s
+1687241758:[PROFIL,0299]    speed_control=10mbar/s
+1687241758:[MAIN  ,0065]surfacing
+1687241782:[SURFIN,0036]P    -29mbar
+1687241784:[SURFIN,0020]filling external bladder
+1687241785:[PUMP  ,0019]external bladder full
+1687241848:[MAIN  ,0272]Vbat 15461mV (min 15460mV)
+1687241850:[MAIN  ,0024]internal pressure 80143Pa
+1687241850:[MAIN  ,0043]Pext 116mbar (rng 40mbar)
+1687241850:[MAIN  ,0064]surface
+1687241850:[CMD   ,0276]0100>
+1687241863:[SURF  ,0022]GPS fix...
+1687241913:[GPSFIX,0123]<WARN>GPRMC ms=10 #1
+1687241940:[SURF  ,0015]10 PPS detected...
+1687241942:[MRMAID,0052]$GPSACK:+53,+5,+19,+6,+14,-51,-346435;
+1687241943:[MRMAID,0052]$GPSOFF:-1;
+1687241955:[GPSFIX,0179]-1s diff
+1687241956:[SURF  ,0222]2023-06-20T06:19:16
+1687241956:[SURF  ,0082]N29deg39.248mn, E141deg35.842mn
+1687241956:[SURF  ,0084]hdop 3.450, vdop 1.000
+1687241966:[SURF  ,0274]last almanac : 5854638
+1687241977:[MRMAID,0026]1259 bytes in 0100/649144F3.MER
+1687241983:[MAIN  ,0320]New pressure offset: 116mbar
+1687241983:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1687242045:[SBE   ,0339]new offset = -0.82 received after 63s
+1687242045:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1687242046:[MAIN  ,0078]*** switching to 0100/6491453E ***
+1687242046:[PREPROCESS]Create 0100_6491453E.LOG
+1687242046:[MAIN  ,0007]buoy 467.174-T-0100
+1687242046:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1687242046:[MAIN  ,0010]cycle 1
+1687242046:[SURF  ,0225]surface2
+1687242059:[SURF  ,0022]GPS fix...
+1687242196:[SURF  ,0015]10 PPS detected...
+1687242197:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-341369;
+1687242207:[MRMAID,0052]$GPSOFF:3686327;
+1687242210:[GPSFIX,0179]+0s diff
+1687242210:[SURF  ,0222]2023-06-20T06:23:30
+1687242210:[SURF  ,0082]N29deg39.210mn, E141deg35.786mn
+1687242210:[SURF  ,0084]hdop 1.170, vdop 2.150
+1687242220:[SURF  ,0025]Iridium...
+1687242263:[SURF  ,0009]connected in 43s, signal quality 5
+1687242450:[SURF  ,0058]<WARN>read error -1
+1687242450:[SURF  ,0071]<WARN>timeout
+1687242450:[SURF  ,0056]<WARN>peer mute
+1687242455:[SURF  ,0014]disconnected after 235s
+1687242460:[SURFIN,0020]filling external bladder
+1687242461:[PUMP  ,0019]external bladder full
+1687242461:[SURF  ,0069]transfer interrupted , retry
+1687242473:[SURF  ,0022]GPS fix...
+1687242493:[SURF  ,0015]10 PPS detected...
+1687242494:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1687242504:[MRMAID,0052]$GPSOFF:3686327;
+1687242506:[GPSFIX,0179]-1s diff
+1687242507:[SURF  ,0222]2023-06-20T06:28:27
+1687242507:[SURF  ,0082]N29deg39.228mn, E141deg35.783mn
+1687242507:[SURF  ,0084]hdop 0.740, vdop 1.030
+1687242517:[SURF  ,0025]Iridium...
+1687242517:[MODEM ,0347]<ERR>ping error
+1687242517:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1687242783:[CMD   ,0276]0100>
+1687242848:[SURF  ,0023]<WARN>failed to connect #2, code -8, net 1, qual 1, dial 1
+1687242910:[SURF  ,0009]connected in 393s, signal quality 5
+1687243035:[CMD   ,0276]0100>
+1687243236:[SURF  ,0071]<WARN>timeout
+1687243237:[SURF  ,0056]<WARN>peer mute
+1687243242:[SURF  ,0014]disconnected after 725s
+1687243247:[SURFIN,0020]filling external bladder
+1687243249:[PUMP  ,0019]external bladder full
+1687243249:[SURF  ,0069]transfer interrupted , retry
+1687243260:[SURF  ,0022]GPS fix...
+1687243280:[SURF  ,0015]10 PPS detected...
+1687243281:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999938;
+1687243291:[MRMAID,0052]$GPSOFF:3686326;
+1687243293:[GPSFIX,0179]-1s diff
+1687243294:[SURF  ,0222]2023-06-20T06:41:34
+1687243294:[SURF  ,0082]N29deg39.242mn, E141deg35.769mn
+1687243294:[SURF  ,0084]hdop 0.710, vdop 1.220
+1687243304:[SURF  ,0025]Iridium...
+1687243511:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1687243734:[SURF  ,0023]<WARN>failed to connect #2, code -8, net 1, qual 5, dial 1
+1687243741:[MODEM ,0347]<ERR>ping error
+1687243741:[SURF  ,0023]<WARN>failed to connect #3, code -1, net -1, qual -1, dial -1
+1687243769:[SURF  ,0023]<WARN>failed to connect #4, code -5, net 4, qual -1, dial -1
+1687243777:[MODEM ,0347]<ERR>ping error
+1687243777:[SURF  ,0023]<WARN>failed to connect #5, code -1, net -1, qual -1, dial -1
+1687243782:[SURF  ,0117]<ERR>no connection after 478s
+1687243787:[SURFIN,0020]filling external bladder
+1687243788:[PUMP  ,0016]pump during 30000ms
+1687243790:[PUMP  ,0019]external bladder full
+1687243790:[SURF  ,0069]transfer interrupted , retry
+1687243801:[SURF  ,0022]GPS fix...
+1687243821:[SURF  ,0015]10 PPS detected...
+1687243822:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1687243832:[MRMAID,0052]$GPSOFF:3686326;
+1687243834:[GPSFIX,0179]-1s diff
+1687243835:[SURF  ,0222]2023-06-20T06:50:35
+1687243835:[SURF  ,0082]N29deg39.199mn, E141deg35.724mn
+1687243835:[SURF  ,0084]hdop 0.790, vdop 1.210
+1687243845:[SURF  ,0025]Iridium...
+1687244050:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1687244104:[SURF  ,0009]connected in 259s, signal quality 5
+1687244420:[SURF  ,0197]<ERR>Timeout when receive cmds
+1687244420:[SURF  ,0012]47 cmd(s) received
+1687244447:[UPLOAD,0248]Upload data files...
+1687244481:[UPLOAD,0231]"0100/649143FF.BIN" uploaded at 107bytes/s
+1687244492:[UPLOAD,0231]"0100/649144F3.MER" uploaded at 140bytes/s
+1687244519:[UPLOAD,0231]"0100/648F9D9A.BIN" uploaded at 99bytes/s
+1687244528:[UPLOAD,0231]"0100/64783DBC.BIN" uploaded at 73bytes/s
+1687244573:[UPLOAD,0231]"0100/64783F7B.BIN" uploaded at 70bytes/s
+1687244586:[UPLOAD,0231]"0100/64784378.MER" uploaded at 104bytes/s
+1687244789:[SURF  ,0014]disconnected after 944s
+1687244794:[SURFIN,0020]filling external bladder
+1687244796:[PUMP  ,0019]external bladder full
+1687244796:[SURF  ,0069]transfer interrupted , retry
+1687244807:[SURF  ,0022]GPS fix...
+1687244827:[SURF  ,0015]10 PPS detected...
+1687244828:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1687244838:[MRMAID,0052]$GPSOFF:3686326;
+1687244840:[GPSFIX,0179]-1s diff
+1687244841:[SURF  ,0222]2023-06-20T07:07:21
+1687244841:[SURF  ,0082]N29deg38.983mn, E141deg35.372mn
+1687244841:[SURF  ,0084]hdop 0.620, vdop 1.000
+1687244851:[SURF  ,0025]Iridium...
+1687244897:[SURF  ,0009]connected in 46s, signal quality 3
+1687245005:[SURF  ,0218]prompt received, remote cmd end
+1687245006:[SURF  ,0012]18 cmd(s) received
+1687245030:[UPLOAD,0248]Upload data files...
+1687245368:[SURF  ,0014]disconnected after 517s
+1687245373:[SURFIN,0020]filling external bladder
+1687245375:[PUMP  ,0019]external bladder full
+1687245375:[SURF  ,0069]transfer interrupted , retry
+1687245386:[SURF  ,0022]GPS fix...
+1687245406:[SURF  ,0015]10 PPS detected...
+1687245407:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1687245417:[MRMAID,0052]$GPSOFF:3686326;
+1687245419:[GPSFIX,0179]-1s diff
+1687245420:[SURF  ,0222]2023-06-20T07:17:00
+1687245420:[SURF  ,0082]N29deg38.874mn, E141deg35.152mn
+1687245420:[SURF  ,0084]hdop 0.650, vdop 0.880
+1687245430:[SURF  ,0025]Iridium...
+1687245637:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1687245700:[SURF  ,0009]connected in 270s, signal quality 5
+1687245796:[SURF  ,0218]prompt received, remote cmd end
+1687245796:[SURF  ,0012]17 cmd(s) received
+1687245816:[UPLOAD,0248]Upload data files...
+1687246319:[SURF  ,0014]disconnected after 889s
+1687246324:[SURFIN,0020]filling external bladder
+1687246325:[PUMP  ,0019]external bladder full
+1687246325:[SURF  ,0069]transfer interrupted , retry
+1687246325:[SURF  ,0228]Go dive (Maximum surface delay expired)
+1687246337:[SURF  ,0022]GPS fix...
+1687246357:[SURF  ,0015]10 PPS detected...
+1687246358:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1687246368:[MRMAID,0052]$GPSOFF:3686326;
+1687246370:[GPSFIX,0179]-1s diff
+1687246371:[SURF  ,0222]2023-06-20T07:32:51
+1687246371:[SURF  ,0082]N29deg38.708mn, E141deg34.804mn
+1687246371:[SURF  ,0084]hdop 0.620, vdop 0.940
+1687246389:[PREPROCESS]End of cycle

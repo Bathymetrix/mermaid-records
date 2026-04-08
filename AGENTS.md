@@ -113,15 +113,20 @@ For event blocks:
 
 Tracked fixtures currently include:
 
-- `data/fixtures/0075_6858665E.CYCLE.h`
-- `data/fixtures/0100_685864F3.MER`
-- `data/fixtures/0100_6872AF2F.BIN`
-- `data/fixtures/0100_687FDFA4.BIN`
-- `data/fixtures/0100_688CFEFC.BIN`
-- `data/fixtures/0100_689A203B.BIN`
-- `data/fixtures/0100_68A75083.BIN`
+- `data/fixtures/467.174-T-0100/bin/*.BIN`
+- `data/fixtures/467.174-T-0100/cycle/*.CYCLE`
+- `data/fixtures/467.174-T-0100/log/*.LOG`
+- `data/fixtures/467.174-T-0100/mer/*.MER`
+- `data/fixtures/467.174-T-0100/s61/*.S61`
+- `data/fixtures/467.174-T-0100/README.md`
 
 These fixtures are intentional parser fixtures and should generally remain tracked unless the user decides otherwise.
+
+Current fixture corpus note:
+
+- `data/fixtures/467.174-T-0100/` mirrors top-level canonical artifacts for float `467.174-T-0100`, grouped by artifact type for easier cross-checking.
+- Raw `BIN` and `MER` files in this fixture family are copied from `~/mermaid/server`.
+- Treat this fixture family as the primary local fixture corpus unless the user asks for a different source set.
 
 ## Workflow Rules
 

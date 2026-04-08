@@ -1,0 +1,2317 @@
+1704744102:[PREPROCESS]Create 0100_659C54A6.LOG
+1704744102:[MAIN  ,0007]buoy 467.174-T-0100
+1704744102:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1704744102:[MAIN  ,0010]cycle 22
+1704744102:[SURF  ,0225]surface2
+1704744115:[SURF  ,0022]GPS fix...
+1704744136:[SURF  ,0015]10 PPS detected...
+1704744137:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1704744147:[MRMAID,0052]$GPSOFF:3686332;
+1704744149:[GPSFIX,0179]-1s diff
+1704744150:[SURF  ,0222]2024-01-08T20:02:30
+1704744150:[SURF  ,0082]N28deg58.372mn, E139deg21.189mn
+1704744150:[SURF  ,0084]hdop 0.710, vdop 1.510
+1704744160:[SURF  ,0025]Iridium...
+1704744192:[SURF  ,0009]connected in 32s, signal quality 5
+1704744352:[SURF  ,0218]prompt received, remote cmd end
+1704744352:[SURF  ,0012]51 cmd(s) received
+1704744374:[UPLOAD,0248]Upload data files...
+1704744415:[UPLOAD,0231]"0100/659BD5EF.S61" uploaded at 111bytes/s
+1704745065:[SURF  ,0014]disconnected after 905s
+1704745070:[SURFIN,0020]filling external bladder
+1704745071:[PUMP  ,0016]pump during 30000ms
+1704745072:[PUMP  ,0019]external bladder full
+1704745072:[SURF  ,0069]transfer interrupted , retry
+1704745084:[SURF  ,0022]GPS fix...
+1704745104:[SURF  ,0015]10 PPS detected...
+1704745105:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999969;
+1704745115:[MRMAID,0052]$GPSOFF:3686331;
+1704745118:[GPSFIX,0179]+0s diff
+1704745118:[SURF  ,0222]2024-01-08T20:18:38
+1704745118:[SURF  ,0082]N28deg58.116mn, E139deg21.142mn
+1704745118:[SURF  ,0084]hdop 0.510, vdop 0.960
+1704745128:[SURF  ,0025]Iridium...
+1704745167:[SURF  ,0009]connected in 39s, signal quality 4
+1704745380:[SURF  ,0218]prompt received, remote cmd end
+1704745380:[SURF  ,0012]58 cmd(s) received
+1704745403:[UPLOAD,0248]Upload data files...
+1704746064:[SURF  ,0014]disconnected after 936s
+1704746069:[SURFIN,0020]filling external bladder
+1704746071:[PUMP  ,0019]external bladder full
+1704746071:[SURF  ,0069]transfer interrupted , retry
+1704746082:[SURF  ,0022]GPS fix...
+1704746102:[SURF  ,0015]10 PPS detected...
+1704746103:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1704746113:[MRMAID,0052]$GPSOFF:3686331;
+1704746114:[GPSFIX,0179]-1s diff
+1704746115:[SURF  ,0222]2024-01-08T20:35:15
+1704746115:[SURF  ,0082]N28deg57.873mn, E139deg21.105mn
+1704746115:[SURF  ,0084]hdop 0.490, vdop 0.900
+1704746125:[SURF  ,0025]Iridium...
+1704746195:[SURF  ,0009]connected in 70s, signal quality 5
+1704746377:[SURF  ,0218]prompt received, remote cmd end
+1704746377:[SURF  ,0012]60 cmd(s) received
+1704746400:[UPLOAD,0248]Upload data files...
+1704747409:[SURF  ,0014]disconnected after 1284s
+1704747414:[SURFIN,0020]filling external bladder
+1704747416:[PUMP  ,0016]pump during 30000ms
+1704747425:[PUMP  ,0212]battery 14452mV, 1055788uA (steady state), P   +240mbar
+1704747425:[PUMP  ,0019]external bladder full
+1704747425:[SURF  ,0069]transfer interrupted , retry
+1704747436:[SURF  ,0022]GPS fix...
+1704747456:[SURF  ,0015]10 PPS detected...
+1704747457:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999847;
+1704747467:[MRMAID,0052]$GPSOFF:3686330;
+1704747468:[GPSFIX,0179]-1s diff
+1704747469:[SURF  ,0222]2024-01-08T20:57:49
+1704747469:[SURF  ,0082]N28deg57.547mn, E139deg21.062mn
+1704747469:[SURF  ,0084]hdop 0.510, vdop 0.900
+1704747479:[SURF  ,0025]Iridium...
+1704747518:[SURF  ,0009]connected in 39s, signal quality 5
+1704747999:[SURF  ,0218]prompt received, remote cmd end
+1704747999:[SURF  ,0012]192 cmd(s) received
+1704748023:[UPLOAD,0248]Upload data files...
+1704748795:[SURF  ,0014]disconnected after 1316s
+1704748800:[SURFIN,0020]filling external bladder
+1704748801:[PUMP  ,0019]external bladder full
+1704748801:[SURF  ,0069]transfer interrupted , retry
+1704748812:[SURF  ,0022]GPS fix...
+1704748833:[SURF  ,0015]10 PPS detected...
+1704748834:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-91;
+1704748844:[MRMAID,0052]$GPSOFF:3686330;
+1704748846:[GPSFIX,0179]-1s diff
+1704748847:[SURF  ,0222]2024-01-08T21:20:47
+1704748847:[SURF  ,0082]N28deg57.221mn, E139deg21.016mn
+1704748847:[SURF  ,0084]hdop 0.490, vdop 0.890
+1704748857:[SURF  ,0025]Iridium...
+1704748890:[SURF  ,0009]connected in 33s, signal quality 5
+1704749005:[SURF  ,0218]prompt received, remote cmd end
+1704749005:[SURF  ,0012]22 cmd(s) received
+1704749028:[UPLOAD,0248]Upload data files...
+1704749061:[ZIO   ,0236]5 consecutive CAN received, aborting
+1704749096:[SURF  ,0014]disconnected after 239s
+1704749101:[SURFIN,0020]filling external bladder
+1704749102:[PUMP  ,0016]pump during 30000ms
+1704749104:[PUMP  ,0019]external bladder full
+1704749104:[SURF  ,0069]transfer interrupted , retry
+1704749116:[SURF  ,0022]GPS fix...
+1704749136:[SURF  ,0015]10 PPS detected...
+1704749137:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1704749147:[MRMAID,0052]$GPSOFF:3686330;
+1704749149:[GPSFIX,0179]-1s diff
+1704749150:[SURF  ,0222]2024-01-08T21:25:50
+1704749150:[SURF  ,0082]N28deg57.154mn, E139deg21.009mn
+1704749150:[SURF  ,0084]hdop 0.480, vdop 0.930
+1704749160:[SURF  ,0025]Iridium...
+1704749380:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 4, dial 1
+1704749436:[SURF  ,0009]connected in 276s, signal quality 5
+1704749548:[SURF  ,0218]prompt received, remote cmd end
+1704749548:[SURF  ,0012]22 cmd(s) received
+1704749571:[UPLOAD,0248]Upload data files...
+1704749639:[UPLOAD,0231]"0100/659C532F.MER" uploaded at 119bytes/s
+1704749891:[SURF  ,0014]disconnected after 731s
+1704749896:[SURFIN,0020]filling external bladder
+1704749897:[PUMP  ,0019]external bladder full
+1704749897:[SURF  ,0069]transfer interrupted , retry
+1704749908:[SURF  ,0022]GPS fix...
+1704749928:[SURF  ,0015]10 PPS detected...
+1704749929:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999969;
+1704749939:[MRMAID,0052]$GPSOFF:3686330;
+1704749941:[GPSFIX,0179]-1s diff
+1704749942:[SURF  ,0222]2024-01-08T21:39:02
+1704749942:[SURF  ,0082]N28deg56.965mn, E139deg21.004mn
+1704749942:[SURF  ,0084]hdop 0.520, vdop 0.950
+1704749952:[SURF  ,0025]Iridium...
+1704749983:[SURF  ,0009]connected in 31s, signal quality 5
+1704750114:[SURF  ,0218]prompt received, remote cmd end
+1704750114:[SURF  ,0012]22 cmd(s) received
+1704750137:[UPLOAD,0248]Upload data files...
+1704750142:[ZIO   ,0240]"NO CARRIER" received, aborting
+1704750142:[UPLOAD,0131]<ERR>opening upload
+1704750142:[UPLOAD,0132]<ERR>opening upload "0100"
+1704750157:[SURF  ,0014]disconnected after 205s
+1704750162:[SURFIN,0020]filling external bladder
+1704750164:[PUMP  ,0019]external bladder full
+1704750164:[SURF  ,0069]transfer interrupted , retry
+1704750175:[SURF  ,0022]GPS fix...
+1704750195:[SURF  ,0015]10 PPS detected...
+1704750196:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1704750206:[MRMAID,0052]$GPSOFF:3686329;
+1704750208:[GPSFIX,0179]-1s diff
+1704750209:[SURF  ,0222]2024-01-08T21:43:29
+1704750209:[SURF  ,0082]N28deg56.901mn, E139deg21.001mn
+1704750209:[SURF  ,0084]hdop 0.490, vdop 0.890
+1704750219:[SURF  ,0025]Iridium...
+1704750259:[SURF  ,0009]connected in 40s, signal quality 3
+1704750377:[SURF  ,0218]prompt received, remote cmd end
+1704750377:[SURF  ,0012]21 cmd(s) received
+1704750395:[UPLOAD,0248]Upload data files...
+1704750563:[SURF  ,0014]disconnected after 344s
+1704750568:[SURFIN,0020]filling external bladder
+1704750570:[PUMP  ,0019]external bladder full
+1704750570:[SURF  ,0069]transfer interrupted , retry
+1704750581:[SURF  ,0022]GPS fix...
+1704750601:[SURF  ,0015]10 PPS detected...
+1704750602:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1704750612:[MRMAID,0052]$GPSOFF:3686329;
+1704750614:[GPSFIX,0179]-1s diff
+1704750615:[SURF  ,0222]2024-01-08T21:50:15
+1704750615:[SURF  ,0082]N28deg56.805mn, E139deg21.001mn
+1704750615:[SURF  ,0084]hdop 0.490, vdop 0.880
+1704750625:[SURF  ,0025]Iridium...
+1704750626:[MODEM ,0347]<ERR>ping error
+1704750626:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1704750633:[MODEM ,0347]<ERR>ping error
+1704750633:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1704750855:[SURF  ,0023]<WARN>failed to connect #3, code -8, net 1, qual 5, dial 1
+1704751076:[SURF  ,0023]<WARN>failed to connect #4, code -8, net 1, qual 4, dial 1
+1704751132:[SURF  ,0009]connected in 507s, signal quality 5
+1704751388:[SURF  ,0218]prompt received, remote cmd end
+1704751388:[SURF  ,0012]97 cmd(s) received
+1704751420:[UPLOAD,0248]Upload data files...
+1704751768:[SURF  ,0014]disconnected after 1143s
+1704751773:[SURFIN,0020]filling external bladder
+1704751774:[PUMP  ,0019]external bladder full
+1704751774:[SURF  ,0069]transfer interrupted , retry
+1704751786:[SURF  ,0022]GPS fix...
+1704751806:[SURF  ,0015]10 PPS detected...
+1704751807:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-122;
+1704751817:[MRMAID,0052]$GPSOFF:3686329;
+1704751819:[GPSFIX,0179]-1s diff
+1704751820:[SURF  ,0222]2024-01-08T22:10:20
+1704751820:[SURF  ,0082]N28deg56.523mn, E139deg21.003mn
+1704751820:[SURF  ,0084]hdop 0.500, vdop 0.980
+1704751830:[SURF  ,0025]Iridium...
+1704751866:[SURF  ,0009]connected in 36s, signal quality 4
+1704752035:[SURF  ,0218]prompt received, remote cmd end
+1704752035:[SURF  ,0012]59 cmd(s) received
+1704752055:[UPLOAD,0248]Upload data files...
+1704752311:[SURF  ,0014]disconnected after 481s
+1704752316:[SURFIN,0020]filling external bladder
+1704752317:[PUMP  ,0019]external bladder full
+1704752317:[SURF  ,0069]transfer interrupted , retry
+1704752329:[SURF  ,0022]GPS fix...
+1704752349:[SURF  ,0015]10 PPS detected...
+1704752350:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1704752360:[MRMAID,0052]$GPSOFF:3686329;
+1704752362:[GPSFIX,0179]-1s diff
+1704752363:[SURF  ,0222]2024-01-08T22:19:23
+1704752363:[SURF  ,0082]N28deg56.388mn, E139deg21.004mn
+1704752363:[SURF  ,0084]hdop 0.500, vdop 0.950
+1704752373:[SURF  ,0025]Iridium...
+1704752409:[SURF  ,0009]connected in 36s, signal quality 5
+1704752524:[SURF  ,0218]prompt received, remote cmd end
+1704752524:[SURF  ,0012]24 cmd(s) received
+1704752551:[UPLOAD,0248]Upload data files...
+1704752692:[SURF  ,0014]disconnected after 319s
+1704752697:[SURFIN,0020]filling external bladder
+1704752698:[PUMP  ,0019]external bladder full
+1704752698:[SURF  ,0069]transfer interrupted , retry
+1704752710:[SURF  ,0022]GPS fix...
+1704752730:[SURF  ,0015]10 PPS detected...
+1704752731:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1704752741:[MRMAID,0052]$GPSOFF:3686329;
+1704752743:[GPSFIX,0179]-1s diff
+1704752744:[SURF  ,0222]2024-01-08T22:25:44
+1704752744:[SURF  ,0082]N28deg56.291mn, E139deg21.005mn
+1704752744:[SURF  ,0084]hdop 0.490, vdop 0.900
+1704752754:[SURF  ,0025]Iridium...
+1704752787:[SURF  ,0009]connected in 33s, signal quality 5
+1704752874:[SURF  ,0218]prompt received, remote cmd end
+1704752874:[SURF  ,0012]28 cmd(s) received
+1704752898:[UPLOAD,0248]Upload data files...
+1704753117:[SURF  ,0014]disconnected after 363s
+1704753122:[SURFIN,0020]filling external bladder
+1704753123:[PUMP  ,0019]external bladder full
+1704753123:[SURF  ,0069]transfer interrupted , retry
+1704753135:[SURF  ,0022]GPS fix...
+1704753155:[SURF  ,0015]10 PPS detected...
+1704753156:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1704753166:[MRMAID,0052]$GPSOFF:3686329;
+1704753168:[GPSFIX,0179]-1s diff
+1704753169:[SURF  ,0222]2024-01-08T22:32:49
+1704753169:[SURF  ,0082]N28deg56.190mn, E139deg21.001mn
+1704753169:[SURF  ,0084]hdop 0.510, vdop 0.920
+1704753179:[SURF  ,0025]Iridium...
+1704753179:[MODEM ,0347]<ERR>ping error
+1704753179:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1704753237:[SURF  ,0009]connected in 58s, signal quality 4
+1704753383:[SURF  ,0218]prompt received, remote cmd end
+1704753383:[SURF  ,0012]68 cmd(s) received
+1704753406:[UPLOAD,0248]Upload data files...
+1704753517:[SURF  ,0014]disconnected after 338s
+1704753522:[SURFIN,0020]filling external bladder
+1704753523:[PUMP  ,0016]pump during 30000ms
+1704753524:[PUMP  ,0019]external bladder full
+1704753524:[SURF  ,0069]transfer interrupted , retry
+1704753536:[SURF  ,0022]GPS fix...
+1704753556:[SURF  ,0015]10 PPS detected...
+1704753557:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,+0;
+1704753567:[MRMAID,0052]$GPSOFF:3686329;
+1704753569:[GPSFIX,0179]-1s diff
+1704753570:[SURF  ,0222]2024-01-08T22:39:30
+1704753570:[SURF  ,0082]N28deg56.090mn, E139deg20.998mn
+1704753570:[SURF  ,0084]hdop 0.520, vdop 0.940
+1704753580:[SURF  ,0025]Iridium...
+1704753581:[MODEM ,0347]<ERR>ping error
+1704753581:[SURF  ,0023]<WARN>failed to connect #1, code -1, net -1, qual -1, dial -1
+1704753814:[SURF  ,0023]<WARN>failed to connect #2, code -8, net 1, qual 5, dial 1
+1704753869:[SURF  ,0009]connected in 289s, signal quality 5
+1704754236:[SURF  ,0197]<ERR>Timeout when receive cmds
+1704754236:[SURF  ,0012]51 cmd(s) received
+1704754258:[UPLOAD,0248]Upload data files...
+1704754401:[SURF  ,0014]disconnected after 821s
+1704754406:[SURFIN,0020]filling external bladder
+1704754408:[PUMP  ,0019]external bladder full
+1704754408:[SURF  ,0069]transfer interrupted , retry
+1704754419:[SURF  ,0022]GPS fix...
+1704754439:[SURF  ,0015]10 PPS detected...
+1704754440:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999938;
+1704754450:[MRMAID,0052]$GPSOFF:3686329;
+1704754452:[GPSFIX,0179]-1s diff
+1704754453:[SURF  ,0222]2024-01-08T22:54:13
+1704754453:[SURF  ,0082]N28deg55.871mn, E139deg21.007mn
+1704754453:[SURF  ,0084]hdop 0.520, vdop 0.900
+1704754463:[SURF  ,0025]Iridium...
+1704754670:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 3, dial 1
+1704754677:[MODEM ,0347]<ERR>ping error
+1704754678:[SURF  ,0023]<WARN>failed to connect #2, code -1, net -1, qual -1, dial -1
+1704754903:[SURF  ,0023]<WARN>failed to connect #3, code -8, net 1, qual 5, dial 1
+1704754960:[SURF  ,0009]connected in 497s, signal quality 5
+1704755084:[SURF  ,0218]prompt received, remote cmd end
+1704755084:[SURF  ,0012]21 cmd(s) received
+1704755110:[UPLOAD,0248]Upload data files...
+1704755187:[SURF  ,0014]disconnected after 724s
+1704755192:[SURFIN,0020]filling external bladder
+1704755193:[PUMP  ,0019]external bladder full
+1704755193:[SURF  ,0069]transfer interrupted , retry
+1704755205:[SURF  ,0022]GPS fix...
+1704755225:[SURF  ,0015]10 PPS detected...
+1704755226:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+1,-999908;
+1704755236:[MRMAID,0052]$GPSOFF:3686328;
+1704755238:[GPSFIX,0179]-1s diff
+1704755239:[SURF  ,0222]2024-01-08T23:07:19
+1704755239:[SURF  ,0082]N28deg55.679mn, E139deg21.003mn
+1704755239:[SURF  ,0084]hdop 0.570, vdop 0.890
+1704755249:[SURF  ,0025]Iridium...
+1704755284:[SURF  ,0009]connected in 35s, signal quality 5
+1704755392:[SURF  ,0218]prompt received, remote cmd end
+1704755392:[SURF  ,0012]21 cmd(s) received
+1704755417:[UPLOAD,0248]Upload data files...
+1704755629:[SURF  ,0014]disconnected after 380s
+1704755634:[SURFIN,0020]filling external bladder
+1704755635:[PUMP  ,0019]external bladder full
+1704755635:[SURF  ,0069]transfer interrupted , retry
+1704755647:[SURF  ,0022]GPS fix...
+1704755667:[SURF  ,0015]10 PPS detected...
+1704755668:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1704755678:[MRMAID,0052]$GPSOFF:3686328;
+1704755680:[GPSFIX,0179]-1s diff
+1704755681:[SURF  ,0222]2024-01-08T23:14:41
+1704755681:[SURF  ,0082]N28deg55.576mn, E139deg21.006mn
+1704755681:[SURF  ,0084]hdop 0.540, vdop 0.800
+1704755691:[SURF  ,0025]Iridium...
+1704755726:[SURF  ,0009]connected in 35s, signal quality 4
+1704755841:[SURF  ,0218]prompt received, remote cmd end
+1704755841:[SURF  ,0012]22 cmd(s) received
+1704755863:[UPLOAD,0248]Upload data files...
+1704756080:[ZIO   ,0240]"NO CARRIER" received, aborting
+1704756096:[SURF  ,0014]disconnected after 405s
+1704756101:[SURFIN,0020]filling external bladder
+1704756102:[PUMP  ,0019]external bladder full
+1704756102:[SURF  ,0069]transfer interrupted , retry
+1704756113:[SURF  ,0022]GPS fix...
+1704756133:[SURF  ,0015]10 PPS detected...
+1704756134:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-61;
+1704756144:[MRMAID,0052]$GPSOFF:3686328;
+1704756146:[GPSFIX,0179]-1s diff
+1704756147:[SURF  ,0222]2024-01-08T23:22:27
+1704756147:[SURF  ,0082]N28deg55.473mn, E139deg21.009mn
+1704756147:[SURF  ,0084]hdop 0.540, vdop 0.810
+1704756157:[SURF  ,0025]Iridium...
+1704756200:[SURF  ,0009]connected in 43s, signal quality 2
+1704756261:[SURF  ,0071]<WARN>timeout
+1704756261:[SURF  ,0056]<WARN>peer mute
+1704756267:[SURF  ,0014]disconnected after 110s
+1704756272:[SURFIN,0020]filling external bladder
+1704756274:[PUMP  ,0019]external bladder full
+1704756274:[SURF  ,0069]transfer interrupted , retry
+1704756285:[SURF  ,0022]GPS fix...
+1704756305:[SURF  ,0015]10 PPS detected...
+1704756306:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1704756316:[MRMAID,0052]$GPSOFF:3686328;
+1704756318:[GPSFIX,0179]-1s diff
+1704756319:[SURF  ,0222]2024-01-08T23:25:19
+1704756319:[SURF  ,0082]N28deg55.434mn, E139deg21.009mn
+1704756319:[SURF  ,0084]hdop 0.560, vdop 0.910
+1704756329:[SURF  ,0025]Iridium...
+1704756361:[SURF  ,0009]connected in 32s, signal quality 5
+1704756485:[SURF  ,0218]prompt received, remote cmd end
+1704756485:[SURF  ,0012]21 cmd(s) received
+1704756508:[UPLOAD,0248]Upload data files...
+1704756563:[UPLOAD,0231]"0100/658F1969.BIN" uploaded at 120bytes/s
+1704756583:[MAIN  ,0013]1 file(s) uploaded
+1704756614:[SURF  ,0014]disconnected after 285s
+1704756619:[SURF  ,0227]1st complete transfer
+1704756619:[SURF  ,0226]Go dive
+1704756630:[SURF  ,0022]GPS fix...
+1704756650:[SURF  ,0015]10 PPS detected...
+1704756651:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1704756661:[MRMAID,0052]$GPSOFF:3686328;
+1704756663:[GPSFIX,0179]-1s diff
+1704756664:[SURF  ,0222]2024-01-08T23:31:04
+1704756664:[SURF  ,0082]N28deg55.358mn, E139deg21.010mn
+1704756664:[SURF  ,0084]hdop 0.560, vdop 0.850
+1704756681:[MAIN  ,0024]internal pressure 77119Pa
+1704756682:[BYCMD ,0120]    bypass 20000ms 120000ms (20000ms 60000ms stored)
+1704756682:[BYCMD ,0121]    valve 60000ms 12750 (60000ms 12750 stored)
+1704756682:[BYCMD ,0376]    pump 60000ms 2832 8320 418 (60000ms 2832 8320 418 stored)
+1704756682:[BYCMD ,0123]    rate 2mbar/s (2mbar/s stored)
+1704756682:[BYCMD ,0124]    surface 500mbar (500mbar stored)
+1704756682:[BYCMD ,0173]    near 7000mbar 2:2:3mbar/s (15000mbar 2:2:3mbar/s stored)
+1704756682:[BYCMD ,0380]    middle 6mbar/s (6mbar/s stored)
+1704756682:[BYCMD ,0126]    far 25000mbar 9mbar/s (25000mbar 9mbar/s stored)
+1704756682:[BYCMD ,0127]    ascent 10mbar/s (10mbar/s stored)
+1704756682:[BYCMD ,0128]    dead 300s (300s stored)
+1704756682:[BYCMD ,0129]    coeff 16/10 (16/10 stored)
+1704756682:[BYCMD ,0130]    stab 10 (10 stored)
+1704756682:[BYCMD ,0131]    delay 900s 18000s (900s 3600s stored)
+1704756682:[BYCMD ,0132]    mmtime 14400min (2880min stored)
+1704756682:[BYCMD ,0133]    dv_landing 100ml (100ml stored)
+1704756682:[BYCMD ,0381]    landing confirmation 5 (5 stored)
+1704756682:[BYCMD ,0379]    cycle nb 1 (1 stored)
+1704756682:[P2TCMD,0150]    p2t37: 15x2000ms, offset 243mbar
+1704756683:[P2TCMD,0151]    p2t37: dp 5000mbar, dt 1000000mdegC
+1704756683:[STAGE ,0080]Stage [0] 200000mbar (+/-5000mbar) 25200s (<25200s) 
+1704756683:[STAGE ,0080]Stage [1] 200000mbar (+/-5000mbar) 788400s (<813600s) MERMAID SBE61 
+1704756683:[PROFIL,0302]    manual_profil=1
+1704756683:[PROFIL,0303]    manual_profil_rate=1 hours
+1704756683:[STAGE ,0080]Stage [2] 300000mbar (+/-5000mbar) 14400s (<828000s) 
+1704756683:[STAGE ,0091]Stage [3] surfacing 36000s (<864000s) SBE61 
+1704756683:[PROFIL,0284]    speed_detection=1
+1704756683:[PROFIL,0285]    bin_average_output=1
+1704756683:[PROFIL,0287]    include_transition_bin=1
+1704756683:[PROFIL,0304]    include_nbin=1
+1704756683:[PROFIL,0301]    load_test_sample=0
+1704756683:[PROFIL,0288]    p_cut_off=2dbar
+1704756683:[PROFIL,0289]    top_bin_interval=2dbar
+1704756683:[PROFIL,0290]    top_bin_size=2dbar
+1704756683:[PROFIL,0291]    top_bin_max=500dbar
+1704756683:[PROFIL,0292]    middle_bin_interval=10dbar
+1704756683:[PROFIL,0293]    middle_bin_size=10dbar
+1704756683:[PROFIL,0294]    middle_bin_max=3000dbar
+1704756683:[PROFIL,0295]    bottom_bin_interval=50dbar
+1704756683:[PROFIL,0296]    bottom_bin_size=50dbar
+1704756683:[PROFIL,0297]    pump_time=0s
+1704756683:[PROFIL,0298]    speed_start=2mbar/s
+1704756683:[PROFIL,0299]    speed_control=10mbar/s
+1704756683:[MAIN  ,0070]turn off bluetooth
+1704756711:[DIVING,0141]diving from -23mbar, +0mbar/s
+1704756711:[BYPASS,0035]bypass opening 120000ms
+1704756716:[BYPASS,0104]battery 14837mV,  262422uA (bypass opening), P    -23mbar
+1704756841:[BYPASS,0106]battery 14833mV,  300120uA (bypass closing), P    -23mbar
+1704756867:[BYPASS,0035]bypass opening 20000ms
+1704756872:[BYPASS,0104]battery 14887mV,  255468uA (bypass opening), P   -193mbar
+1704756898:[BYPASS,0106]battery 14836mV,  298778uA (bypass closing), P   -193mbar
+1704756924:[BYPASS,0035]bypass opening 20000ms
+1704756929:[BYPASS,0104]battery 14892mV,  254248uA (bypass opening), P   -203mbar
+1704756954:[BYPASS,0106]battery 14837mV,  297924uA (bypass closing), P   -203mbar
+1704756981:[BYPASS,0035]bypass opening 20000ms
+1704756986:[BYPASS,0104]battery 14892mV,  252540uA (bypass opening), P   -173mbar
+1704757011:[BYPASS,0106]battery 14837mV,  297192uA (bypass closing), P   -173mbar
+1704757158:[DIVING,0028]517mbar reached (+6mbar/s), 4 bypass done
+1704757159:[MAIN  ,0056]stage[0]
+1704757161:[MAIN  ,0024]internal pressure 81347Pa
+1704757162:[BUOY  ,0037]P   +537mbar
+1704757163:[BUOY  ,0087]from +6mbar/s to +9mbar/s
+1704757163:[BUOY  ,0090]need to transfer -72mL (valve during 39913ms)
+1704757163:[VALVE ,0034]valve opening 39913ms
+1704757203:[VALVE ,0234]battery 14643mV,  486658uA, P   +557mbar
+1704757488:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1704757488:[BUOY  ,0090]need to transfer -52mL (valve during 11431ms)
+1704757489:[VALVE ,0034]valve opening 11431ms
+1704757500:[VALVE ,0234]battery 14668mV,  486414uA, P  +3457mbar
+1704758114:[PRESS ,0038]P  +9617mbar,T+32767mdegC
+1704758763:[PRESS ,0038]P +15177mbar,T+32767mdegC
+1704758788:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1704758788:[BUOY  ,0090]need to transfer -52mL (valve during 5390ms)
+1704758788:[VALVE ,0034]valve opening 5390ms
+1704758794:[VALVE ,0234]battery 14646mV,  486170uA, P +15347mbar
+1704759413:[PRESS ,0038]P +21797mbar,T+32767mdegC
+1704759763:[BUOY  ,0087]from +5mbar/s to +9mbar/s
+1704759763:[BUOY  ,0090]need to transfer -90mL (valve during 7356ms)
+1704759763:[VALVE ,0034]valve opening 7356ms
+1704759771:[VALVE ,0234]battery 14613mV,  485194uA, P +24507mbar
+1704760069:[PRESS ,0038]P +26807mbar,T+32767mdegC
+1704760713:[PRESS ,0038]P +33707mbar,T+32767mdegC
+1704761363:[PRESS ,0038]P +40097mbar,T+32767mdegC
+1704762013:[PRESS ,0038]P +47047mbar,T+32767mdegC
+1704762663:[PRESS ,0038]P +53197mbar,T+32767mdegC
+1704763312:[PRESS ,0038]P +59867mbar,T+32767mdegC
+1704763962:[PRESS ,0038]P +65347mbar,T+32767mdegC
+1704763987:[BUOY  ,0087]from +6mbar/s to +9mbar/s
+1704763987:[BUOY  ,0090]need to transfer -72mL (valve during 3600ms)
+1704763987:[VALVE ,0034]valve opening 3600ms
+1704763991:[VALVE ,0234]battery 14461mV,  484340uA, P +65487mbar
+1704764612:[PRESS ,0038]P +71417mbar,T+32767mdegC
+1704765262:[PRESS ,0038]P +78787mbar,T+32767mdegC
+1704765912:[PRESS ,0038]P +85397mbar,T+32767mdegC
+1704766562:[PRESS ,0038]P +90787mbar,T+32767mdegC
+1704767211:[PRESS ,0038]P +96637mbar,T+32767mdegC
+1704767861:[PRESS ,0038]P+103027mbar,T+32767mdegC
+1704768511:[PRESS ,0038]P+109807mbar,T+32767mdegC
+1704769161:[PRESS ,0038]P+115337mbar,T+32767mdegC
+1704769186:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1704769186:[BUOY  ,0090]need to transfer -52mL (valve during 1956ms)
+1704769186:[VALVE ,0034]valve opening 1956ms
+1704769188:[VALVE ,0234]battery 14121mV,  483242uA, P+115517mbar
+1704769811:[PRESS ,0038]P+121687mbar,T+32767mdegC
+1704770461:[PRESS ,0038]P+128277mbar,T+32767mdegC
+1704771110:[PRESS ,0038]P+135047mbar,T+32767mdegC
+1704771760:[PRESS ,0038]P+141297mbar,T+32767mdegC
+1704772410:[PRESS ,0038]P+147227mbar,T+32767mdegC
+1704773060:[PRESS ,0038]P+153247mbar,T+32767mdegC
+1704773709:[PRESS ,0038]P+159017mbar,T+32767mdegC
+1704774359:[PRESS ,0038]P+165107mbar,T+32767mdegC
+1704775009:[PRESS ,0038]P+171547mbar,T+32767mdegC
+1704775359:[BUOY  ,0087]from +11mbar/s to +6mbar/s
+1704775359:[PUMP  ,0378]Outflow calculated : 2729
+1704775359:[BUOY  ,0089]need to transfer +136mL (pump during 194842ms)
+1704775360:[PUMP  ,0016]pump during 60000ms
+1704775419:[PUMP  ,0212]battery 13818mV,  800930uA (steady state), P+175137mbar
+1704775660:[PRESS ,0038]P+178067mbar,T+32767mdegC
+1704775685:[BUOY  ,0087]from +9mbar/s to +6mbar/s
+1704775685:[PUMP  ,0378]Outflow calculated : 2727
+1704775685:[BUOY  ,0089]need to transfer +72mL (pump during 103152ms)
+1704775686:[PUMP  ,0016]pump during 60000ms
+1704775745:[PUMP  ,0212]battery 14320mV,  808860uA (steady state), P+178307mbar
+1704776011:[BUOY  ,0087]from +8mbar/s to +6mbar/s
+1704776012:[PUMP  ,0378]Outflow calculated : 2723
+1704776012:[BUOY  ,0089]need to transfer +44mL (pump during 64516ms)
+1704776013:[PUMP  ,0016]pump during 60000ms
+1704776072:[PUMP  ,0212]battery 14335mV,  813984uA (steady state), P+181147mbar
+1704776313:[PRESS ,0038]P+183347mbar,T+32767mdegC
+1704777288:[PRESS ,0038]P+189377mbar,T+32767mdegC
+1704778264:[PRESS ,0038]P+194397mbar,T+32767mdegC
+1704778287:[BUOY  ,0087]from +6mbar/s to +2mbar/s
+1704778287:[PUMP  ,0378]Outflow calculated : 2717
+1704778287:[BUOY  ,0089]need to transfer +52mL (pump during 74928ms)
+1704778289:[PUMP  ,0016]pump during 60000ms
+1704778348:[PUMP  ,0212]battery 14452mV,  858270uA (steady state), P+194507mbar
+1704778614:[STAGE ,0213]195627mbar reached at 1704778614s, ref 200000mbar +/-5000mbar
+1704778614:[BUOY  ,0087]from +3mbar/s to +0mbar/s
+1704778614:[PUMP  ,0378]Outflow calculated : 2717
+1704778614:[BUOY  ,0089]need to transfer +14mL (pump during 20163ms)
+1704778615:[PUMP  ,0016]pump during 20163ms
+1704778635:[PUMP  ,0212]battery 14352mV,  862174uA (steady state), P+195627mbar
+1704778940:[BUOY  ,0087]from +3mbar/s to +0mbar/s
+1704778940:[PUMP  ,0378]Outflow calculated : 2715
+1704778940:[BUOY  ,0089]need to transfer +14mL (pump during 20418ms)
+1704778941:[PUMP  ,0016]pump during 20418ms
+1704778961:[PUMP  ,0212]battery 14395mV,  864492uA (steady state), P+196617mbar
+1704780467:[PRESS ,0038]P+199437mbar,T+32767mdegC
+1704781067:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704781067:[PUMP  ,0378]Outflow calculated : 2714
+1704781067:[BUOY  ,0089]need to transfer +6mL (pump during 8658ms)
+1704781069:[PUMP  ,0016]pump during 8658ms
+1704781077:[PUMP  ,0212]battery 14478mV,  882426uA (steady state), P+200307mbar
+1704781694:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704781694:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704781694:[VALVE ,0034]valve opening 57ms
+1704782019:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704782019:[PUMP  ,0378]Outflow calculated : 2714
+1704782019:[BUOY  ,0089]need to transfer +6mL (pump during 8661ms)
+1704782020:[PUMP  ,0016]pump during 8661ms
+1704782028:[PUMP  ,0212]battery 14487mV,  879010uA (steady state), P+200337mbar
+1704782345:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704782345:[PUMP  ,0378]Outflow calculated : 2713
+1704782345:[BUOY  ,0089]need to transfer +2mL (pump during 2888ms)
+1704782347:[PUMP  ,0016]pump during 2888ms
+1704782671:[MAIN  ,0140]stage[0] complete 25513s after mission start
+1704782672:[MAIN  ,0056]stage[1]
+1704782674:[MAIN  ,0024]internal pressure 77581Pa
+1704782675:[MRMAID,0002]acq started
+1704782676:[SBE   ,0391]Mode changed from SLEEP to UPDATE
+1704782676:[BUOY  ,0037]P+200877mbar
+1704782678:[STAGE ,0213]200877mbar reached at 1704782678s, ref 200000mbar +/-5000mbar
+1704782678:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704782678:[PUMP  ,0378]Outflow calculated : 2713
+1704782678:[BUOY  ,0089]need to transfer +2mL (pump during 2894ms)
+1704782680:[PUMP  ,0016]pump during 2894ms
+1704782681:[SBE   ,0391]Mode changed from UPDATE to START
+1704782681:[SBE   ,0385]Start manual acquisitions
+1704782681:[SBE   ,0391]Mode changed from START to PROFILING
+1704782715:[SBE61 ,0396]P +20125,T +19261,S +34586
+1704782726:[MRMAID,0184]acq already started
+1704782728:[MRMAID,0059]stop canceled
+1704783004:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704783004:[PUMP  ,0378]Outflow calculated : 2713
+1704783004:[BUOY  ,0089]need to transfer +2mL (pump during 2894ms)
+1704783004:[MRMAID,0003]acq stopped
+1704783006:[PUMP  ,0016]pump during 2894ms
+1704783010:[MRMAID,0002]acq started
+1704783331:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704783332:[PUMP  ,0378]Outflow calculated : 2713
+1704783332:[BUOY  ,0089]need to transfer +2mL (pump during 2899ms)
+1704783332:[MRMAID,0003]acq stopped
+1704783333:[PUMP  ,0016]pump during 2899ms
+1704783337:[MRMAID,0002]acq started
+1704784259:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704784259:[PUMP  ,0378]Outflow calculated : 2713
+1704784259:[BUOY  ,0089]need to transfer +2mL (pump during 2890ms)
+1704784259:[MRMAID,0003]acq stopped
+1704784259:[MRMAID,0185]27 spurious byte(s) received
+1704784261:[PUMP  ,0016]pump during 2890ms
+1704784265:[MRMAID,0002]acq started
+1704785787:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704785787:[PUMP  ,0378]Outflow calculated : 2712
+1704785787:[BUOY  ,0089]need to transfer +2mL (pump during 2890ms)
+1704785787:[MRMAID,0003]acq stopped
+1704785787:[MRMAID,0185]20 spurious byte(s) received
+1704785789:[PUMP  ,0016]pump during 2890ms
+1704785793:[MRMAID,0002]acq started
+1704786114:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704786114:[PUMP  ,0378]Outflow calculated : 2712
+1704786114:[BUOY  ,0089]need to transfer +2mL (pump during 2891ms)
+1704786114:[MRMAID,0003]acq stopped
+1704786116:[PUMP  ,0016]pump during 2891ms
+1704786120:[MRMAID,0002]acq started
+1704786289:[MRMAID,0003]acq stopped
+1704786324:[SBE61 ,0396]P +20319,T +19317,S +34585
+1704786325:[MRMAID,0002]acq started
+1704789443:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704789443:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704789443:[MRMAID,0003]acq stopped
+1704789443:[MRMAID,0052]$MEASFS,122646,3065.063324,40.014181;
+1704789444:[VALVE ,0034]valve opening 57ms
+1704789455:[MRMAID,0002]acq started
+1704789779:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704789779:[PUMP  ,0378]Outflow calculated : 2713
+1704789779:[BUOY  ,0089]need to transfer +6mL (pump during 8674ms)
+1704789780:[MRMAID,0003]acq stopped
+1704789781:[PUMP  ,0016]pump during 8674ms
+1704789789:[PUMP  ,0212]battery 14402mV,  889014uA (steady state), P+200627mbar
+1704789791:[MRMAID,0002]acq started
+1704789898:[MRMAID,0003]acq stopped
+1704789934:[SBE61 ,0396]P +20125,T +19459,S +34582
+1704789935:[MRMAID,0002]acq started
+1704790107:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704790107:[PUMP  ,0378]Outflow calculated : 2713
+1704790107:[BUOY  ,0089]need to transfer +6mL (pump during 8674ms)
+1704790107:[MRMAID,0003]acq stopped
+1704790109:[PUMP  ,0016]pump during 8674ms
+1704790117:[PUMP  ,0212]battery 14405mV,  886574uA (steady state), P+201187mbar
+1704790119:[MRMAID,0002]acq started
+1704790434:[BUOY  ,0101]stage[1] 10 stab done
+1704790434:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704790434:[PUMP  ,0378]Outflow calculated : 2712
+1704790434:[BUOY  ,0089]need to transfer +2mL (pump during 2907ms)
+1704790434:[MRMAID,0003]acq stopped
+1704790436:[PUMP  ,0016]pump during 2907ms
+1704790440:[MRMAID,0002]acq started
+1704790890:[MRMAID,0027]2016dbar, 33degC
+1704791060:[MRMAID,0005]ascent request rejected
+1704793498:[MRMAID,0003]acq stopped
+1704793498:[MRMAID,0052]$MEASFS,120244,3005.033417,40.014197;
+1704793533:[SBE61 ,0396]P +20180,T +19350,S +34584
+1704793535:[MRMAID,0002]acq started
+1704797098:[MRMAID,0003]acq stopped
+1704797098:[MRMAID,0052]$MEASFS,140449,3509.978332,40.014207;
+1704797133:[SBE61 ,0396]P +20255,T +19329,S +34587
+1704797134:[MRMAID,0002]acq started
+1704800707:[MRMAID,0003]acq stopped
+1704800707:[MRMAID,0052]$MEASFS,140852,3520.049011,40.014216;
+1704800743:[SBE61 ,0396]P +20358,T +19336,S +34584
+1704800744:[MRMAID,0002]acq started
+1704804307:[MRMAID,0003]acq stopped
+1704804307:[MRMAID,0052]$MEASFS,140449,3509.977081,40.014221;
+1704804342:[SBE61 ,0396]P +20306,T +19349,S +34584
+1704804344:[MRMAID,0002]acq started
+1704807916:[MRMAID,0003]acq stopped
+1704807917:[MRMAID,0052]$MEASFS,140847,3519.923096,40.014226;
+1704807952:[SBE61 ,0396]P +20391,T +19357,S +34584
+1704807953:[MRMAID,0002]acq started
+1704811516:[MRMAID,0003]acq stopped
+1704811516:[MRMAID,0052]$MEASFS,140448,3509.951324,40.014230;
+1704811552:[SBE61 ,0396]P +20369,T +19500,S +34582
+1704811553:[MRMAID,0002]acq started
+1704815116:[MRMAID,0003]acq stopped
+1704815116:[MRMAID,0052]$MEASFS,140442,3509.801148,40.014233;
+1704815151:[SBE61 ,0396]P +20328,T +19210,S +34587
+1704815152:[MRMAID,0002]acq started
+1704818725:[MRMAID,0003]acq stopped
+1704818725:[MRMAID,0052]$MEASFS,140849,3519.972290,40.014235;
+1704818761:[SBE61 ,0396]P +20458,T +19347,S +34584
+1704818762:[MRMAID,0002]acq started
+1704822325:[MRMAID,0003]acq stopped
+1704822325:[MRMAID,0052]$MEASFS,140450,3510.000672,40.014237;
+1704822360:[SBE61 ,0396]P +20451,T +19409,S +34584
+1704822362:[MRMAID,0002]acq started
+1704825925:[MRMAID,0003]acq stopped
+1704825925:[MRMAID,0052]$MEASFS,140450,3510.000580,40.014238;
+1704825960:[SBE61 ,0396]P +20417,T +19220,S +34586
+1704825961:[MRMAID,0002]acq started
+1704826479:[PRESS ,0038]P+204517mbar,T+32767mdegC
+1704827079:[BUOY  ,0087]from +0mbar/s to -2mbar/s
+1704827079:[PUMP  ,0378]Outflow calculated : 2710
+1704827079:[BUOY  ,0089]need to transfer +6mL (pump during 8713ms)
+1704827079:[MRMAID,0003]acq stopped
+1704827079:[MRMAID,0185]20 spurious byte(s) received
+1704827081:[PUMP  ,0016]pump during 8713ms
+1704827089:[PUMP  ,0212]battery 14237mV,  906460uA (steady state), P+205197mbar
+1704827091:[MRMAID,0002]acq started
+1704827407:[BUOY  ,0087]from +0mbar/s to -2mbar/s
+1704827407:[PUMP  ,0378]Outflow calculated : 2710
+1704827407:[BUOY  ,0089]need to transfer +6mL (pump during 8729ms)
+1704827407:[MRMAID,0003]acq stopped
+1704827408:[PUMP  ,0016]pump during 8729ms
+1704827416:[PUMP  ,0212]battery 14295mV,  911706uA (steady state), P+205227mbar
+1704827418:[MRMAID,0002]acq started
+1704829534:[MRMAID,0003]acq stopped
+1704829534:[MRMAID,0052]$MEASFS,82554,2063.115539,40.014240;
+1704829570:[SBE61 ,0396]P +20153,T +19675,S +34579
+1704829571:[MRMAID,0002]acq started
+1704830435:[PRESS ,0038]P+199507mbar,T+32767mdegC
+1704830435:[BUOY  ,0087]from -2mbar/s to +0mbar/s
+1704830435:[BUOY  ,0090]need to transfer -6mL (valve during 172ms)
+1704830435:[MRMAID,0003]acq stopped
+1704830436:[VALVE ,0034]valve opening 172ms
+1704830439:[MRMAID,0002]acq started
+1704831063:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704831063:[PUMP  ,0378]Outflow calculated : 2713
+1704831063:[BUOY  ,0089]need to transfer +6mL (pump during 8696ms)
+1704831063:[MRMAID,0003]acq stopped
+1704831065:[PUMP  ,0016]pump during 8696ms
+1704831073:[PUMP  ,0212]battery 14335mV,  886452uA (steady state), P+200497mbar
+1704831075:[MRMAID,0002]acq started
+1704831391:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704831391:[PUMP  ,0378]Outflow calculated : 2713
+1704831391:[BUOY  ,0089]need to transfer +2mL (pump during 2899ms)
+1704831391:[MRMAID,0003]acq stopped
+1704831393:[PUMP  ,0016]pump during 2899ms
+1704831397:[MRMAID,0002]acq started
+1704831718:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704831718:[PUMP  ,0378]Outflow calculated : 2713
+1704831718:[BUOY  ,0089]need to transfer +2mL (pump during 2906ms)
+1704831718:[MRMAID,0003]acq stopped
+1704831720:[PUMP  ,0016]pump during 2906ms
+1704831724:[MRMAID,0002]acq started
+1704832045:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704832045:[PUMP  ,0378]Outflow calculated : 2712
+1704832045:[BUOY  ,0089]need to transfer +2mL (pump during 2907ms)
+1704832045:[MRMAID,0003]acq stopped
+1704832047:[PUMP  ,0016]pump during 2907ms
+1704832051:[MRMAID,0002]acq started
+1704832373:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704832373:[PUMP  ,0378]Outflow calculated : 2712
+1704832373:[BUOY  ,0089]need to transfer +2mL (pump during 2904ms)
+1704832373:[MRMAID,0003]acq stopped
+1704832374:[PUMP  ,0016]pump during 2904ms
+1704832378:[MRMAID,0002]acq started
+1704833134:[MRMAID,0003]acq stopped
+1704833134:[MRMAID,0185]19 spurious byte(s) received
+1704833169:[SBE61 ,0396]P +20255,T +19356,S +34585
+1704833171:[MRMAID,0002]acq started
+1704836743:[MRMAID,0003]acq stopped
+1704836744:[MRMAID,0052]$MEASFS,140848,3519.946839,40.014241;
+1704836779:[SBE61 ,0396]P +20372,T +19342,S +34584
+1704836780:[MRMAID,0002]acq started
+1704838403:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704838403:[PUMP  ,0378]Outflow calculated : 2711
+1704838403:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704838403:[MRMAID,0003]acq stopped
+1704838403:[MRMAID,0185]28 spurious byte(s) received
+1704838404:[PUMP  ,0016]pump during 2900ms
+1704838409:[MRMAID,0002]acq started
+1704840343:[MRMAID,0052]$ST$MEASFS,75287,1881.505127,40.014241;
+1704840346:[MRMAID,0185]9 spurious byte(s) received
+1704840379:[SBE61 ,0396]P +20245,T +19586,S +34581
+1704840380:[MRMAID,0002]acq started
+1704843943:[MRMAID,0003]acq stopped
+1704843943:[MRMAID,0052]$MEASFS,140448,3509.950318,40.014242;
+1704843978:[SBE61 ,0396]P +20187,T +19484,S +34579
+1704843979:[MRMAID,0002]acq started
+1704847552:[MRMAID,0003]acq stopped
+1704847552:[MRMAID,0052]$MEASFS,140847,3519.921722,40.014242;
+1704847588:[SBE61 ,0396]P +20159,T +19419,S +34583
+1704847589:[MRMAID,0002]acq started
+1704849235:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704849235:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704849235:[MRMAID,0003]acq stopped
+1704849235:[MRMAID,0185]28 spurious byte(s) received
+1704849236:[VALVE ,0034]valve opening 57ms
+1704849247:[MRMAID,0002]acq started
+1704849571:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704849572:[PUMP  ,0378]Outflow calculated : 2713
+1704849572:[BUOY  ,0089]need to transfer +6mL (pump during 8698ms)
+1704849572:[MRMAID,0003]acq stopped
+1704849573:[PUMP  ,0016]pump during 8698ms
+1704849581:[PUMP  ,0212]battery 14303mV,  889990uA (steady state), P+200247mbar
+1704849583:[MRMAID,0002]acq started
+1704849899:[BUOY  ,0101]stage[1] 10 stab done
+1704849899:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704849899:[PUMP  ,0378]Outflow calculated : 2713
+1704849899:[BUOY  ,0089]need to transfer +6mL (pump during 8698ms)
+1704849899:[MRMAID,0003]acq stopped
+1704849901:[PUMP  ,0016]pump during 8698ms
+1704849909:[PUMP  ,0212]battery 14327mV,  894016uA (steady state), P+200767mbar
+1704849911:[MRMAID,0002]acq started
+1704851152:[MRMAID,0003]acq stopped
+1704851152:[MRMAID,0185]20 spurious byte(s) received
+1704851187:[SBE61 ,0396]P +20316,T +19211,S +34586
+1704851189:[MRMAID,0002]acq started
+1704854752:[MRMAID,0003]acq stopped
+1704854752:[MRMAID,0052]$MEASFS,140450,3510.000244,40.014242;
+1704854787:[SBE61 ,0396]P +20310,T +19064,S +34589
+1704854788:[MRMAID,0002]acq started
+1704856829:[PRESS ,0038]P+204707mbar,T+32767mdegC
+1704857130:[BUOY  ,0087]from +0mbar/s to -2mbar/s
+1704857130:[PUMP  ,0378]Outflow calculated : 2711
+1704857130:[BUOY  ,0089]need to transfer +6mL (pump during 8701ms)
+1704857130:[MRMAID,0003]acq stopped
+1704857131:[PUMP  ,0016]pump during 8701ms
+1704857140:[PUMP  ,0212]battery 14343mV,  904264uA (steady state), P+205017mbar
+1704857141:[MRMAID,0002]acq started
+1704857457:[BUOY  ,0087]from +0mbar/s to -2mbar/s
+1704857457:[PUMP  ,0378]Outflow calculated : 2710
+1704857457:[BUOY  ,0089]need to transfer +6mL (pump during 8718ms)
+1704857457:[MRMAID,0003]acq stopped
+1704857459:[PUMP  ,0016]pump during 8718ms
+1704857467:[PUMP  ,0212]battery 14342mV,  905972uA (steady state), P+205087mbar
+1704857469:[MRMAID,0002]acq started
+1704858361:[MRMAID,0003]acq stopped
+1704858361:[MRMAID,0185]27 spurious byte(s) received
+1704858397:[SBE61 ,0396]P +20459,T +19249,S +34586
+1704858398:[MRMAID,0002]acq started
+1704861086:[BUOY  ,0087]from -2mbar/s to +0mbar/s
+1704861086:[BUOY  ,0090]need to transfer -6mL (valve during 171ms)
+1704861086:[MRMAID,0003]acq stopped
+1704861086:[MRMAID,0052]$MEASFS,105445,2635.186707,40.014243;
+1704861087:[VALVE ,0034]valve opening 171ms
+1704861098:[MRMAID,0002]acq started
+1704861422:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704861422:[PUMP  ,0378]Outflow calculated : 2713
+1704861423:[BUOY  ,0089]need to transfer +6mL (pump during 8696ms)
+1704861423:[MRMAID,0003]acq stopped
+1704861424:[PUMP  ,0016]pump during 8696ms
+1704861432:[PUMP  ,0212]battery 14355mV,  886086uA (steady state), P+200647mbar
+1704861434:[MRMAID,0002]acq started
+1704861750:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704861750:[PUMP  ,0378]Outflow calculated : 2713
+1704861750:[BUOY  ,0089]need to transfer +6mL (pump during 8696ms)
+1704861750:[MRMAID,0003]acq stopped
+1704861752:[PUMP  ,0016]pump during 8696ms
+1704861760:[PUMP  ,0212]battery 14352mV,  890112uA (steady state), P+201307mbar
+1704861762:[MRMAID,0002]acq started
+1704861961:[MRMAID,0003]acq stopped
+1704861996:[SBE61 ,0396]P +20195,T +19453,S +34582
+1704861998:[MRMAID,0002]acq started
+1704862077:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704862077:[PUMP  ,0378]Outflow calculated : 2711
+1704862077:[BUOY  ,0089]need to transfer +2mL (pump during 2956ms)
+1704862077:[MRMAID,0003]acq stopped
+1704862079:[PUMP  ,0016]pump during 2956ms
+1704862083:[MRMAID,0002]acq started
+1704862404:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704862405:[PUMP  ,0378]Outflow calculated : 2711
+1704862405:[BUOY  ,0089]need to transfer +2mL (pump during 2956ms)
+1704862405:[MRMAID,0003]acq stopped
+1704862406:[PUMP  ,0016]pump during 2956ms
+1704862410:[MRMAID,0002]acq started
+1704865570:[MRMAID,0003]acq stopped
+1704865571:[MRMAID,0052]$MEASFS,124334,3107.243621,40.014243;
+1704865606:[SBE61 ,0396]P +20104,T +19475,S +34582
+1704865607:[MRMAID,0002]acq started
+1704869170:[MRMAID,0003]acq stopped
+1704869170:[MRMAID,0052]$MEASFS,140449,3509.975189,40.014243;
+1704869206:[SBE61 ,0396]P +20190,T +19663,S +34579
+1704869207:[MRMAID,0002]acq started
+1704872770:[MRMAID,0003]acq stopped
+1704872770:[MRMAID,0052]$MEASFS,140448,3509.950195,40.014243;
+1704872805:[SBE61 ,0396]P +20146,T +19775,S +34577
+1704872806:[MRMAID,0002]acq started
+1704876379:[MRMAID,0003]acq stopped
+1704876380:[MRMAID,0052]$MEASFS,140851,3520.021607,40.014243;
+1704876415:[SBE61 ,0396]P +20167,T +19781,S +34577
+1704876416:[MRMAID,0002]acq started
+1704879979:[MRMAID,0003]acq stopped
+1704879979:[MRMAID,0052]$MEASFS,140448,3509.950226,40.014243;
+1704880014:[SBE61 ,0396]P +20117,T +19751,S +34578
+1704880016:[MRMAID,0002]acq started
+1704883579:[MRMAID,0003]acq stopped
+1704883579:[MRMAID,0052]$MEASFS,140450,3510.000213,40.014243;
+1704883614:[SBE61 ,0396]P +20049,T +19599,S +34579
+1704883615:[MRMAID,0002]acq started
+1704886743:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704886743:[PUMP  ,0378]Outflow calculated : 2712
+1704886743:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704886744:[MRMAID,0003]acq stopped
+1704886744:[MRMAID,0052]$MEASFS,123053,3075.230011,40.014243;
+1704886745:[PUMP  ,0016]pump during 2900ms
+1704886749:[MRMAID,0002]acq started
+1704887188:[MRMAID,0002]acq started
+1704887190:[MRMAID,0185]11 spurious byte(s) received
+1704887224:[SBE61 ,0396]P +20275,T +19613,S +34580
+1704887225:[MRMAID,0002]acq started
+1704889172:[PRESS ,0038]P+199507mbar,T+32767mdegC
+1704889172:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704889172:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704889172:[MRMAID,0003]acq stopped
+1704889172:[MRMAID,0052]$MEASFS,75794,1894.175538,40.014243;
+1704889172:[VALVE ,0034]valve opening 57ms
+1704889184:[MRMAID,0002]acq started
+1704890709:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704890709:[PUMP  ,0378]Outflow calculated : 2713
+1704890709:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704890709:[MRMAID,0003]acq stopped
+1704890709:[MRMAID,0185]28 spurious byte(s) received
+1704890711:[PUMP  ,0016]pump during 2900ms
+1704890715:[MRMAID,0002]acq started
+1704890788:[MRMAID,0003]acq stopped
+1704890823:[SBE61 ,0396]P +20094,T +19456,S +34582
+1704890825:[MRMAID,0002]acq started
+1704891036:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704891036:[PUMP  ,0378]Outflow calculated : 2713
+1704891036:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704891036:[MRMAID,0003]acq stopped
+1704891038:[PUMP  ,0016]pump during 2900ms
+1704891042:[MRMAID,0002]acq started
+1704891363:[BUOY  ,0101]stage[1] 10 stab done
+1704891363:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704891363:[PUMP  ,0378]Outflow calculated : 2712
+1704891363:[BUOY  ,0089]need to transfer +2mL (pump during 2902ms)
+1704891364:[MRMAID,0003]acq stopped
+1704891365:[PUMP  ,0016]pump during 2902ms
+1704891369:[MRMAID,0002]acq started
+1704894392:[PRESS ,0038]P+204587mbar,T+32767mdegC
+1704894398:[MRMAID,0003]acq stopped
+1704894398:[MRMAID,0052]$MEASFS,119059,2975.415527,40.014243;
+1704894433:[SBE61 ,0396]P +20495,T +19238,S +34586
+1704894434:[MRMAID,0002]acq started
+1704894992:[BUOY  ,0087]from +1mbar/s to -2mbar/s
+1704894992:[PUMP  ,0378]Outflow calculated : 2710
+1704894992:[BUOY  ,0089]need to transfer +8mL (pump during 11612ms)
+1704894992:[MRMAID,0003]acq stopped
+1704894994:[PUMP  ,0016]pump during 11612ms
+1704895005:[PUMP  ,0212]battery 14350mV,  902800uA (steady state), P+205117mbar
+1704895007:[MRMAID,0002]acq started
+1704897997:[MRMAID,0003]acq stopped
+1704897997:[MRMAID,0052]$MEASFS,117534,2937.304107,40.014243;
+1704898033:[SBE61 ,0396]P +20217,T +19486,S +34582
+1704898034:[MRMAID,0002]acq started
+1704901597:[MRMAID,0003]acq stopped
+1704901597:[MRMAID,0052]$MEASFS,140449,3509.975159,40.014243;
+1704901632:[SBE61 ,0396]P +20118,T +19578,S +34580
+1704901633:[MRMAID,0002]acq started
+1704905206:[MRMAID,0003]acq stopped
+1704905207:[MRMAID,0052]$MEASFS,140848,3519.946625,40.014243;
+1704905242:[SBE61 ,0396]P +20208,T +19716,S +34578
+1704905243:[MRMAID,0002]acq started
+1704908806:[MRMAID,0003]acq stopped
+1704908806:[MRMAID,0052]$MEASFS,140448,3509.950195,40.014243;
+1704908841:[SBE61 ,0396]P +20054,T +19656,S +34579
+1704908843:[MRMAID,0002]acq started
+1704912406:[MRMAID,0003]acq stopped
+1704912406:[MRMAID,0052]$MEASFS,140448,3509.950195,40.014243;
+1704912441:[SBE61 ,0396]P +20153,T +19610,S +34580
+1704912442:[MRMAID,0002]acq started
+1704916015:[MRMAID,0003]acq stopped
+1704916015:[MRMAID,0052]$MEASFS,140839,3519.721710,40.014243;
+1704916051:[SBE61 ,0396]P +20113,T +19670,S +34580
+1704916052:[MRMAID,0002]acq started
+1704919615:[MRMAID,0003]acq stopped
+1704919615:[MRMAID,0052]$MEASFS,140450,3510.000153,40.014243;
+1704919650:[SBE61 ,0396]P +20098,T +19598,S +34581
+1704919652:[MRMAID,0002]acq started
+1704923225:[MRMAID,0003]acq stopped
+1704923225:[MRMAID,0052]$MEASFS,140848,3519.946625,40.014243;
+1704923260:[SBE61 ,0396]P +20126,T +19495,S +34582
+1704923261:[MRMAID,0002]acq started
+1704926824:[MRMAID,0003]acq stopped
+1704926824:[MRMAID,0052]$MEASFS,140450,3510.000184,40.014243;
+1704926860:[SBE61 ,0396]P +20100,T +19619,S +34580
+1704926861:[MRMAID,0002]acq started
+1704930424:[MRMAID,0003]acq stopped
+1704930424:[MRMAID,0052]$MEASFS,140449,3509.975189,40.014243;
+1704930459:[SBE61 ,0396]P +20178,T +19623,S +34580
+1704930460:[MRMAID,0002]acq started
+1704934033:[MRMAID,0003]acq stopped
+1704934034:[MRMAID,0052]$MEASFS,140848,3519.946625,40.014243;
+1704934069:[SBE61 ,0396]P +20148,T +19613,S +34580
+1704934070:[MRMAID,0002]acq started
+1704937633:[MRMAID,0003]acq stopped
+1704937633:[MRMAID,0052]$MEASFS,140449,3509.975189,40.014243;
+1704937668:[SBE61 ,0396]P +20149,T +19675,S +34579
+1704937670:[MRMAID,0002]acq started
+1704941233:[MRMAID,0003]acq stopped
+1704941233:[MRMAID,0052]$MEASFS,140458,3510.200104,40.014243;
+1704941268:[SBE61 ,0396]P +20195,T +19715,S +34579
+1704941269:[MRMAID,0002]acq started
+1704944842:[MRMAID,0003]acq stopped
+1704944842:[MRMAID,0052]$MEASFS,140847,3519.921631,40.014243;
+1704944878:[SBE61 ,0396]P +20181,T +19718,S +34579
+1704944879:[MRMAID,0002]acq started
+1704948442:[MRMAID,0003]acq stopped
+1704948442:[MRMAID,0052]$MEASFS,140448,3509.950195,40.014243;
+1704948477:[SBE61 ,0396]P +20020,T +19711,S +34578
+1704948479:[MRMAID,0002]acq started
+1704949046:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704949046:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704949046:[VALVE ,0034]valve opening 57ms
+1704949047:[MRMAID,0003]acq stopped
+1704949048:[MRMAID,0002]acq started
+1704949373:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704949373:[PUMP  ,0378]Outflow calculated : 2713
+1704949373:[BUOY  ,0089]need to transfer +6mL (pump during 8706ms)
+1704949373:[MRMAID,0003]acq stopped
+1704949375:[PUMP  ,0016]pump during 8706ms
+1704949383:[PUMP  ,0212]battery 14231mV,  893650uA (steady state), P+200647mbar
+1704949385:[MRMAID,0002]acq started
+1704949700:[BUOY  ,0087]from +3mbar/s to +0mbar/s
+1704949700:[PUMP  ,0378]Outflow calculated : 2713
+1704949700:[BUOY  ,0089]need to transfer +14mL (pump during 20313ms)
+1704949700:[MRMAID,0003]acq stopped
+1704949702:[PUMP  ,0016]pump during 20313ms
+1704949722:[PUMP  ,0212]battery 14291mV,  898652uA (steady state), P+201427mbar
+1704949724:[MRMAID,0002]acq started
+1704952042:[MRMAID,0003]acq stopped
+1704952042:[MRMAID,0052]$MEASFS,90645,2265.318390,40.014243;
+1704952077:[SBE61 ,0396]P +20144,T +19757,S +34578
+1704952078:[MRMAID,0002]acq started
+1704953329:[PRESS ,0038]P+199557mbar,T+32767mdegC
+1704953329:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704953329:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704953329:[MRMAID,0003]acq stopped
+1704953329:[MRMAID,0052]$MEASFS,47941,1198.098388,40.014243;
+1704953330:[VALVE ,0034]valve opening 57ms
+1704953342:[MRMAID,0002]acq started
+1704953966:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1704953966:[PUMP  ,0378]Outflow calculated : 2713
+1704953966:[BUOY  ,0089]need to transfer +6mL (pump during 8700ms)
+1704953966:[MRMAID,0003]acq stopped
+1704953968:[PUMP  ,0016]pump during 8700ms
+1704953976:[PUMP  ,0212]battery 14341mV,  885842uA (steady state), P+200457mbar
+1704953978:[MRMAID,0002]acq started
+1704954293:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704954293:[PUMP  ,0378]Outflow calculated : 2713
+1704954293:[BUOY  ,0089]need to transfer +2mL (pump during 2906ms)
+1704954293:[MRMAID,0003]acq stopped
+1704954295:[PUMP  ,0016]pump during 2906ms
+1704954299:[MRMAID,0002]acq started
+1704954620:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704954620:[PUMP  ,0378]Outflow calculated : 2713
+1704954621:[BUOY  ,0089]need to transfer +2mL (pump during 2906ms)
+1704954621:[MRMAID,0003]acq stopped
+1704954622:[PUMP  ,0016]pump during 2906ms
+1704954626:[MRMAID,0002]acq started
+1704954948:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704954948:[PUMP  ,0378]Outflow calculated : 2712
+1704954948:[BUOY  ,0089]need to transfer +2mL (pump during 2908ms)
+1704954948:[MRMAID,0003]acq stopped
+1704954950:[PUMP  ,0016]pump during 2908ms
+1704954954:[MRMAID,0002]acq started
+1704955651:[MRMAID,0003]acq stopped
+1704955651:[MRMAID,0185]19 spurious byte(s) received
+1704955687:[SBE61 ,0396]P +20125,T +19732,S +34578
+1704955688:[MRMAID,0002]acq started
+1704957676:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704957676:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704957676:[MRMAID,0003]acq stopped
+1704957676:[MRMAID,0052]$MEASFS,77446,1935.460846,40.014243;
+1704957677:[VALVE ,0034]valve opening 57ms
+1704957689:[MRMAID,0002]acq started
+1704958013:[BUOY  ,0101]stage[1] 10 stab done
+1704958013:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704958013:[PUMP  ,0378]Outflow calculated : 2713
+1704958013:[BUOY  ,0089]need to transfer +2mL (pump during 2897ms)
+1704958013:[MRMAID,0003]acq stopped
+1704958015:[PUMP  ,0016]pump during 2897ms
+1704958019:[MRMAID,0002]acq started
+1704959251:[MRMAID,0003]acq stopped
+1704959251:[MRMAID,0185]20 spurious byte(s) received
+1704959286:[SBE61 ,0396]P +20257,T +19617,S +34580
+1704959287:[MRMAID,0002]acq started
+1704960741:[PRESS ,0038]P+204697mbar,T+32767mdegC
+1704961041:[BUOY  ,0087]from +2mbar/s to -2mbar/s
+1704961041:[PUMP  ,0378]Outflow calculated : 2710
+1704961041:[BUOY  ,0089]need to transfer +12mL (pump during 17408ms)
+1704961041:[MRMAID,0003]acq stopped
+1704961042:[MRMAID,0052]$MEASFS,68063,1700.969360,40.014242;
+1704961043:[PUMP  ,0016]pump during 17408ms
+1704961060:[PUMP  ,0212]battery 14403mV,  836310uA (steady state), P+205177mbar
+1704961062:[MRMAID,0002]acq started
+1704962860:[MRMAID,0003]acq stopped
+1704962861:[MRMAID,0052]$MEASFS,69846,1745.528473,40.014243;
+1704962896:[SBE61 ,0396]P +20336,T +19579,S +34581
+1704962897:[MRMAID,0002]acq started
+1704966460:[MRMAID,0003]acq stopped
+1704966460:[MRMAID,0052]$MEASFS,140449,3509.975220,40.014243;
+1704966496:[SBE61 ,0396]P +20071,T +19616,S +34580
+1704966497:[MRMAID,0002]acq started
+1704970060:[MRMAID,0003]acq stopped
+1704970060:[MRMAID,0052]$MEASFS,140449,3509.975220,40.014243;
+1704970095:[SBE61 ,0396]P +20083,T +19590,S +34581
+1704970096:[MRMAID,0002]acq started
+1704973669:[MRMAID,0003]acq stopped
+1704973669:[MRMAID,0052]$MEASFS,140852,3520.046600,40.014243;
+1704973705:[SBE61 ,0396]P +20129,T +19565,S +34581
+1704973706:[MRMAID,0002]acq started
+1704976076:[PRESS ,0038]P+199627mbar,T+32767mdegC
+1704977269:[MRMAID,0003]acq stopped
+1704977269:[MRMAID,0052]$MEASFS,140448,3509.950195,40.014243;
+1704977304:[SBE61 ,0396]P +20051,T +19458,S +34583
+1704977306:[MRMAID,0002]acq started
+1704979678:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704979678:[PUMP  ,0378]Outflow calculated : 2713
+1704979678:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704979678:[MRMAID,0003]acq stopped
+1704979678:[MRMAID,0052]$MEASFS,92797,2319.099243,40.014243;
+1704979679:[PUMP  ,0016]pump during 2900ms
+1704979684:[MRMAID,0002]acq started
+1704980869:[MRMAID,0003]acq stopped
+1704980869:[MRMAID,0185]20 spurious byte(s) received
+1704980904:[SBE61 ,0396]P +20123,T +19611,S +34580
+1704980905:[MRMAID,0002]acq started
+1704982106:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1704982106:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1704982106:[MRMAID,0003]acq stopped
+1704982106:[MRMAID,0052]$MEASFS,45927,1147.766297,40.014243;
+1704982107:[VALVE ,0034]valve opening 57ms
+1704982118:[MRMAID,0002]acq started
+1704982442:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704982442:[PUMP  ,0378]Outflow calculated : 2713
+1704982442:[BUOY  ,0089]need to transfer +2mL (pump during 2899ms)
+1704982443:[MRMAID,0003]acq stopped
+1704982444:[PUMP  ,0016]pump during 2899ms
+1704982448:[MRMAID,0002]acq started
+1704982770:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704982770:[PUMP  ,0378]Outflow calculated : 2713
+1704982770:[BUOY  ,0089]need to transfer +2mL (pump during 2899ms)
+1704982770:[MRMAID,0003]acq stopped
+1704982772:[PUMP  ,0016]pump during 2899ms
+1704982776:[MRMAID,0002]acq started
+1704983097:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704983097:[PUMP  ,0378]Outflow calculated : 2713
+1704983097:[BUOY  ,0089]need to transfer +2mL (pump during 2902ms)
+1704983097:[MRMAID,0003]acq stopped
+1704983099:[MRMAID,0185]1 spurious byte(s) received
+1704983099:[PUMP  ,0016]pump during 2902ms
+1704983103:[MRMAID,0002]acq started
+1704983424:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704983424:[PUMP  ,0378]Outflow calculated : 2712
+1704983424:[BUOY  ,0089]need to transfer +2mL (pump during 2903ms)
+1704983424:[MRMAID,0003]acq stopped
+1704983426:[PUMP  ,0016]pump during 2903ms
+1704983430:[MRMAID,0002]acq started
+1704984052:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704984052:[PUMP  ,0378]Outflow calculated : 2712
+1704984052:[BUOY  ,0089]need to transfer +2mL (pump during 2902ms)
+1704984052:[MRMAID,0003]acq stopped
+1704984054:[PUMP  ,0016]pump during 2902ms
+1704984058:[MRMAID,0002]acq started
+1704984478:[MRMAID,0003]acq stopped
+1704984514:[SBE61 ,0396]P +20298,T +19355,S +34585
+1704984515:[MRMAID,0002]acq started
+1704984679:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704984679:[PUMP  ,0378]Outflow calculated : 2712
+1704984679:[BUOY  ,0089]need to transfer +2mL (pump during 2903ms)
+1704984679:[MRMAID,0003]acq stopped
+1704984681:[PUMP  ,0016]pump during 2903ms
+1704984685:[MRMAID,0002]acq started
+1704988078:[MRMAID,0003]acq stopped
+1704988078:[MRMAID,0052]$MEASFS,133651,3340.085693,40.014243;
+1704988113:[SBE61 ,0396]P +20401,T +19445,S +34583
+1704988115:[MRMAID,0002]acq started
+1704989509:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1704989509:[PUMP  ,0378]Outflow calculated : 2711
+1704989509:[BUOY  ,0089]need to transfer +2mL (pump during 2900ms)
+1704989509:[MRMAID,0052]$STOPAC$MEASFS,53665,1341.147461,40.014243;
+1704989510:[PUMP  ,0016]pump during 2900ms
+1704989512:[MRMAID,0185]5 spurious byte(s) received
+1704989515:[MRMAID,0002]acq started
+1704991687:[MRMAID,0003]acq stopped
+1704991688:[MRMAID,0052]$MEASFS,84829,2119.970123,40.014243;
+1704991723:[SBE61 ,0396]P +20163,T +19530,S +34582
+1704991724:[MRMAID,0002]acq started
+1704995287:[MRMAID,0003]acq stopped
+1704995287:[MRMAID,0052]$MEASFS,140449,3509.975159,40.014243;
+1704995323:[SBE61 ,0396]P +20191,T +19533,S +34581
+1704995324:[MRMAID,0002]acq started
+1704998887:[MRMAID,0003]acq stopped
+1704998887:[MRMAID,0052]$MEASFS,140449,3509.975159,40.014243;
+1704998922:[SBE61 ,0396]P +20248,T +19448,S +34583
+1704998923:[MRMAID,0002]acq started
+1705000041:[BUOY  ,0101]stage[1] 10 stab done
+1705000041:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1705000041:[PUMP  ,0378]Outflow calculated : 2711
+1705000041:[BUOY  ,0089]need to transfer +2mL (pump during 2903ms)
+1705000041:[MRMAID,0003]acq stopped
+1705000041:[MRMAID,0185]28 spurious byte(s) received
+1705000043:[PUMP  ,0016]pump during 2903ms
+1705000047:[MRMAID,0002]acq started
+1705002496:[MRMAID,0003]acq stopped
+1705002496:[MRMAID,0052]$MEASFS,95897,2396.571625,40.014243;
+1705002532:[SBE61 ,0396]P +20092,T +19575,S +34581
+1705002533:[MRMAID,0002]acq started
+1705006096:[MRMAID,0003]acq stopped
+1705006096:[MRMAID,0052]$MEASFS,140449,3509.975158,40.014243;
+1705006131:[SBE61 ,0396]P +20213,T +19665,S +34579
+1705006133:[MRMAID,0002]acq started
+1705009696:[MRMAID,0003]acq stopped
+1705009696:[MRMAID,0052]$MEASFS,140453,3510.075135,40.014243;
+1705009731:[SBE61 ,0396]P +20106,T +19650,S +34580
+1705009732:[MRMAID,0002]acq started
+1705013305:[MRMAID,0003]acq stopped
+1705013305:[MRMAID,0052]$MEASFS,140847,3519.921631,40.014243;
+1705013341:[SBE61 ,0396]P +20096,T +19594,S +34581
+1705013342:[MRMAID,0002]acq started
+1705016905:[MRMAID,0003]acq stopped
+1705016905:[MRMAID,0052]$MEASFS,140448,3509.950165,40.014243;
+1705016940:[SBE61 ,0396]P +20090,T +19538,S +34581
+1705016942:[MRMAID,0002]acq started
+1705020515:[MRMAID,0003]acq stopped
+1705020515:[MRMAID,0052]$MEASFS,140849,3519.971619,40.014243;
+1705020550:[SBE61 ,0396]P +20109,T +19513,S +34582
+1705020551:[MRMAID,0002]acq started
+1705024114:[MRMAID,0003]acq stopped
+1705024114:[MRMAID,0052]$MEASFS,140454,3510.100128,40.014243;
+1705024150:[SBE61 ,0396]P +20168,T +19596,S +34580
+1705024151:[MRMAID,0002]acq started
+1705027132:[MRMAID,0027]1997dbar, 33degC
+1705027258:[MRMAID,0005]ascent request rejected
+1705027714:[MRMAID,0052]$STOPACK:$MEASFS,140459,3510.225067,40.014243;
+1705027716:[MRMAID,0185]3 spurious byte(s) received
+1705027749:[SBE61 ,0396]P +20076,T +19426,S +34583
+1705027750:[MRMAID,0002]acq started
+1705031323:[MRMAID,0003]acq stopped
+1705031323:[MRMAID,0052]$MEASFS,140848,3519.946594,40.014243;
+1705031359:[SBE61 ,0396]P +20106,T +19506,S +34583
+1705031360:[MRMAID,0002]acq started
+1705034923:[MRMAID,0003]acq stopped
+1705034923:[MRMAID,0052]$MEASFS,140449,3509.975158,40.014243;
+1705034958:[SBE61 ,0396]P +20108,T +19409,S +34583
+1705034960:[MRMAID,0002]acq started
+1705038523:[MRMAID,0003]acq stopped
+1705038523:[MRMAID,0052]$MEASFS,140449,3509.975128,40.014244;
+1705038558:[SBE61 ,0396]P +20051,T +19387,S +34583
+1705038559:[MRMAID,0002]acq started
+1705042132:[MRMAID,0003]acq stopped
+1705042132:[MRMAID,0052]$MEASFS,140848,3519.946564,40.014244;
+1705042168:[SBE61 ,0396]P +20162,T +19370,S +34584
+1705042169:[MRMAID,0002]acq started
+1705045732:[MRMAID,0003]acq stopped
+1705045732:[MRMAID,0052]$MEASFS,140449,3509.975128,40.014244;
+1705045767:[SBE61 ,0396]P +20172,T +19481,S +34582
+1705045769:[MRMAID,0002]acq started
+1705049341:[MRMAID,0003]acq stopped
+1705049342:[MRMAID,0052]$MEASFS,140847,3519.921600,40.014243;
+1705049377:[SBE61 ,0396]P +20177,T +19562,S +34581
+1705049378:[MRMAID,0002]acq started
+1705052941:[MRMAID,0003]acq stopped
+1705052941:[MRMAID,0052]$MEASFS,140451,3510.025085,40.014244;
+1705052977:[SBE61 ,0396]P +20203,T +19662,S +34579
+1705052978:[MRMAID,0002]acq started
+1705054676:[MRMAID,0027]2008dbar, 33degC
+1705054814:[MRMAID,0005]ascent request rejected
+1705056541:[MRMAID,0003]acq stopped
+1705056541:[MRMAID,0052]$MEASFS,140453,3510.075073,40.014244;
+1705056576:[SBE61 ,0396]P +20108,T +19627,S +34580
+1705056577:[MRMAID,0002]acq started
+1705060150:[MRMAID,0003]acq stopped
+1705060150:[MRMAID,0052]$MEASFS,140849,3519.971589,40.014243;
+1705060186:[SBE61 ,0396]P +20194,T +19559,S +34581
+1705060187:[MRMAID,0002]acq started
+1705063449:[MRMAID,0027]2021dbar, 33degC
+1705063598:[MRMAID,0005]ascent request rejected
+1705063750:[MRMAID,0003]acq stopped
+1705063750:[MRMAID,0052]$MEASFS,140452,3510.050110,40.014244;
+1705063785:[SBE61 ,0396]P +20258,T +19679,S +34579
+1705063787:[MRMAID,0002]acq started
+1705067350:[MRMAID,0003]acq stopped
+1705067350:[MRMAID,0052]$MEASFS,140449,3509.975159,40.014243;
+1705067385:[SBE61 ,0396]P +20107,T +19802,S +34577
+1705067386:[MRMAID,0002]acq started
+1705070959:[MRMAID,0003]acq stopped
+1705070959:[MRMAID,0052]$MEASFS,140848,3519.946595,40.014243;
+1705070995:[SBE61 ,0396]P +20145,T +19607,S +34580
+1705070996:[MRMAID,0002]acq started
+1705074559:[MRMAID,0003]acq stopped
+1705074559:[MRMAID,0052]$MEASFS,140449,3509.975159,40.014243;
+1705074594:[SBE61 ,0396]P +20023,T +19399,S +34583
+1705074596:[MRMAID,0002]acq started
+1705078169:[MRMAID,0052]$STOPACK:$MEASFS,140852,3520.046569,40.014243;
+1705078171:[MRMAID,0185]3 spurious byte(s) received
+1705078204:[SBE61 ,0396]P +20216,T +19346,S +34584
+1705078205:[MRMAID,0002]acq started
+1705081768:[MRMAID,0003]acq stopped
+1705081768:[MRMAID,0052]$MEASFS,140449,3509.975128,40.014244;
+1705081804:[SBE61 ,0396]P +20132,T +19438,S +34583
+1705081805:[MRMAID,0002]acq started
+1705085368:[MRMAID,0003]acq stopped
+1705085368:[MRMAID,0052]$MEASFS,140448,3509.950134,40.014244;
+1705085403:[SBE61 ,0396]P +19963,T +19300,S +34585
+1705085404:[MRMAID,0002]acq started
+1705088977:[MRMAID,0052]$STOPACK$MEASFS,140850,3519.996552,40.014244;
+1705088980:[MRMAID,0185]4 spurious byte(s) received
+1705089013:[SBE61 ,0396]P +20160,T +19295,S +34585
+1705089014:[MRMAID,0002]acq started
+1705092577:[MRMAID,0003]acq stopped
+1705092577:[MRMAID,0052]$MEASFS,140450,3510.000092,40.014244;
+1705092612:[SBE61 ,0396]P +20149,T +19286,S +34585
+1705092614:[MRMAID,0002]acq started
+1705096177:[MRMAID,0003]acq stopped
+1705096177:[MRMAID,0052]$MEASFS,140449,3509.975098,40.014244;
+1705096212:[SBE61 ,0396]P +20139,T +19321,S +34584
+1705096213:[MRMAID,0002]acq started
+1705099786:[MRMAID,0052]$STOPA$MEASFS,140853,3520.071503,40.014244;
+1705099789:[MRMAID,0185]6 spurious byte(s) received
+1705099822:[SBE61 ,0396]P +20249,T +19357,S +34584
+1705099823:[MRMAID,0002]acq started
+1705103386:[MRMAID,0003]acq stopped
+1705103386:[MRMAID,0052]$MEASFS,140449,3509.975098,40.014244;
+1705103421:[SBE61 ,0396]P +20236,T +19582,S +34581
+1705103423:[MRMAID,0002]acq started
+1705106996:[MRMAID,0003]acq stopped
+1705106996:[MRMAID,0052]$MEASFS,140848,3519.946564,40.014244;
+1705107031:[SBE61 ,0396]P +20151,T +19547,S +34581
+1705107032:[MRMAID,0002]acq started
+1705110595:[MRMAID,0003]acq stopped
+1705110595:[MRMAID,0052]$MEASFS,140449,3509.975097,40.014244;
+1705110631:[SBE61 ,0396]P +20148,T +19350,S +34584
+1705110632:[MRMAID,0002]acq started
+1705114195:[MRMAID,0003]acq stopped
+1705114195:[MRMAID,0052]$MEASFS,140462,3510.299988,40.014244;
+1705114230:[SBE61 ,0396]P +20074,T +19286,S +34586
+1705114231:[MRMAID,0002]acq started
+1705117804:[MRMAID,0003]acq stopped
+1705117804:[MRMAID,0052]$MEASFS,140847,3519.921539,40.014244;
+1705117840:[SBE61 ,0396]P +20200,T +19321,S +34584
+1705117841:[MRMAID,0002]acq started
+1705121404:[MRMAID,0003]acq stopped
+1705121404:[MRMAID,0052]$MEASFS,140448,3509.950135,40.014244;
+1705121439:[SBE61 ,0396]P +20108,T +19210,S +34586
+1705121441:[MRMAID,0002]acq started
+1705125004:[MRMAID,0003]acq stopped
+1705125004:[MRMAID,0052]$MEASFS,140451,3510.025055,40.014244;
+1705125039:[SBE61 ,0396]P +20211,T +19311,S +34585
+1705125040:[MRMAID,0002]acq started
+1705128613:[MRMAID,0003]acq stopped
+1705128613:[MRMAID,0052]$MEASFS,140849,3519.971528,40.014244;
+1705128649:[SBE61 ,0396]P +20082,T +19248,S +34587
+1705128650:[MRMAID,0002]acq started
+1705132213:[MRMAID,0003]acq stopped
+1705132213:[MRMAID,0052]$MEASFS,140450,3510.000061,40.014244;
+1705132248:[SBE61 ,0396]P +20289,T +19224,S +34586
+1705132250:[MRMAID,0002]acq started
+1705135823:[MRMAID,0003]acq stopped
+1705135823:[MRMAID,0052]$MEASFS,140849,3519.971527,40.014244;
+1705135858:[SBE61 ,0396]P +20203,T +19352,S +34584
+1705135859:[MRMAID,0002]acq started
+1705139422:[MRMAID,0003]acq stopped
+1705139422:[MRMAID,0052]$MEASFS,140449,3509.975068,40.014244;
+1705139458:[SBE61 ,0396]P +20242,T +19464,S +34582
+1705139459:[MRMAID,0002]acq started
+1705143022:[MRMAID,0003]acq stopped
+1705143022:[MRMAID,0052]$MEASFS,140449,3509.975098,40.014244;
+1705143057:[SBE61 ,0396]P +20269,T +19456,S +34583
+1705143059:[MRMAID,0002]acq started
+1705146631:[MRMAID,0003]acq stopped
+1705146632:[MRMAID,0052]$MEASFS,140849,3519.971527,40.014244;
+1705146667:[SBE61 ,0396]P +20124,T +19482,S +34582
+1705146668:[MRMAID,0002]acq started
+1705150231:[MRMAID,0003]acq stopped
+1705150231:[MRMAID,0052]$MEASFS,140449,3509.975098,40.014244;
+1705150266:[SBE61 ,0396]P +20142,T +19329,S +34584
+1705150268:[MRMAID,0002]acq started
+1705153831:[MRMAID,0003]acq stopped
+1705153831:[MRMAID,0052]$MEASFS,140448,3509.950073,40.014244;
+1705153866:[SBE61 ,0396]P +20097,T +19292,S +34585
+1705153867:[MRMAID,0002]acq started
+1705157440:[MRMAID,0003]acq stopped
+1705157440:[MRMAID,0052]$MEASFS,140848,3519.946533,40.014244;
+1705157476:[SBE61 ,0396]P +20301,T +19246,S +34586
+1705157477:[MRMAID,0002]acq started
+1705158699:[MRMAID,0027]2034dbar, 33degC
+1705158878:[MRMAID,0005]ascent request rejected
+1705161040:[MRMAID,0003]acq stopped
+1705161040:[MRMAID,0052]$MEASFS,140450,3510.000092,40.014244;
+1705161075:[SBE61 ,0396]P +20196,T +19343,S +34584
+1705161077:[MRMAID,0002]acq started
+1705164650:[MRMAID,0003]acq stopped
+1705164650:[MRMAID,0052]$MEASFS,140849,3519.971527,40.014244;
+1705164685:[SBE61 ,0396]P +20237,T +19326,S +34584
+1705164686:[MRMAID,0002]acq started
+1705168249:[MRMAID,0003]acq stopped
+1705168249:[MRMAID,0052]$MEASFS,140454,3510.100037,40.014244;
+1705168285:[SBE61 ,0396]P +20202,T +19360,S +34584
+1705168286:[MRMAID,0002]acq started
+1705171849:[MRMAID,0003]acq stopped
+1705171849:[MRMAID,0052]$MEASFS,140449,3509.975097,40.014244;
+1705171884:[SBE61 ,0396]P +20192,T +19294,S +34585
+1705171886:[MRMAID,0002]acq started
+1705175458:[MRMAID,0003]acq stopped
+1705175459:[MRMAID,0052]$MEASFS,140848,3519.946533,40.014244;
+1705175494:[SBE61 ,0396]P +20165,T +19338,S +34584
+1705175495:[MRMAID,0002]acq started
+1705179058:[MRMAID,0003]acq stopped
+1705179058:[MRMAID,0052]$MEASFS,140449,3509.975097,40.014244;
+1705179093:[SBE61 ,0396]P +20045,T +19210,S +34586
+1705179095:[MRMAID,0002]acq started
+1705182658:[MRMAID,0003]acq stopped
+1705182658:[MRMAID,0052]$MEASFS,140449,3509.975067,40.014244;
+1705182693:[SBE61 ,0396]P +20272,T +19092,S +34587
+1705182694:[MRMAID,0002]acq started
+1705186267:[MRMAID,0003]acq stopped
+1705186267:[MRMAID,0052]$MEASFS,140848,3519.946533,40.014244;
+1705186303:[SBE61 ,0396]P +20192,T +19238,S +34586
+1705186304:[MRMAID,0002]acq started
+1705189867:[MRMAID,0003]acq stopped
+1705189867:[MRMAID,0052]$MEASFS,140448,3509.950042,40.014245;
+1705189902:[SBE61 ,0396]P +20295,T +19349,S +34584
+1705189904:[MRMAID,0002]acq started
+1705193467:[MRMAID,0003]acq stopped
+1705193467:[MRMAID,0052]$MEASFS,140452,3510.050048,40.014244;
+1705193502:[SBE61 ,0396]P +20341,T +19482,S +34582
+1705193503:[MRMAID,0002]acq started
+1705197076:[MRMAID,0003]acq stopped
+1705197076:[MRMAID,0052]$MEASFS,140849,3519.971528,40.014244;
+1705197112:[SBE61 ,0396]P +20244,T +19454,S +34583
+1705197113:[MRMAID,0002]acq started
+1705200676:[MRMAID,0003]acq stopped
+1705200676:[MRMAID,0052]$MEASFS,140460,3510.249970,40.014244;
+1705200711:[SBE61 ,0396]P +20246,T +19347,S +34585
+1705200713:[MRMAID,0002]acq started
+1705204286:[MRMAID,0003]acq stopped
+1705204288:[MRMAID,0185]1 spurious byte(s) received
+1705204321:[SBE61 ,0396]P +20211,T +19363,S +34585
+1705204322:[MRMAID,0002]acq started
+1705207885:[MRMAID,0003]acq stopped
+1705207885:[MRMAID,0052]$MEASFS,140449,3509.975067,40.014244;
+1705207921:[SBE61 ,0396]P +19867,T +19148,S +34587
+1705207922:[MRMAID,0002]acq started
+1705211485:[MRMAID,0003]acq stopped
+1705211485:[MRMAID,0052]$MEASFS,140449,3509.975067,40.014244;
+1705211520:[SBE61 ,0396]P +20085,T +18919,S +34590
+1705211521:[MRMAID,0002]acq started
+1705215094:[MRMAID,0052]$STOPACK:+$MEASFS,140848,3519.946503,40.014245;
+1705215097:[MRMAID,0185]2 spurious byte(s) received
+1705215130:[SBE61 ,0396]P +20307,T +18875,S +34591
+1705215131:[MRMAID,0002]acq started
+1705218694:[MRMAID,0003]acq stopped
+1705218694:[MRMAID,0052]$MEASFS,140453,3510.074982,40.014245;
+1705218729:[SBE61 ,0396]P +20327,T +18992,S +34589
+1705218731:[MRMAID,0002]acq started
+1705222294:[MRMAID,0003]acq stopped
+1705222294:[MRMAID,0052]$MEASFS,140449,3509.975007,40.014245;
+1705222329:[SBE61 ,0396]P +20239,T +19167,S +34587
+1705222330:[MRMAID,0002]acq started
+1705225903:[MRMAID,0052]$STOPAC$MEASFS,140847,3519.921479,40.014245;
+1705225906:[MRMAID,0185]5 spurious byte(s) received
+1705225939:[SBE61 ,0396]P +20194,T +19153,S +34587
+1705225940:[MRMAID,0002]acq started
+1705229503:[MRMAID,0003]acq stopped
+1705229503:[MRMAID,0052]$MEASFS,140451,3510.024994,40.014245;
+1705229538:[SBE61 ,0396]P +20375,T +19181,S +34587
+1705229540:[MRMAID,0002]acq started
+1705233112:[MRMAID,0003]acq stopped
+1705233113:[MRMAID,0052]$MEASFS,140849,3519.971435,40.014245;
+1705233148:[SBE61 ,0396]P +20201,T +19244,S +34586
+1705233149:[MRMAID,0002]acq started
+1705236712:[MRMAID,0003]acq stopped
+1705236712:[MRMAID,0052]$MEASFS,140450,3510.000031,40.014245;
+1705236748:[SBE61 ,0396]P +20317,T +19297,S +34585
+1705236749:[MRMAID,0002]acq started
+1705240312:[MRMAID,0003]acq stopped
+1705240312:[MRMAID,0052]$MEASFS,140450,3510.000031,40.014245;
+1705240347:[SBE61 ,0396]P +20252,T +19306,S +34585
+1705240348:[MRMAID,0002]acq started
+1705243921:[MRMAID,0003]acq stopped
+1705243921:[MRMAID,0052]$MEASFS,140848,3519.946473,40.014245;
+1705243957:[SBE61 ,0396]P +20317,T +19347,S +34584
+1705243958:[MRMAID,0002]acq started
+1705247521:[MRMAID,0003]acq stopped
+1705247521:[MRMAID,0052]$MEASFS,140449,3509.975037,40.014245;
+1705247556:[SBE61 ,0396]P +20238,T +19333,S +34584
+1705247558:[MRMAID,0002]acq started
+1705251121:[MRMAID,0003]acq stopped
+1705251121:[MRMAID,0052]$MEASFS,140449,3509.975036,40.014245;
+1705251156:[SBE61 ,0396]P +20263,T +19279,S +34586
+1705251157:[MRMAID,0002]acq started
+1705254730:[MRMAID,0003]acq stopped
+1705254730:[MRMAID,0052]$MEASFS,140851,3520.021484,40.014244;
+1705254766:[SBE61 ,0396]P +20225,T +19231,S +34586
+1705254767:[MRMAID,0002]acq started
+1705258330:[MRMAID,0003]acq stopped
+1705258330:[MRMAID,0052]$MEASFS,140449,3509.975067,40.014244;
+1705258365:[SBE61 ,0396]P +20057,T +18986,S +34589
+1705258367:[MRMAID,0002]acq started
+1705261939:[MRMAID,0003]acq stopped
+1705261940:[MRMAID,0052]$MEASFS,140847,3519.921478,40.014245;
+1705261975:[SBE61 ,0396]P +20353,T +18877,S +34591
+1705261976:[MRMAID,0002]acq started
+1705263296:[PRESS ,0038]P+204677mbar,T+32767mdegC
+1705265539:[MRMAID,0003]acq stopped
+1705265539:[MRMAID,0052]$MEASFS,140447,3509.925048,40.014245;
+1705265575:[SBE61 ,0396]P +20379,T +19293,S +34585
+1705265576:[MRMAID,0002]acq started
+1705269139:[MRMAID,0003]acq stopped
+1705269139:[MRMAID,0052]$MEASFS,140454,3510.100006,40.014245;
+1705269174:[SBE61 ,0396]P +20310,T +19498,S +34582
+1705269175:[MRMAID,0002]acq started
+1705272748:[MRMAID,0003]acq stopped
+1705272748:[MRMAID,0052]$MEASFS,140849,3519.971466,40.014245;
+1705272784:[SBE61 ,0396]P +20186,T +19383,S +34583
+1705272785:[MRMAID,0002]acq started
+1705276348:[MRMAID,0003]acq stopped
+1705276348:[MRMAID,0052]$MEASFS,140450,3510.000030,40.014245;
+1705276383:[SBE61 ,0396]P +20153,T +19298,S +34586
+1705276385:[MRMAID,0002]acq started
+1705279948:[MRMAID,0003]acq stopped
+1705279948:[MRMAID,0052]$MEASFS,140453,3510.075013,40.014245;
+1705279983:[SBE61 ,0396]P +20343,T +19216,S +34586
+1705279984:[MRMAID,0002]acq started
+1705283557:[MRMAID,0003]acq stopped
+1705283557:[MRMAID,0052]$MEASFS,140848,3519.946503,40.014245;
+1705283593:[SBE61 ,0396]P +20047,T +19193,S +34586
+1705283594:[MRMAID,0002]acq started
+1705287157:[MRMAID,0003]acq stopped
+1705287157:[MRMAID,0052]$MEASFS,140459,3510.224945,40.014245;
+1705287192:[SBE61 ,0396]P +20310,T +19115,S +34587
+1705287194:[MRMAID,0002]acq started
+1705288197:[MRMAID,0027]2025dbar, 33degC
+1705288328:[MRMAID,0005]ascent request rejected
+1705290766:[MRMAID,0003]acq stopped
+1705290767:[MRMAID,0052]$MEASFS,140847,3519.921478,40.014245;
+1705290802:[SBE61 ,0396]P +20203,T +19077,S +34588
+1705290803:[MRMAID,0002]acq started
+1705294366:[MRMAID,0003]acq stopped
+1705294366:[MRMAID,0185]29 spurious byte(s) received
+1705294402:[SBE61 ,0396]P +20212,T +18954,S +34589
+1705294403:[MRMAID,0002]acq started
+1705297966:[MRMAID,0003]acq stopped
+1705297966:[MRMAID,0185]21 spurious byte(s) received
+1705298001:[SBE61 ,0396]P +20271,T +18845,S +34592
+1705298002:[MRMAID,0002]acq started
+1705301575:[MRMAID,0003]acq stopped
+1705301576:[MRMAID,0052]$MEASFS,140852,3520.046448,40.014245;
+1705301611:[SBE61 ,0396]P +20342,T +18916,S +34590
+1705301612:[MRMAID,0002]acq started
+1705305175:[MRMAID,0003]acq stopped
+1705305175:[MRMAID,0052]$MEASFS,140450,3509.999970,40.014245;
+1705305211:[SBE61 ,0396]P +20272,T +18914,S +34591
+1705305212:[MRMAID,0002]acq started
+1705308775:[MRMAID,0003]acq stopped
+1705308775:[MRMAID,0052]$MEASFS,140450,3509.999969,40.014245;
+1705308810:[SBE61 ,0396]P +20232,T +18913,S +34591
+1705308811:[MRMAID,0002]acq started
+1705312384:[MRMAID,0003]acq stopped
+1705312384:[MRMAID,0052]$MEASFS,140849,3519.971435,40.014245;
+1705312420:[SBE61 ,0396]P +20205,T +18868,S +34591
+1705312421:[MRMAID,0002]acq started
+1705315984:[MRMAID,0003]acq stopped
+1705315984:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705316019:[SBE61 ,0396]P +20252,T +18866,S +34591
+1705316021:[MRMAID,0002]acq started
+1705319584:[MRMAID,0003]acq stopped
+1705319584:[MRMAID,0052]$MEASFS,140453,3510.074951,40.014245;
+1705319619:[SBE61 ,0396]P +20242,T +18891,S +34591
+1705319620:[MRMAID,0002]acq started
+1705320057:[MRMAID,0027]2022dbar, 33degC
+1705320199:[MRMAID,0005]ascent request rejected
+1705323193:[MRMAID,0003]acq stopped
+1705323193:[MRMAID,0052]$MEASFS,140851,3520.021393,40.014245;
+1705323229:[SBE61 ,0396]P +20285,T +19055,S +34588
+1705323230:[MRMAID,0002]acq started
+1705326793:[MRMAID,0003]acq stopped
+1705326793:[MRMAID,0052]$MEASFS,140448,3509.949981,40.014245;
+1705326828:[SBE61 ,0396]P +20383,T +19133,S +34587
+1705326830:[MRMAID,0002]acq started
+1705330403:[MRMAID,0052]$STO$MEASFS,140847,3519.921448,40.014245;
+1705330405:[MRMAID,0185]8 spurious byte(s) received
+1705330438:[SBE61 ,0396]P +20208,T +19212,S +34586
+1705330439:[MRMAID,0002]acq started
+1705334002:[MRMAID,0003]acq stopped
+1705334002:[MRMAID,0052]$MEASFS,140448,3509.949982,40.014245;
+1705334038:[SBE61 ,0396]P +20400,T +19209,S +34586
+1705334039:[MRMAID,0002]acq started
+1705337602:[MRMAID,0003]acq stopped
+1705337602:[MRMAID,0052]$MEASFS,140451,3510.024994,40.014245;
+1705337637:[SBE61 ,0396]P +20208,T +19199,S +34587
+1705337638:[MRMAID,0002]acq started
+1705341211:[MRMAID,0003]acq stopped
+1705341211:[MRMAID,0052]$MEASFS,140849,3519.971466,40.014245;
+1705341247:[SBE61 ,0396]P +20256,T +19138,S +34587
+1705341248:[MRMAID,0002]acq started
+1705344811:[MRMAID,0003]acq stopped
+1705344811:[MRMAID,0052]$MEASFS,140453,3510.074981,40.014245;
+1705344846:[SBE61 ,0396]P +20417,T +19178,S +34587
+1705344848:[MRMAID,0002]acq started
+1705348411:[MRMAID,0003]acq stopped
+1705348411:[MRMAID,0052]$MEASFS,140450,3510.000030,40.014245;
+1705348446:[SBE61 ,0396]P +20295,T +19257,S +34585
+1705348447:[MRMAID,0002]acq started
+1705352020:[MRMAID,0003]acq stopped
+1705352020:[MRMAID,0052]$MEASFS,140848,3519.946472,40.014245;
+1705352056:[SBE61 ,0396]P +20316,T +19209,S +34586
+1705352057:[MRMAID,0002]acq started
+1705355620:[MRMAID,0003]acq stopped
+1705355620:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705355655:[SBE61 ,0396]P +20106,T +19140,S +34587
+1705355657:[MRMAID,0002]acq started
+1705359229:[MRMAID,0003]acq stopped
+1705359230:[MRMAID,0052]$MEASFS,140848,3519.946472,40.014245;
+1705359265:[SBE61 ,0396]P +20098,T +18830,S +34591
+1705359266:[MRMAID,0002]acq started
+1705362829:[MRMAID,0003]acq stopped
+1705362829:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705362865:[SBE61 ,0396]P +20215,T +18758,S +34593
+1705362866:[MRMAID,0002]acq started
+1705366429:[MRMAID,0003]acq stopped
+1705366429:[MRMAID,0052]$MEASFS,140448,3509.950012,40.014245;
+1705366464:[SBE61 ,0396]P +20359,T +18818,S +34592
+1705366465:[MRMAID,0002]acq started
+1705370038:[MRMAID,0052]$STOPA$MEASFS,140847,3519.921448,40.014245;
+1705370043:[MRMAID,0185]6 spurious byte(s) received
+1705370074:[SBE61 ,0396]P +20280,T +18807,S +34592
+1705370075:[MRMAID,0002]acq started
+1705373638:[MRMAID,0003]acq stopped
+1705373638:[MRMAID,0052]$MEASFS,140460,3510.249878,40.014245;
+1705373673:[SBE61 ,0396]P +20327,T +18868,S +34591
+1705373675:[MRMAID,0002]acq started
+1705377238:[MRMAID,0003]acq stopped
+1705377238:[MRMAID,0052]$MEASFS,140450,3509.999970,40.014245;
+1705377273:[SBE61 ,0396]P +20354,T +19129,S +34587
+1705377274:[MRMAID,0002]acq started
+1705380847:[MRMAID,0052]$MEASFS,140849,3519.971405,40.014246;
+1705380850:[MRMAID,0003]acq stopped
+1705380883:[SBE61 ,0396]P +20273,T +19018,S +34589
+1705380884:[MRMAID,0002]acq started
+1705384447:[MRMAID,0003]acq stopped
+1705384447:[MRMAID,0052]$MEASFS,140449,3509.974975,40.014245;
+1705384482:[SBE61 ,0396]P +20295,T +19086,S +34588
+1705384484:[MRMAID,0002]acq started
+1705388057:[MRMAID,0003]acq stopped
+1705388057:[MRMAID,0052]$MEASFS,140852,3520.046387,40.014245;
+1705388092:[SBE61 ,0396]P +20161,T +19042,S +34589
+1705388093:[MRMAID,0002]acq started
+1705391656:[MRMAID,0003]acq stopped
+1705391656:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705391692:[SBE61 ,0396]P +20295,T +18888,S +34591
+1705391693:[MRMAID,0002]acq started
+1705395256:[MRMAID,0003]acq stopped
+1705395256:[MRMAID,0052]$MEASFS,140448,3509.949982,40.014245;
+1705395291:[SBE61 ,0396]P +20202,T +18899,S +34589
+1705395292:[MRMAID,0002]acq started
+1705398866:[MRMAID,0052]$STOPACK:+$MEASFS,140852,3520.046387,40.014245;
+1705398868:[MRMAID,0185]2 spurious byte(s) received
+1705398901:[SBE61 ,0396]P +20290,T +18810,S +34592
+1705398902:[MRMAID,0002]acq started
+1705402465:[MRMAID,0003]acq stopped
+1705402465:[MRMAID,0052]$MEASFS,140452,3510.049927,40.014246;
+1705402500:[SBE61 ,0396]P +20273,T +18777,S +34593
+1705402502:[MRMAID,0002]acq started
+1705406065:[MRMAID,0003]acq stopped
+1705406065:[MRMAID,0052]$MEASFS,140448,3509.949981,40.014245;
+1705406100:[SBE61 ,0396]P +20491,T +18900,S +34590
+1705406101:[MRMAID,0002]acq started
+1705409674:[MRMAID,0052]$STOPA$MEASFS,140849,3519.971405,40.014246;
+1705409677:[MRMAID,0185]6 spurious byte(s) received
+1705409710:[SBE61 ,0396]P +20292,T +19026,S +34589
+1705409711:[MRMAID,0002]acq started
+1705413274:[MRMAID,0003]acq stopped
+1705413274:[MRMAID,0052]$MEASFS,140454,3510.099945,40.014245;
+1705413309:[SBE61 ,0396]P +20225,T +18943,S +34590
+1705413311:[MRMAID,0002]acq started
+1705416884:[MRMAID,0003]acq stopped
+1705416884:[MRMAID,0052]$MEASFS,140849,3519.971405,40.014246;
+1705416919:[SBE61 ,0396]P +20347,T +18974,S +34589
+1705416920:[MRMAID,0002]acq started
+1705420483:[MRMAID,0003]acq stopped
+1705420483:[MRMAID,0052]$MEASFS,140449,3509.974976,40.014245;
+1705420519:[SBE61 ,0396]P +20479,T +19067,S +34589
+1705420520:[MRMAID,0002]acq started
+1705421173:[BUOY  ,0087]from +1mbar/s to -2mbar/s
+1705421173:[PUMP  ,0378]Outflow calculated : 2710
+1705421173:[BUOY  ,0089]need to transfer +8mL (pump during 11637ms)
+1705421173:[MRMAID,0003]acq stopped
+1705421173:[MRMAID,0185]19 spurious byte(s) received
+1705421175:[PUMP  ,0016]pump during 11637ms
+1705421186:[PUMP  ,0212]battery 13987mV,  923052uA (steady state), P+205017mbar
+1705421187:[MRMAID,0002]acq started
+1705423601:[BUOY  ,0087]from -2mbar/s to +0mbar/s
+1705423601:[BUOY  ,0090]need to transfer -6mL (valve during 172ms)
+1705423601:[MRMAID,0003]acq stopped
+1705423601:[MRMAID,0052]$MEASFS,94465,2360.784241,40.014245;
+1705423602:[VALVE ,0034]valve opening 172ms
+1705423613:[MRMAID,0002]acq started
+1705423938:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1705423938:[PUMP  ,0378]Outflow calculated : 2713
+1705423938:[BUOY  ,0089]need to transfer +6mL (pump during 8702ms)
+1705423938:[MRMAID,0003]acq stopped
+1705423939:[PUMP  ,0016]pump during 8702ms
+1705423948:[PUMP  ,0212]battery 14233mV,  902800uA (steady state), P+200117mbar
+1705423949:[MRMAID,0002]acq started
+1705424083:[MRMAID,0003]acq stopped
+1705424118:[SBE61 ,0396]P +20072,T +19270,S +34586
+1705424119:[MRMAID,0002]acq started
+1705424265:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1705424265:[PUMP  ,0378]Outflow calculated : 2713
+1705424265:[BUOY  ,0089]need to transfer +6mL (pump during 8702ms)
+1705424265:[MRMAID,0003]acq stopped
+1705424267:[PUMP  ,0016]pump during 8702ms
+1705424275:[PUMP  ,0212]battery 14236mV,  902678uA (steady state), P+200577mbar
+1705424277:[MRMAID,0002]acq started
+1705424592:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1705424592:[PUMP  ,0378]Outflow calculated : 2712
+1705424592:[BUOY  ,0089]need to transfer +2mL (pump during 2917ms)
+1705424592:[MRMAID,0003]acq stopped
+1705424594:[PUMP  ,0016]pump during 2917ms
+1705424598:[MRMAID,0002]acq started
+1705424920:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1705424920:[PUMP  ,0378]Outflow calculated : 2712
+1705424920:[BUOY  ,0089]need to transfer +6mL (pump during 8751ms)
+1705424920:[MRMAID,0003]acq stopped
+1705424921:[PUMP  ,0016]pump during 8751ms
+1705424930:[PUMP  ,0212]battery 14247mV,  903776uA (steady state), P+201227mbar
+1705424932:[MRMAID,0002]acq started
+1705426448:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1705426448:[BUOY  ,0090]need to transfer -2mL (valve during 57ms)
+1705426448:[MRMAID,0003]acq stopped
+1705426448:[MRMAID,0185]28 spurious byte(s) received
+1705426448:[VALVE ,0034]valve opening 57ms
+1705426460:[MRMAID,0002]acq started
+1705426784:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1705426784:[PUMP  ,0378]Outflow calculated : 2713
+1705426784:[BUOY  ,0089]need to transfer +6mL (pump during 8714ms)
+1705426784:[MRMAID,0052]$STOPACK
+1705426786:[MRMAID,0185]4 spurious byte(s) received
+1705426786:[PUMP  ,0016]pump during 8714ms
+1705426794:[PUMP  ,0212]battery 14291mV,  902434uA (steady state), P+200327mbar
+1705426796:[MRMAID,0002]acq started
+1705427111:[BUOY  ,0087]from +2mbar/s to +0mbar/s
+1705427111:[PUMP  ,0378]Outflow calculated : 2713
+1705427112:[BUOY  ,0089]need to transfer +6mL (pump during 8714ms)
+1705427112:[MRMAID,0003]acq stopped
+1705427113:[PUMP  ,0016]pump during 8714ms
+1705427121:[PUMP  ,0212]battery 14280mV,  894382uA (steady state), P+200717mbar
+1705427123:[MRMAID,0002]acq started
+1705427439:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1705427439:[PUMP  ,0378]Outflow calculated : 2713
+1705427439:[BUOY  ,0089]need to transfer +2mL (pump during 2912ms)
+1705427439:[MRMAID,0052]$STOPACK:+
+1705427441:[MRMAID,0185]2 spurious byte(s) received
+1705427441:[PUMP  ,0016]pump during 2912ms
+1705427445:[MRMAID,0002]acq started
+1705427692:[MRMAID,0003]acq stopped
+1705427728:[SBE61 ,0396]P +20107,T +19189,S +34586
+1705427729:[MRMAID,0002]acq started
+1705431292:[MRMAID,0003]acq stopped
+1705431292:[MRMAID,0052]$MEASFS,140459,3510.224975,40.014244;
+1705431327:[SBE61 ,0396]P +20086,T +19236,S +34586
+1705431329:[MRMAID,0002]acq started
+1705434892:[MRMAID,0003]acq stopped
+1705434892:[MRMAID,0052]$MEASFS,140448,3509.950074,40.014244;
+1705434927:[SBE61 ,0396]P +20020,T +19192,S +34586
+1705434928:[MRMAID,0002]acq started
+1705438501:[MRMAID,0003]acq stopped
+1705438501:[MRMAID,0052]$MEASFS,140847,3519.921508,40.014245;
+1705438537:[SBE61 ,0396]P +20055,T +19195,S +34586
+1705438538:[MRMAID,0002]acq started
+1705442101:[MRMAID,0003]acq stopped
+1705442101:[MRMAID,0052]$MEASFS,140451,3510.025025,40.014245;
+1705442136:[SBE61 ,0396]P +20098,T +19179,S +34587
+1705442138:[MRMAID,0002]acq started
+1705445701:[MRMAID,0003]acq stopped
+1705445701:[MRMAID,0052]$MEASFS,140450,3510.000030,40.014245;
+1705445736:[SBE61 ,0396]P +20181,T +19185,S +34586
+1705445737:[MRMAID,0002]acq started
+1705446975:[BUOY  ,0101]stage[1] 10 stab done
+1705446976:[BUOY  ,0087]from +1mbar/s to +0mbar/s
+1705446976:[PUMP  ,0378]Outflow calculated : 2712
+1705446976:[BUOY  ,0089]need to transfer +2mL (pump during 2903ms)
+1705446976:[MRMAID,0003]acq stopped
+1705446976:[MRMAID,0185]28 spurious byte(s) received
+1705446977:[PUMP  ,0016]pump during 2903ms
+1705446981:[MRMAID,0002]acq started
+1705449310:[MRMAID,0052]$$MEASFS,91062,2275.739563,40.014245;
+1705449313:[MRMAID,0185]11 spurious byte(s) received
+1705449346:[SBE61 ,0396]P +20063,T +19383,S +34583
+1705449347:[MRMAID,0002]acq started
+1705450304:[PRESS ,0038]P+199577mbar,T+32767mdegC
+1705452910:[MRMAID,0003]acq stopped
+1705452910:[MRMAID,0052]$MEASFS,140449,3509.975037,40.014245;
+1705452945:[SBE61 ,0396]P +19908,T +19340,S +34584
+1705452946:[MRMAID,0002]acq started
+1705456519:[MRMAID,0003]acq stopped
+1705456520:[MRMAID,0052]$MEASFS,140849,3519.971497,40.014244;
+1705456555:[SBE61 ,0396]P +19922,T +19148,S +34587
+1705456556:[MRMAID,0002]acq started
+1705460119:[MRMAID,0003]acq stopped
+1705460119:[MRMAID,0052]$MEASFS,140459,3510.224975,40.014244;
+1705460155:[SBE61 ,0396]P +20094,T +19232,S +34586
+1705460156:[MRMAID,0002]acq started
+1705463719:[MRMAID,0003]acq stopped
+1705463719:[MRMAID,0052]$MEASFS,140452,3510.050018,40.014245;
+1705463754:[SBE61 ,0396]P +19944,T +19192,S +34586
+1705463755:[MRMAID,0002]acq started
+1705467328:[MRMAID,0003]acq stopped
+1705467328:[MRMAID,0052]$MEASFS,140847,3519.921509,40.014245;
+1705467364:[SBE61 ,0396]P +19991,T +19195,S +34586
+1705467365:[MRMAID,0002]acq started
+1705470928:[MRMAID,0003]acq stopped
+1705470928:[MRMAID,0052]$MEASFS,140448,3509.950043,40.014245;
+1705470963:[SBE61 ,0396]P +19882,T +19162,S +34586
+1705470965:[MRMAID,0002]acq started
+1705474528:[MRMAID,0003]acq stopped
+1705474528:[MRMAID,0052]$MEASFS,140452,3510.050018,40.014245;
+1705474563:[SBE61 ,0396]P +20095,T +19228,S +34586
+1705474564:[MRMAID,0002]acq started
+1705478137:[MRMAID,0003]acq stopped
+1705478137:[MRMAID,0052]$MEASFS,140849,3519.971467,40.014245;
+1705478173:[SBE61 ,0396]P +19979,T +19253,S +34583
+1705478174:[MRMAID,0002]acq started
+1705481737:[MRMAID,0003]acq stopped
+1705481737:[MRMAID,0052]$MEASFS,140450,3510.000030,40.014245;
+1705481772:[SBE61 ,0396]P +19965,T +19225,S +34586
+1705481774:[MRMAID,0002]acq started
+1705485347:[MRMAID,0003]acq stopped
+1705485347:[MRMAID,0052]$MEASFS,140850,3519.996490,40.014244;
+1705485382:[SBE61 ,0396]P +19942,T +19165,S +34586
+1705485383:[MRMAID,0002]acq started
+1705488946:[MRMAID,0003]acq stopped
+1705488946:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705488982:[SBE61 ,0396]P +19873,T +19102,S +34587
+1705488983:[MRMAID,0002]acq started
+1705492546:[MRMAID,0003]acq stopped
+1705492546:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705492581:[SBE61 ,0396]P +20066,T +19072,S +34588
+1705492582:[MRMAID,0002]acq started
+1705496155:[MRMAID,0003]acq stopped
+1705496156:[MRMAID,0052]$MEASFS,140853,3520.071412,40.014245;
+1705496191:[SBE61 ,0396]P +19878,T +19035,S +34587
+1705496192:[MRMAID,0002]acq started
+1705496414:[MRMAID,0027]1985dbar, 33degC
+1705496626:[MRMAID,0005]ascent request rejected
+1705499755:[MRMAID,0003]acq stopped
+1705499755:[MRMAID,0052]$MEASFS,140448,3509.950043,40.014245;
+1705499790:[SBE61 ,0396]P +19956,T +18922,S +34590
+1705499792:[MRMAID,0002]acq started
+1705503355:[MRMAID,0003]acq stopped
+1705503355:[MRMAID,0052]$MEASFS,140449,3509.975007,40.014245;
+1705503390:[SBE61 ,0396]P +20032,T +19072,S +34588
+1705503391:[MRMAID,0002]acq started
+1705506964:[MRMAID,0003]acq stopped
+1705506964:[MRMAID,0052]$MEASFS,140848,3519.946442,40.014245;
+1705507000:[SBE61 ,0396]P +20154,T +19105,S +34588
+1705507001:[MRMAID,0002]acq started
+1705510564:[MRMAID,0003]acq stopped
+1705510564:[MRMAID,0052]$MEASFS,140448,3509.950013,40.014245;
+1705510599:[SBE61 ,0396]P +19965,T +19166,S +34586
+1705510601:[MRMAID,0002]acq started
+1705514174:[MRMAID,0052]$STOP$MEASFS,140849,3519.971466,40.014245;
+1705514176:[MRMAID,0185]7 spurious byte(s) received
+1705514209:[SBE61 ,0396]P +20165,T +19257,S +34585
+1705514210:[MRMAID,0002]acq started
+1705514629:[MRMAID,0027]2013dbar, 33degC
+1705514760:[MRMAID,0005]ascent request rejected
+1705517773:[MRMAID,0003]acq stopped
+1705517773:[MRMAID,0052]$MEASFS,140450,3509.000000,40.025648;
+1705517809:[SBE61 ,0396]P +19918,T +19307,S +34585
+1705517810:[MRMAID,0002]acq started
+1705521373:[MRMAID,0003]acq stopped
+1705521373:[MRMAID,0052]$MEASFS,140450,3509.000000,40.025648;
+1705521408:[SBE61 ,0396]P +19987,T +19185,S +34586
+1705521409:[MRMAID,0002]acq started
+1705524982:[MRMAID,0052]$STO$MEASFS,140848,3519.946472,40.014245;
+1705524985:[MRMAID,0185]8 spurious byte(s) received
+1705525018:[SBE61 ,0396]P +20014,T +19324,S +34584
+1705525019:[MRMAID,0002]acq started
+1705528582:[MRMAID,0003]acq stopped
+1705528582:[MRMAID,0052]$MEASFS,140449,3509.975037,40.014245;
+1705528617:[SBE61 ,0396]P +20124,T +19361,S +34584
+1705528619:[MRMAID,0002]acq started
+1705532182:[MRMAID,0003]acq stopped
+1705532182:[MRMAID,0052]$MEASFS,140449,3509.975036,40.014245;
+1705532217:[SBE61 ,0396]P +20055,T +19515,S +34581
+1705532218:[MRMAID,0002]acq started
+1705535791:[MRMAID,0052]$S$MEASFS,140851,3520.021485,40.014244;
+1705535794:[MRMAID,0185]10 spurious byte(s) received
+1705535827:[SBE61 ,0396]P +19878,T +19303,S +34585
+1705535828:[MRMAID,0002]acq started
+1705539391:[MRMAID,0003]acq stopped
+1705539391:[MRMAID,0052]$MEASFS,140448,3509.950043,40.014245;
+1705539426:[SBE61 ,0396]P +20057,T +19254,S +34586
+1705539428:[MRMAID,0002]acq started
+1705543001:[MRMAID,0003]acq stopped
+1705543001:[MRMAID,0052]$MEASFS,140851,3520.021485,40.014244;
+1705543036:[SBE61 ,0396]P +19958,T +19216,S +34587
+1705543037:[MRMAID,0002]acq started
+1705546600:[MRMAID,0003]acq stopped
+1705546600:[MRMAID,0052]$MEASFS,140458,3510.199952,40.014245;
+1705546636:[SBE61 ,0396]P +20060,T +19256,S +34585
+1705546637:[MRMAID,0002]acq started
+1705549178:[MRMAID,0027]1990dbar, 33degC
+1705550200:[MRMAID,0003]acq stopped
+1705550200:[MRMAID,0052]$MEASFS,140450,3510.000030,40.014245;
+1705550235:[SBE61 ,0396]P +19749,T +19130,S +34588
+1705550237:[MRMAID,0002]acq started
+1705553809:[MRMAID,0003]acq stopped
+1705553810:[MRMAID,0052]$MEASFS,140849,3519.971497,40.014244;
+1705553845:[SBE61 ,0396]P +19999,T +18839,S +34591
+1705553846:[MRMAID,0002]acq started
+1705554024:[MRMAID,0027]1996dbar, 33degC
+1705554180:[MRMAID,0005]ascent request rejected
+1705557409:[MRMAID,0003]acq stopped
+1705557409:[MRMAID,0052]$MEASFS,140451,3510.024993,40.014245;
+1705557444:[SBE61 ,0396]P +19967,T +18964,S +34589
+1705557446:[MRMAID,0002]acq started
+1705561009:[MRMAID,0003]acq stopped
+1705561009:[MRMAID,0052]$MEASFS,140449,3509.975006,40.014245;
+1705561044:[SBE61 ,0396]P +19970,T +18968,S +34590
+1705561045:[MRMAID,0002]acq started
+1705564618:[MRMAID,0003]acq stopped
+1705564618:[MRMAID,0052]$MEASFS,140848,3519.946473,40.014245;
+1705564654:[SBE61 ,0396]P +20054,T +19064,S +34588
+1705564655:[MRMAID,0002]acq started
+1705565506:[MRMAID,0027]1994dbar, 33degC
+1705568218:[MRMAID,0003]acq stopped
+1705568218:[MRMAID,0052]$MEASFS,140450,3509.000000,40.025648;
+1705568253:[SBE61 ,0396]P +20039,T +18928,S +34590
+1705568255:[MRMAID,0002]acq started
+1705570964:[MAIN  ,0140]stage[1] complete 27374s after mission start
+1705570969:[SBE   ,0391]Mode changed from PROFILING to SLEEP
+1705570970:[MRMAID,0003]acq stopped
+1705570970:[MRMAID,0052]$MEASFS,106527,2662.226898,40.014245;
+1705570970:[MAIN  ,0056]stage[2]
+1705570972:[MAIN  ,0024]internal pressure 76746Pa
+1705570973:[BUOY  ,0037]P+200627mbar
+1705570975:[BUOY  ,0087]from +0mbar/s to +9mbar/s
+1705570975:[BUOY  ,0090]need to transfer -130mL (valve during 3708ms)
+1705570975:[VALVE ,0034]valve opening 3708ms
+1705570979:[VALVE ,0234]battery 13860mV,  514108uA, P+200627mbar
+1705571600:[PRESS ,0038]P+205417mbar,T+32767mdegC
+1705572270:[PRESS ,0038]P+210427mbar,T+32767mdegC
+1705572600:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1705572600:[BUOY  ,0090]need to transfer -52mL (valve during 1438ms)
+1705572600:[VALVE ,0034]valve opening 1438ms
+1705572601:[VALVE ,0234]battery 14182mV,  511424uA, P+212727mbar
+1705573225:[PRESS ,0038]P+217767mbar,T+32767mdegC
+1705574200:[PRESS ,0038]P+224877mbar,T+32767mdegC
+1705574549:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1705574549:[BUOY  ,0090]need to transfer -52mL (valve during 1393ms)
+1705574549:[VALVE ,0034]valve opening 1393ms
+1705574551:[VALVE ,0234]battery 14212mV,  512156uA, P+227277mbar
+1705575175:[PRESS ,0038]P+232237mbar,T+32767mdegC
+1705575199:[BUOY  ,0087]from +7mbar/s to +9mbar/s
+1705575199:[BUOY  ,0090]need to transfer -52mL (valve during 1376ms)
+1705575199:[VALVE ,0034]valve opening 1376ms
+1705575201:[VALVE ,0234]battery 14233mV,  511912uA, P+232417mbar
+1705575825:[PRESS ,0038]P+238637mbar,T+32767mdegC
+1705576474:[PRESS ,0038]P+245287mbar,T+32767mdegC
+1705577124:[PRESS ,0038]P+252087mbar,T+32767mdegC
+1705577774:[PRESS ,0038]P+259147mbar,T+32767mdegC
+1705578424:[PRESS ,0038]P+266267mbar,T+32767mdegC
+1705579074:[PRESS ,0038]P+273567mbar,T+32767mdegC
+1705579423:[BUOY  ,0087]from +11mbar/s to +6mbar/s
+1705579423:[PUMP  ,0378]Outflow calculated : 2667
+1705579423:[BUOY  ,0089]need to transfer +136mL (pump during 200590ms)
+1705579425:[PUMP  ,0016]pump during 60000ms
+1705579484:[PUMP  ,0212]battery 14028mV, 1173396uA (steady state), P+277657mbar
+1705579725:[PRESS ,0038]P+281037mbar,T+32767mdegC
+1705579750:[BUOY  ,0087]from +12mbar/s to +6mbar/s
+1705579750:[PUMP  ,0378]Outflow calculated : 2665
+1705579750:[BUOY  ,0089]need to transfer +172mL (pump during 253687ms)
+1705579751:[PUMP  ,0016]pump during 60000ms
+1705579810:[PUMP  ,0212]battery 13987mV, 1172054uA (steady state), P+281307mbar
+1705580076:[BUOY  ,0087]from +11mbar/s to +6mbar/s
+1705580076:[PUMP  ,0378]Outflow calculated : 2660
+1705580076:[BUOY  ,0089]need to transfer +136mL (pump during 206061ms)
+1705580077:[PUMP  ,0016]pump during 60000ms
+1705580136:[PUMP  ,0212]battery 13986mV, 1179496uA (steady state), P+284667mbar
+1705580378:[PRESS ,0038]P+287497mbar,T+32767mdegC
+1705580403:[BUOY  ,0087]from +8mbar/s to +6mbar/s
+1705580403:[PUMP  ,0378]Outflow calculated : 2658
+1705580403:[BUOY  ,0089]need to transfer +44mL (pump during 66768ms)
+1705580404:[PUMP  ,0016]pump during 60000ms
+1705580463:[PUMP  ,0212]battery 13996mV, 1188768uA (steady state), P+287687mbar
+1705580729:[BUOY  ,0087]from +9mbar/s to +6mbar/s
+1705580729:[PUMP  ,0378]Outflow calculated : 2656
+1705580729:[BUOY  ,0089]need to transfer +72mL (pump during 109924ms)
+1705580730:[PUMP  ,0016]pump during 60000ms
+1705580789:[PUMP  ,0212]battery 14005mV, 1194990uA (steady state), P+290547mbar
+1705581031:[PRESS ,0038]P+292887mbar,T+32767mdegC
+1705581055:[BUOY  ,0087]from +8mbar/s to +2mbar/s
+1705581055:[PUMP  ,0378]Outflow calculated : 2654
+1705581055:[BUOY  ,0089]need to transfer +96mL (pump during 146565ms)
+1705581057:[PUMP  ,0016]pump during 60000ms
+1705581116:[PUMP  ,0212]battery 14007mV, 1213168uA (steady state), P+293027mbar
+1705581382:[BUOY  ,0087]from +6mbar/s to +2mbar/s
+1705581382:[PUMP  ,0378]Outflow calculated : 2652
+1705581382:[BUOY  ,0089]need to transfer +52mL (pump during 80123ms)
+1705581383:[PUMP  ,0016]pump during 60000ms
+1705581442:[PUMP  ,0212]battery 14015mV, 1213168uA (steady state), P+294997mbar
+1705581708:[STAGE ,0213]296427mbar reached at 1705581708s, ref 300000mbar +/-5000mbar
+1705581708:[BUOY  ,0087]from +4mbar/s to +0mbar/s
+1705581708:[PUMP  ,0378]Outflow calculated : 2651
+1705581708:[BUOY  ,0089]need to transfer +26mL (pump during 40080ms)
+1705581710:[PUMP  ,0016]pump during 40080ms
+1705581750:[PUMP  ,0212]battery 14020mV, 1220122uA (steady state), P+296427mbar
+1705582035:[BUOY  ,0087]from +4mbar/s to +0mbar/s
+1705582035:[PUMP  ,0378]Outflow calculated : 2651
+1705582035:[BUOY  ,0089]need to transfer +26mL (pump during 40080ms)
+1705582036:[PUMP  ,0016]pump during 40080ms
+1705582076:[PUMP  ,0212]battery 14057mV, 1219512uA (steady state), P+297527mbar
+1705582361:[BUOY  ,0087]from -1mbar/s to +0mbar/s
+1705582361:[BUOY  ,0090]need to transfer -2mL (valve during 47ms)
+1705582361:[VALVE ,0034]valve opening 47ms
+1705582661:[PRESS ,0038]P+299607mbar,T+32767mdegC
+1705582686:[BUOY  ,0087]from +6mbar/s to +0mbar/s
+1705582686:[PUMP  ,0378]Outflow calculated : 2652
+1705582686:[BUOY  ,0089]need to transfer +58mL (pump during 87481ms)
+1705582687:[PUMP  ,0016]pump during 60000ms
+1705582746:[PUMP  ,0212]battery 14163mV, 1231346uA (steady state), P+299747mbar
+1705583012:[BUOY  ,0087]from +5mbar/s to +0mbar/s
+1705583012:[PUMP  ,0378]Outflow calculated : 2651
+1705583012:[BUOY  ,0089]need to transfer +40mL (pump during 60514ms)
+1705583014:[PUMP  ,0016]pump during 60000ms
+1705583073:[PUMP  ,0212]battery 14048mV, 1237080uA (steady state), P+301527mbar
+1705583339:[BUOY  ,0087]from +5mbar/s to +0mbar/s
+1705583339:[PUMP  ,0378]Outflow calculated : 2650
+1705583339:[BUOY  ,0089]need to transfer +40mL (pump during 60514ms)
+1705583340:[PUMP  ,0016]pump during 60000ms
+1705583399:[PUMP  ,0212]battery 14032mV, 1244034uA (steady state), P+303027mbar
+1705583665:[BUOY  ,0087]from +4mbar/s to +0mbar/s
+1705583665:[PUMP  ,0378]Outflow calculated : 2648
+1705583665:[BUOY  ,0089]need to transfer +26mL (pump during 39589ms)
+1705583666:[PUMP  ,0016]pump during 39589ms
+1705583705:[PUMP  ,0212]battery 14032mV, 1239398uA (steady state), P+304197mbar
+1705584892:[PRESS ,0038]P+304677mbar,T+32767mdegC
+1705585192:[MAIN  ,0140]stage[2] complete -23934s after mission start
+1705585192:[MAIN  ,0056]stage[3]
+1705585194:[MAIN  ,0024]internal pressure 77477Pa
+1705585195:[SBE   ,0391]Mode changed from SLEEP to UPDATE
+1705585195:[BUOY  ,0037]P+304847mbar
+1705585197:[BUOY  ,0087]from +0mbar/s to -10mbar/s
+1705585197:[PUMP  ,0378]Outflow calculated : 2651
+1705585197:[BUOY  ,0089]need to transfer +160mL (pump during 238095ms)
+1705585198:[PUMP  ,0016]pump during 60000ms
+1705585199:[SBE   ,0391]Mode changed from UPDATE to START
+1705585257:[PUMP  ,0212]battery 14243mV, 1251842uA (steady state), P+304867mbar
+1705585523:[BUOY  ,0087]from -5mbar/s to -10mbar/s
+1705585523:[PUMP  ,0378]Outflow calculated : 2648
+1705585524:[BUOY  ,0089]need to transfer +120mL (pump during 182927ms)
+1705585525:[PUMP  ,0016]pump during 60000ms
+1705585525:[SBE   ,0384]Start profil acquisitions
+1705585525:[SBE   ,0391]Mode changed from START to PROFILING
+1705585584:[PUMP  ,0212]battery 14061mV, 1287344uA (steady state), P+303827mbar
+1705585850:[BUOY  ,0087]from -4mbar/s to -10mbar/s
+1705585850:[PUMP  ,0378]Outflow calculated : 2649
+1705585850:[BUOY  ,0089]need to transfer +134mL (pump during 203957ms)
+1705585851:[PUMP  ,0016]pump during 60000ms
+1705585910:[PUMP  ,0212]battery 14023mV, 1262090uA (steady state), P+302287mbar
+1705586176:[BUOY  ,0087]from -6mbar/s to -10mbar/s
+1705586176:[PUMP  ,0378]Outflow calculated : 2648
+1705586176:[BUOY  ,0089]need to transfer +102mL (pump during 158385ms)
+1705586178:[PUMP  ,0016]pump during 60000ms
+1705586237:[PUMP  ,0212]battery 14018mV, 1252330uA (steady state), P+300387mbar
+1705586478:[PRESS ,0038]P+297987mbar,T+32767mdegC
+1705586503:[BUOY  ,0087]from -7mbar/s to -10mbar/s
+1705586503:[PUMP  ,0378]Outflow calculated : 2650
+1705586503:[BUOY  ,0089]need to transfer +82mL (pump during 127132ms)
+1705586504:[PUMP  ,0016]pump during 60000ms
+1705586563:[PUMP  ,0212]battery 14018mV, 1242082uA (steady state), P+297797mbar
+1705586829:[BUOY  ,0087]from -8mbar/s to -10mbar/s
+1705586829:[PUMP  ,0378]Outflow calculated : 2651
+1705586829:[BUOY  ,0089]need to transfer +58mL (pump during 89922ms)
+1705586830:[PUMP  ,0016]pump during 60000ms
+1705586889:[PUMP  ,0212]battery 14025mV, 1227198uA (steady state), P+294847mbar
+1705587131:[PRESS ,0038]P+292237mbar,T+32767mdegC
+1705587155:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705587155:[PUMP  ,0378]Outflow calculated : 2656
+1705587156:[BUOY  ,0089]need to transfer +30mL (pump during 45490ms)
+1705587157:[PUMP  ,0016]pump during 45490ms
+1705587202:[PUMP  ,0212]battery 14031mV, 1208654uA (steady state), P+292007mbar
+1705587482:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705587482:[PUMP  ,0378]Outflow calculated : 2658
+1705587482:[BUOY  ,0089]need to transfer +30mL (pump during 45456ms)
+1705587483:[PUMP  ,0016]pump during 45456ms
+1705587528:[PUMP  ,0212]battery 14050mV, 1201822uA (steady state), P+289127mbar
+1705587783:[PRESS ,0038]P+286247mbar,T+32767mdegC
+1705588133:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705588133:[PUMP  ,0378]Outflow calculated : 2662
+1705588133:[BUOY  ,0089]need to transfer +30mL (pump during 45381ms)
+1705588135:[PUMP  ,0016]pump during 45381ms
+1705588180:[PUMP  ,0212]battery 14138mV, 1181326uA (steady state), P+282687mbar
+1705588435:[PRESS ,0038]P+279637mbar,T+32767mdegC
+1705589085:[PRESS ,0038]P+273387mbar,T+32767mdegC
+1705589109:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705589109:[PUMP  ,0378]Outflow calculated : 2669
+1705589109:[BUOY  ,0089]need to transfer +30mL (pump during 44758ms)
+1705589111:[PUMP  ,0016]pump during 44758ms
+1705589155:[PUMP  ,0212]battery 14185mV, 1157902uA (steady state), P+273167mbar
+1705589736:[PRESS ,0038]P+266477mbar,T+32767mdegC
+1705590386:[PRESS ,0038]P+259357mbar,T+32767mdegC
+1705591036:[PRESS ,0038]P+252717mbar,T+32767mdegC
+1705591385:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705591385:[PUMP  ,0378]Outflow calculated : 2683
+1705591385:[BUOY  ,0089]need to transfer +30mL (pump during 44377ms)
+1705591387:[PUMP  ,0016]pump during 44377ms
+1705591431:[PUMP  ,0212]battery 14225mV, 1071282uA (steady state), P+249307mbar
+1705591687:[PRESS ,0038]P+246437mbar,T+32767mdegC
+1705592036:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705592037:[PUMP  ,0378]Outflow calculated : 2686
+1705592037:[BUOY  ,0089]need to transfer +30mL (pump during 44572ms)
+1705592038:[PUMP  ,0016]pump during 44572ms
+1705592082:[PUMP  ,0212]battery 14205mV, 1048590uA (steady state), P+243087mbar
+1705592338:[PRESS ,0038]P+240157mbar,T+32767mdegC
+1705592988:[PRESS ,0038]P+233717mbar,T+32767mdegC
+1705593638:[PRESS ,0038]P+226937mbar,T+32767mdegC
+1705594288:[PRESS ,0038]P+219837mbar,T+32767mdegC
+1705594937:[PRESS ,0038]P+213107mbar,T+32767mdegC
+1705594962:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705594962:[PUMP  ,0378]Outflow calculated : 2705
+1705594962:[BUOY  ,0089]need to transfer +30mL (pump during 44033ms)
+1705594963:[PUMP  ,0016]pump during 44033ms
+1705595007:[PUMP  ,0212]battery 14257mV,  947940uA (steady state), P+212847mbar
+1705595589:[PRESS ,0038]P+207007mbar,T+32767mdegC
+1705595613:[BUOY  ,0087]from -8mbar/s to -10mbar/s
+1705595613:[PUMP  ,0378]Outflow calculated : 2708
+1705595613:[BUOY  ,0089]need to transfer +58mL (pump during 85420ms)
+1705595615:[PUMP  ,0016]pump during 60000ms
+1705595674:[PUMP  ,0212]battery 14246mV,  922198uA (steady state), P+206787mbar
+1705595940:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705595940:[PUMP  ,0378]Outflow calculated : 2710
+1705595940:[BUOY  ,0089]need to transfer +30mL (pump during 44174ms)
+1705595941:[PUMP  ,0016]pump during 44174ms
+1705595985:[PUMP  ,0212]battery 14166mV,  906704uA (steady state), P+203857mbar
+1705596241:[PRESS ,0038]P+201127mbar,T+32767mdegC
+1705596591:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705596591:[PUMP  ,0378]Outflow calculated : 2712
+1705596591:[BUOY  ,0089]need to transfer +30mL (pump during 44632ms)
+1705596592:[PUMP  ,0016]pump during 44632ms
+1705596636:[PUMP  ,0212]battery 14243mV,  896700uA (steady state), P+197907mbar
+1705596893:[PRESS ,0038]P+194977mbar,T+32767mdegC
+1705597543:[PRESS ,0038]P+188657mbar,T+32767mdegC
+1705598192:[PRESS ,0038]P+181967mbar,T+32767mdegC
+1705598842:[PRESS ,0038]P+175207mbar,T+32767mdegC
+1705599192:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705599192:[PUMP  ,0378]Outflow calculated : 2730
+1705599192:[BUOY  ,0089]need to transfer +30mL (pump during 43630ms)
+1705599193:[PUMP  ,0016]pump during 43630ms
+1705599236:[PUMP  ,0212]battery 14298mV,  803004uA (steady state), P+171607mbar
+1705599493:[PRESS ,0038]P+168357mbar,T+32767mdegC
+1705599843:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705599843:[PUMP  ,0378]Outflow calculated : 2733
+1705599843:[BUOY  ,0089]need to transfer +30mL (pump during 43800ms)
+1705599844:[PUMP  ,0016]pump during 43800ms
+1705599887:[PUMP  ,0212]battery 14300mV,  781288uA (steady state), P+164797mbar
+1705600145:[PRESS ,0038]P+161677mbar,T+32767mdegC
+1705600795:[PRESS ,0038]P+154697mbar,T+32767mdegC
+1705601444:[PRESS ,0038]P+147977mbar,T+32767mdegC
+1705602094:[PRESS ,0038]P+140787mbar,T+32767mdegC
+1705602744:[PRESS ,0038]P+133677mbar,T+32767mdegC
+1705603094:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705603094:[PUMP  ,0378]Outflow calculated : 2754
+1705603094:[BUOY  ,0089]need to transfer +30mL (pump during 43262ms)
+1705603095:[PUMP  ,0016]pump during 43262ms
+1705603138:[PUMP  ,0212]battery 14342mV,  658068uA (steady state), P+130307mbar
+1705603395:[PRESS ,0038]P+127427mbar,T+32767mdegC
+1705603745:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705603745:[PUMP  ,0378]Outflow calculated : 2757
+1705603745:[BUOY  ,0089]need to transfer +30mL (pump during 43569ms)
+1705603746:[PUMP  ,0016]pump during 43569ms
+1705603789:[PUMP  ,0212]battery 14365mV,  638670uA (steady state), P+124087mbar
+1705604047:[PRESS ,0038]P+121147mbar,T+32767mdegC
+1705604696:[PRESS ,0038]P+114847mbar,T+32767mdegC
+1705604721:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705604721:[PUMP  ,0378]Outflow calculated : 2763
+1705604721:[BUOY  ,0089]need to transfer +30mL (pump during 43249ms)
+1705604723:[PUMP  ,0016]pump during 43249ms
+1705604766:[PUMP  ,0212]battery 14390mV,  609268uA (steady state), P+114597mbar
+1705605348:[PRESS ,0038]P+107967mbar,T+32767mdegC
+1705605997:[PRESS ,0038]P+100647mbar,T+32767mdegC
+1705606347:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705606347:[PUMP  ,0378]Outflow calculated : 2774
+1705606347:[BUOY  ,0089]need to transfer +30mL (pump during 42967ms)
+1705606348:[PUMP  ,0016]pump during 42967ms
+1705606390:[PUMP  ,0212]battery 14430mV,  539850uA (steady state), P +96927mbar
+1705606649:[PRESS ,0038]P +93957mbar,T+32767mdegC
+1705606674:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705606674:[PUMP  ,0378]Outflow calculated : 2776
+1705606674:[BUOY  ,0089]need to transfer +30mL (pump during 42936ms)
+1705606675:[PUMP  ,0016]pump during 42936ms
+1705606717:[PUMP  ,0212]battery 14396mV,  527650uA (steady state), P +93737mbar
+1705607300:[PRESS ,0038]P +86907mbar,T+32767mdegC
+1705607950:[PRESS ,0038]P +78327mbar,T+32767mdegC
+1705608600:[PRESS ,0038]P +70737mbar,T+32767mdegC
+1705609249:[PRESS ,0038]P +64527mbar,T+32767mdegC
+1705609899:[PRESS ,0038]P +57397mbar,T+32767mdegC
+1705610549:[PRESS ,0038]P +50617mbar,T+32767mdegC
+1705610574:[BUOY  ,0087]from -6mbar/s to -10mbar/s
+1705610574:[PUMP  ,0378]Outflow calculated : 2802
+1705610574:[BUOY  ,0089]need to transfer +102mL (pump during 144476ms)
+1705610575:[PUMP  ,0016]pump during 60000ms
+1705610634:[PUMP  ,0212]battery 14498mV,  370880uA (steady state), P +50437mbar
+1705611200:[PRESS ,0038]P +43717mbar,T+32767mdegC
+1705611850:[PRESS ,0038]P +36607mbar,T+32767mdegC
+1705612200:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705612200:[PUMP  ,0378]Outflow calculated : 2812
+1705612200:[BUOY  ,0089]need to transfer +30mL (pump during 42358ms)
+1705612201:[PUMP  ,0016]pump during 42358ms
+1705612243:[PUMP  ,0212]battery 14602mV,  308294uA (steady state), P +33167mbar
+1705612501:[PRESS ,0038]P +30577mbar,T+32767mdegC
+1705612526:[BUOY  ,0087]from -8mbar/s to -10mbar/s
+1705612526:[PUMP  ,0378]Outflow calculated : 2814
+1705612526:[BUOY  ,0089]need to transfer +58mL (pump during 82037ms)
+1705612528:[PUMP  ,0016]pump during 60000ms
+1705612587:[PUMP  ,0212]battery 14608mV,  296460uA (steady state), P +30357mbar
+1705613153:[PRESS ,0038]P +22987mbar,T+32767mdegC
+1705613803:[PRESS ,0038]P +15737mbar,T+32767mdegC
+1705614152:[BUOY  ,0087]from -8mbar/s to -10mbar/s
+1705614152:[PUMP  ,0378]Outflow calculated : 2825
+1705614152:[BUOY  ,0089]need to transfer +58mL (pump during 81232ms)
+1705614154:[PUMP  ,0016]pump during 60000ms
+1705614213:[PUMP  ,0212]battery 14738mV,  220576uA (steady state), P +12397mbar
+1705614454:[PRESS ,0038]P  +9567mbar,T+32767mdegC
+1705614479:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705614479:[PUMP  ,0378]Outflow calculated : 2826
+1705614479:[BUOY  ,0089]need to transfer +30mL (pump during 42020ms)
+1705614480:[PUMP  ,0016]pump during 42020ms
+1705614522:[PUMP  ,0212]battery 14747mV,  206790uA (steady state), P  +9327mbar
+1705614805:[BUOY  ,0087]from -9mbar/s to -10mbar/s
+1705614805:[PUMP  ,0378]Outflow calculated : 2828
+1705614805:[BUOY  ,0089]need to transfer +30mL (pump during 42132ms)
+1705614806:[PUMP  ,0016]pump during 42132ms
+1705614848:[PUMP  ,0212]battery 14772mV,  193370uA (steady state), P  +6087mbar
+1705615107:[PRESS ,0038]P  +2467mbar,T+32767mdegC
+1705615456:[STAGE ,0214]-173mbar (500) reached at 1705615456s, ascending from 304847mbar
+1705615456:[STAGE ,0342]The float reached the surface : OK
+1705615456:[MAIN  ,0140]stage[3] complete 6330s after mission start
+1705615457:[SBE   ,0391]Mode changed from PROFILING to SLEEP
+1705615458:[SBE   ,0391]Mode changed from SLEEP to STOP
+1705615637:[SBE   ,0391]Mode changed from STOP to SLEEP
+1705615638:[SBE   ,0391]Mode changed from SLEEP to DUMP
+1705615639:[SBE   ,0343]SBE dump : 504 stored samples in hexa format
+1705615655:[SBE   ,0338]Dump finished
+1705615655:[SBE   ,0388]504 samples in 0100/65A92A2A.S61
+1705615655:[SBE   ,0391]Mode changed from DUMP to SLEEP
+1705615655:[MRMAID,0188]acq already stopped
+1705615656:[MSSION,0192]mission stopped, 4 stage(s) done
+1705615656:[MAIN  ,0065]surfacing
+1705615657:[SURFIN,0036]P   -163mbar
+1705615659:[SURFIN,0020]filling external bladder
+1705615661:[PUMP  ,0016]pump during 30000ms
+1705615690:[PUMP  ,0212]battery 14281mV, 1346026uA (steady state), P   -183mbar
+1705615707:[PUMP  ,0016]pump during 30000ms
+1705615736:[PUMP  ,0212]battery 14972mV,   13054uA (steady state), P   -183mbar
+1705615753:[PUMP  ,0016]pump during 30000ms
+1705615755:[PUMP  ,0019]external bladder full
+1705615818:[MAIN  ,0272]Vbat 14960mV (min 14392mV)
+1705615820:[MAIN  ,0024]internal pressure 75665Pa
+1705615820:[MAIN  ,0043]Pext 227mbar (rng 40mbar)
+1705615820:[MAIN  ,0064]surface
+1705615831:[SURF  ,0022]GPS fix...
+1705615848:[GPSFIX,0121]<WARN>GPRMC #1
+1705615872:[GPSFIX,0121]<WARN>GPRMC #1
+1705615904:[SURF  ,0015]10 PPS detected...
+1705615906:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,-1,-354797;
+1705615915:[MRMAID,0052]$GPSOFF:3686332;
+1705615918:[GPSFIX,0179]-12s diff
+1705615930:[SURF  ,0222]2024-01-18T22:12:10
+1705615930:[SURF  ,0082]N28deg49.466mn, E139deg25.070mn
+1705615930:[SURF  ,0084]hdop 1.280, vdop 2.290
+1705615940:[SURF  ,0274]last almanac : 7857363
+1705617109:[MRMAID,0026]103831 bytes in 0100/65A9A5CB.MER
+1705617114:[MAIN  ,0320]New pressure offset: 227mbar
+1705617115:[SBE   ,0391]Mode changed from SLEEP to RESETOFFSET
+1705617176:[SBE   ,0339]new offset = -1.98 received after 63s
+1705617176:[SBE   ,0391]Mode changed from RESETOFFSET to SLEEP
+1705617177:[MAIN  ,0078]*** switching to 0100/65A9A719 ***
+1705617177:[PREPROCESS]Create 0100_65A9A719.LOG
+1705617177:[MAIN  ,0007]buoy 467.174-T-0100
+1705617177:[MAIN  ,0055]soft pilotage 467.174.300_V2.67-20230503
+1705617177:[MAIN  ,0010]cycle 23
+1705617177:[SURF  ,0225]surface2
+1705617191:[SURF  ,0022]GPS fix...
+1705617211:[SURF  ,0015]10 PPS detected...
+1705617212:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1705617222:[MRMAID,0052]$GPSOFF:3686332;
+1705617224:[GPSFIX,0179]-1s diff
+1705617225:[SURF  ,0222]2024-01-18T22:33:45
+1705617225:[SURF  ,0082]N28deg49.531mn, E139deg25.593mn
+1705617225:[SURF  ,0084]hdop 0.710, vdop 1.350
+1705617235:[SURF  ,0025]Iridium...
+1705617266:[SURF  ,0009]connected in 31s, signal quality 5
+1705617368:[MRMAID,0149]<ERR>read 0,-2
+1705617368:[MRMAID,0185]2 spurious byte(s) received
+1705617368:[MRMAID,0185]2 spurious byte(s) received
+1705617411:[MRMAID,0052]$BOARD:452116600-A0;
+1705617411:[MRMAID,0185]5 spurious byte(s) received
+1705617459:[SURF  ,0218]prompt received, remote cmd end
+1705617459:[SURF  ,0012]65 cmd(s) received
+1705617490:[UPLOAD,0248]Upload data files...
+1705617531:[UPLOAD,0231]"0100/65A92A2A.S61" uploaded at 110bytes/s
+1705618005:[SURF  ,0014]disconnected after 770s
+1705618010:[SURFIN,0020]filling external bladder
+1705618011:[PUMP  ,0016]pump during 30000ms
+1705618024:[PUMP  ,0212]battery 14257mV, 1077748uA (steady state), P   +200mbar
+1705618024:[PUMP  ,0019]external bladder full
+1705618024:[SURF  ,0069]transfer interrupted , retry
+1705618035:[SURF  ,0022]GPS fix...
+1705618055:[SURF  ,0015]10 PPS detected...
+1705618056:[MRMAID,0052]$GPSACK:+54,+0,+17,+22,+36,+10,-12084;
+1705618066:[MRMAID,0052]$GPSOFF:3686331;
+1705618068:[GPSFIX,0179]-1s diff
+1705618069:[SURF  ,0222]2024-01-18T22:47:49
+1705618069:[SURF  ,0082]N28deg49.573mn, E139deg25.959mn
+1705618069:[SURF  ,0084]hdop 0.590, vdop 1.020
+1705618079:[SURF  ,0025]Iridium...
+1705618113:[SURF  ,0009]connected in 34s, signal quality 2
+1705618190:[MRMAID,0149]<ERR>read 0,-2
+1705618190:[MRMAID,0185]2 spurious byte(s) received
+1705618190:[MRMAID,0185]2 spurious byte(s) received
+1705618225:[MRMAID,0052]$BOARD:452116600-A0;
+1705618225:[MRMAID,0185]5 spurious byte(s) received
+1705618258:[SURF  ,0218]prompt received, remote cmd end
+1705618258:[SURF  ,0012]50 cmd(s) received
+1705618278:[UPLOAD,0248]Upload data files...
+1705618884:[UPLOAD,0231]"0100/65A9A5CB.MER" uploaded at 123bytes/s
+1705619563:[SURF  ,0014]disconnected after 1484s
+1705619568:[SURFIN,0020]filling external bladder
+1705619569:[PUMP  ,0016]pump during 30000ms
+1705619572:[PUMP  ,0019]external bladder full
+1705619572:[SURF  ,0069]transfer interrupted , retry
+1705619583:[SURF  ,0022]GPS fix...
+1705619603:[SURF  ,0015]10 PPS detected...
+1705619604:[MRMAID,0052]$GPSACK:+54,+0,+17,+23,-10,-8,-119720;
+1705619614:[MRMAID,0052]$GPSOFF:3686330;
+1705619616:[GPSFIX,0179]-1s diff
+1705619617:[SURF  ,0222]2024-01-18T23:13:37
+1705619617:[SURF  ,0082]N28deg49.674mn, E139deg26.647mn
+1705619617:[SURF  ,0084]hdop 0.580, vdop 0.860
+1705619627:[SURF  ,0025]Iridium...
+1705619828:[SURF  ,0023]<WARN>failed to connect #1, code -8, net 1, qual 5, dial 1
+1705620046:[SURF  ,0023]<WARN>failed to connect #2, code -8, net 1, qual 5, dial 1
+1705620099:[SURF  ,0009]connected in 472s, signal quality 5
+1705620182:[MRMAID,0149]<ERR>read 0,-2
+1705620182:[MRMAID,0185]1 spurious byte(s) received
+1705620182:[MRMAID,0185]2 spurious byte(s) received
+1705620214:[SURF  ,0218]prompt received, remote cmd end
+1705620214:[SURF  ,0012]22 cmd(s) received
+1705620216:[MRMAID,0052]$BOARD:452116600-A0;
+1705620217:[MRMAID,0185]5 spurious byte(s) received
+1705620231:[UPLOAD,0248]Upload data files...
+1705620466:[UPLOAD,0231]"0100/659C54A6.BIN" uploaded at 153bytes/s
+1705620483:[MAIN  ,0013]1 file(s) uploaded
+1705620519:[SURF  ,0014]disconnected after 892s
+1705620524:[SURF  ,0227]1st complete transfer
+1705620524:[SURF  ,0226]Go dive
+1705620535:[SURF  ,0022]GPS fix...
+1705620555:[SURF  ,0015]10 PPS detected...
+1705620556:[MRMAID,0052]$GPSACK:+54,+0,+17,+23,+23,+4,-227294;
+1705620566:[MRMAID,0052]$GPSOFF:3686330;
+1705620568:[GPSFIX,0179]-1s diff
+1705620569:[SURF  ,0222]2024-01-18T23:29:29
+1705620569:[SURF  ,0082]N28deg49.743mn, E139deg27.100mn
+1705620569:[SURF  ,0084]hdop 0.620, vdop 0.910
+1705620587:[PREPROCESS]End of cycle
