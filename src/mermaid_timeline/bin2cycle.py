@@ -1,83 +1,61 @@
 # SPDX-License-Identifier: MIT
 
-"""External adapter layer for upstream BIN-to-cycle decoding."""
+"""External adapter layer for upstream BIN-to-CYCLE decoding."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
-import shutil
 import subprocess
-import tempfile
 from typing import Iterator
 
+from .bin2log import (
+    Bin2LogConfig,
+    Bin2LogError,
+    _decoded_log_workspace,
+    _validate_inputs,
+)
 
-@dataclass(slots=True)
-class Bin2CycleConfig:
-    """Configuration for invoking the external manufacturer decoder."""
-
-    python_executable: Path
-    decoder_script: Path
+Bin2CycleConfig = Bin2LogConfig
 
 
 class Bin2CycleError(RuntimeError):
-    """Raised when external BIN-to-cycle decoding fails."""
+    """Raised when external BIN-to-CYCLE decoding fails."""
 
 
 def iter_decoded_cycle_lines(path: Path, *, config: Bin2CycleConfig) -> Iterator[str]:
-    """Yield decoded cycle text lines for one raw .BIN file.
+    """Yield decoded CYCLE text lines for one raw .BIN file.
 
-    Observed manufacturer decoder I/O contract:
+    The manufacturer flow is naturally two-stage:
 
-    - `preprocess.py` does not expose a stdout-oriented CLI for decoded cycle text
-    - it decodes `.BIN` files into `.LOG` files and then writes `.CYCLE` files to disk
-    - it may delete the source `.BIN` as part of that process
+    - `decrypt_all(...)` decodes `.BIN` into intermediate `.LOG`
+    - `convert_in_cycle(...)` groups decoded LOG content into derived `CYCLE`
 
-    The least invasive adapter is therefore:
-
-    - copy the requested `.BIN` into a temporary working directory
-    - invoke the external decoder in a subprocess
-    - find the emitted `.CYCLE` artifact(s)
-    - yield the cycle text lines
-    - clean up the temporary directory afterwards
+    This adapter therefore reuses the BIN->LOG workspace first, then invokes the
+    later cycle-grouping step on top of those emitted LOG files.
     """
 
     _validate_inputs(path, config)
 
-    with tempfile.TemporaryDirectory(prefix="mermaid-bin2cycle-") as tmpdir:
-        workdir = Path(tmpdir)
-        bin_copy = workdir / path.name
-        shutil.copy2(path, bin_copy)
+    try:
+        with _decoded_log_workspace(path, config) as workdir:
+            _run_cycle_grouping(workdir, config)
 
-        _run_decoder(workdir, config)
+            cycle_paths = sorted(workdir.glob("*.CYCLE"))
+            if not cycle_paths:
+                raise Bin2CycleError(
+                    f"External decoder did not emit any .CYCLE files for {path}."
+                )
 
-        cycle_paths = sorted(workdir.glob("*.CYCLE"))
-        if not cycle_paths:
-            raise Bin2CycleError(
-                f"External decoder did not emit any .CYCLE files for {path}."
-            )
-
-        for cycle_path in cycle_paths:
-            with cycle_path.open("r", encoding="utf-8") as handle:
-                for raw_line in handle:
-                    yield raw_line.rstrip("\r\n")
-
-
-def _validate_inputs(path: Path, config: Bin2CycleConfig) -> None:
-    """Validate adapter inputs before subprocess invocation."""
-
-    if not path.exists():
-        raise FileNotFoundError(path)
-    if not path.is_file():
-        raise Bin2CycleError(f"BIN input is not a file: {path}")
-    if not config.python_executable.exists():
-        raise FileNotFoundError(config.python_executable)
-    if not config.decoder_script.exists():
-        raise FileNotFoundError(config.decoder_script)
+            for cycle_path in cycle_paths:
+                with cycle_path.open("r", encoding="utf-8") as handle:
+                    for raw_line in handle:
+                        yield raw_line.rstrip("\r\n")
+    except Bin2LogError as exc:
+        raise Bin2CycleError(str(exc)) from exc
 
 
-def _run_decoder(workdir: Path, config: Bin2CycleConfig) -> None:
-    """Invoke the external decoder script in a subprocess."""
+def _run_cycle_grouping(workdir: Path, config: Bin2CycleConfig) -> None:
+    """Invoke the external decoder script for the LOG->CYCLE grouping step."""
 
     harness = """
 from pathlib import Path
@@ -91,12 +69,10 @@ workdir = Path(sys.argv[2]).resolve()
 sys.path.insert(0, str(decoder_script.parent))
 namespace = runpy.run_path(str(decoder_script))
 
-decrypt_all = namespace["decrypt_all"]
 convert_in_cycle = namespace["convert_in_cycle"]
 utc_class = namespace["UTCDateTime"]
 
 workdir_str = str(workdir) + os.sep
-decrypt_all(workdir_str)
 convert_in_cycle(workdir_str, utc_class(0), utc_class(32503680000))
 """
     result = subprocess.run(

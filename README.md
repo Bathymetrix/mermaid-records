@@ -5,7 +5,8 @@
 The package intentionally separates decode, parsing, normalization-oriented extraction, and later interpretation:
 
 - canonical upstream sources currently include `BIN`, `LOG`, and `MER`
-- raw `BIN` to emitted `CYCLE` decode remains separate in `bin2cycle.py`
+- raw `BIN` to `LOG` decode lives in `bin2log.py`
+- derived `BIN` to emitted `CYCLE` decode remains separate in `bin2cycle.py`
 - shared operational text parsing for `LOG`, `CYCLE`, and `.CYCLE.h` lives in `operational_raw.py`
 - raw `.MER` parsing lives in `mer_raw.py`
 - audit and discovery layers stay separate from parsing

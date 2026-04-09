@@ -19,10 +19,14 @@ class UTCDateTime:
         self.value = value
 
 def decrypt_all(path):
+    workdir = Path(path)
+    log = workdir / "0000_TEST.LOG"
+    log.write_text("decoded log\\n", encoding="utf-8")
     return [path]
 
 def convert_in_cycle(path, begin, end):
     workdir = Path(path)
+    assert (workdir / "0000_TEST.LOG").exists()
     cycle = workdir / "0000_TEST.CYCLE"
     cycle.write_text("line one\\nline two\\n", encoding="utf-8")
 """,
@@ -70,6 +74,10 @@ class UTCDateTime:
         self.value = value
 
 def decrypt_all(path):
+    from pathlib import Path
+    workdir = Path(path)
+    log = workdir / "0000_TEST.LOG"
+    log.write_text("decoded log\\n", encoding="utf-8")
     return [path]
 
 def convert_in_cycle(path, begin, end):

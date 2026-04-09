@@ -18,6 +18,7 @@ from .audit import (
     audit_server_mer,
 )
 from .bin2cycle import Bin2CycleConfig, Bin2CycleError, iter_decoded_cycle_lines
+from .bin2log import Bin2LogConfig, Bin2LogError, iter_decoded_log_lines
 from .operational_raw import iter_cycle_events, iter_operational_log_entries
 from .discovery import (
     iter_bin_files,
@@ -47,6 +48,8 @@ __all__ = [
     "AcquisitionWindow",
     "Bin2CycleConfig",
     "Bin2CycleError",
+    "Bin2LogConfig",
+    "Bin2LogError",
     "CycleCorpusStats",
     "EvidenceRecord",
     "MerCorpusStats",
@@ -65,6 +68,7 @@ __all__ = [
     "iter_log_files",
     "iter_operational_log_entries",
     "iter_decoded_cycle_lines",
+    "iter_decoded_log_lines",
     "iter_mer_env_files",
     "iter_mer_files",
     "iter_processed_cycle",

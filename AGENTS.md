@@ -68,9 +68,11 @@ Do not frame `LOG`/`BIN` as purely operational and `MER` as purely data. These c
 
 Decode/parsing boundary:
 
-- decode: raw `BIN` -> emitted raw `CYCLE` text
+- decode: raw `BIN` -> decoded `LOG`, with optional later grouping to emitted raw `CYCLE`
 - parsing: consume raw `LOG`, emitted raw `CYCLE`, or processed `.CYCLE.h`
 - interpretation/timeline logic remains separate and should not be mixed into either layer
+
+For v1 normalization work, prefer the `BIN` -> `LOG` boundary as the primary decode seam. Treat `CYCLE` as the later derived grouping step built from decoded LOG content.
 
 ### Operational Text Sources
 
