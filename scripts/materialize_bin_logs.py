@@ -8,7 +8,9 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +18,11 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_timeline.bin2log import Bin2LogConfig, iter_decoded_log_lines
+from mermaid_timeline.bin2log import (
+    Bin2LogConfig,
+    decode_workspace_logs,
+    prepare_decode_workspace,
+)
 
 
 @dataclass(slots=True)
@@ -99,47 +105,55 @@ def materialize_family(
     if limit is not None:
         bin_paths = bin_paths[:limit]
 
-    reports: list[LogMaterializationReport] = []
-    for bin_path in bin_paths:
-        expected_log = log_root / f"{bin_path.stem}.LOG"
-        decoded_lines: list[str] = []
-        decode_success = False
-        decode_error: str | None = None
-        wrote_log_file = False
-        matches_expected_log: bool | None = None
-        expected_exists = expected_log.exists()
+    with tempfile.TemporaryDirectory(prefix="mermaid-binlog-fixtures-") as tmpdir:
+        workdir = Path(tmpdir)
+        for bin_path in bin_paths:
+            shutil.copy2(bin_path, workdir / bin_path.name)
 
-        try:
-            decoded_lines = list(iter_decoded_log_lines(bin_path, config=config))
-            decode_success = True
-        except Exception as exc:  # pragma: no cover - real workflow path
-            decode_error = repr(exc)
-        else:
-            decoded_text = "\n".join(decoded_lines) + ("\n" if decoded_lines else "")
-            if expected_exists:
-                matches_expected_log = (
-                    expected_log.read_text(encoding="utf-8") == decoded_text
+        prepare_decode_workspace(workdir, config=config, refresh_database=True)
+        decode_workspace_logs(workdir, config=config)
+
+        reports: list[LogMaterializationReport] = []
+        for bin_path in bin_paths:
+            expected_log = log_root / f"{bin_path.stem}.LOG"
+            decoded_log = workdir / f"{bin_path.stem}.LOG"
+            decoded_lines: list[str] = []
+            decode_success = False
+            decode_error: str | None = None
+            wrote_log_file = False
+            matches_expected_log: bool | None = None
+            expected_exists = expected_log.exists()
+
+            if decoded_log.exists():
+                decoded_lines = decoded_log.read_text(encoding="utf-8").splitlines()
+                decoded_text = "\n".join(decoded_lines) + ("\n" if decoded_lines else "")
+                decode_success = True
+                if expected_exists:
+                    matches_expected_log = (
+                        expected_log.read_text(encoding="utf-8") == decoded_text
+                    )
+                elif write_missing:
+                    expected_log.parent.mkdir(parents=True, exist_ok=True)
+                    expected_log.write_text(decoded_text, encoding="utf-8")
+                    wrote_log_file = True
+                    matches_expected_log = True
+            else:
+                decode_error = f"Decoded LOG not emitted for {bin_path.name}"
+
+            reports.append(
+                LogMaterializationReport(
+                    bin_file=bin_path,
+                    expected_log_file=expected_log,
+                    decode_success=decode_success,
+                    decode_error=decode_error,
+                    decoded_line_count=len(decoded_lines),
+                    wrote_log_file=wrote_log_file,
+                    expected_log_exists=expected_exists,
+                    matches_expected_log=matches_expected_log,
                 )
-            elif write_missing:
-                expected_log.parent.mkdir(parents=True, exist_ok=True)
-                expected_log.write_text(decoded_text, encoding="utf-8")
-                wrote_log_file = True
-                matches_expected_log = True
-
-        reports.append(
-            LogMaterializationReport(
-                bin_file=bin_path,
-                expected_log_file=expected_log,
-                decode_success=decode_success,
-                decode_error=decode_error,
-                decoded_line_count=len(decoded_lines),
-                wrote_log_file=wrote_log_file,
-                expected_log_exists=expected_exists,
-                matches_expected_log=matches_expected_log,
             )
-        )
 
-    return reports
+        return reports
 
 
 def _print_reports(reports: list[LogMaterializationReport]) -> None:

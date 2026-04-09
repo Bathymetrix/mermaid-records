@@ -12,6 +12,8 @@ The package intentionally separates decode, parsing, normalization-oriented extr
 - audit and discovery layers stay separate from parsing
 - higher-level interpretation modules remain intentionally minimal for now
 
+For batch decode workflows, decoder database refresh should be treated as a separate preflight step rather than something repeated once per `BIN`.
+
 The long-term normalized record-family direction is:
 
 - `operational_records`

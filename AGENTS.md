@@ -75,6 +75,15 @@ Decode/parsing boundary:
 
 For v1 normalization work, prefer the `BIN` -> `LOG` boundary as the primary decode seam. Treat `CYCLE` as the later derived grouping step built from decoded LOG content.
 
+Mirror the upstream preprocess call order responsibly:
+
+- `database_update(...)` is a batch preflight step
+- `concatenate_files(...)` and `decrypt_all(...)` are part of the per-workspace `BIN` -> `LOG` decode path
+- `convert_in_cycle(...)` is the later derived `LOG` -> `CYCLE` step
+- `concatenate_rbr_files(...)` may also be part of preprocessing, but should not force interpretation into the decode layer
+
+Do not call `database_update(...)` once per `BIN`; prefer a single explicit refresh before a batch decode workflow.
+
 ### Operational Text Sources
 
 Use one common `OperationalLogEntry` model for `LOG`, `CYCLE`, and `.CYCLE.h` with:

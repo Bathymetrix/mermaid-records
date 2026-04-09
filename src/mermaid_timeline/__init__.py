@@ -18,7 +18,12 @@ from .audit import (
     audit_server_mer,
 )
 from .bin2cycle import Bin2CycleConfig, Bin2CycleError, iter_decoded_cycle_lines
-from .bin2log import Bin2LogConfig, Bin2LogError, iter_decoded_log_lines
+from .bin2log import (
+    Bin2LogConfig,
+    Bin2LogError,
+    iter_decoded_log_lines,
+    update_decoder_database,
+)
 from .operational_raw import iter_cycle_events, iter_operational_log_entries
 from .discovery import (
     iter_bin_files,
@@ -69,6 +74,7 @@ __all__ = [
     "iter_operational_log_entries",
     "iter_decoded_cycle_lines",
     "iter_decoded_log_lines",
+    "update_decoder_database",
     "iter_mer_env_files",
     "iter_mer_files",
     "iter_processed_cycle",

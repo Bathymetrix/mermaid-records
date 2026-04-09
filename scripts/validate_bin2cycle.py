@@ -18,6 +18,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from mermaid_timeline.bin2cycle import Bin2CycleConfig, iter_decoded_cycle_lines
+from mermaid_timeline.bin2log import update_decoder_database
 from mermaid_timeline.operational_raw import iter_cycle_events
 from mermaid_timeline.discovery import iter_bin_files
 
@@ -84,6 +85,7 @@ def main() -> int:
         python_executable=args.decoder_python,
         decoder_script=args.decoder_script,
     )
+    update_decoder_database(config)
     bins = sorted(iter_bin_files(args.fixtures_root))[: args.limit]
     cycle_index = _index_processed_cycles(args.processed_root)
 

@@ -24,19 +24,129 @@ class Bin2LogError(RuntimeError):
     """Raised when external BIN-to-LOG decoding fails."""
 
 
+def update_decoder_database(config: Bin2LogConfig) -> None:
+    """Refresh the external decoder database files once for a batch workflow."""
+
+    _validate_decoder_paths(config)
+    harness = """
+from pathlib import Path
+import runpy
+import sys
+
+decoder_script = Path(sys.argv[1]).resolve()
+
+sys.path.insert(0, str(decoder_script.parent))
+namespace = runpy.run_path(str(decoder_script))
+
+database_update = namespace.get("database_update")
+if callable(database_update):
+    database_update(None)
+"""
+    result = subprocess.run(
+        [
+            str(config.python_executable),
+            "-c",
+            harness,
+            str(config.decoder_script),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        stdout = result.stdout.strip()
+        detail = stderr or stdout or f"exit code {result.returncode}"
+        raise Bin2LogError(f"External decoder failed: {detail}")
+
+
+def prepare_decode_workspace(
+    workdir: Path,
+    *,
+    config: Bin2LogConfig,
+    refresh_database: bool = False,
+) -> None:
+    """Run batch-scoped preprocess steps in a copied decode workspace."""
+
+    _validate_decoder_paths(config)
+    if not workdir.exists():
+        raise FileNotFoundError(workdir)
+    if not workdir.is_dir():
+        raise Bin2LogError(f"Decode workspace is not a directory: {workdir}")
+
+    harness = """
+from pathlib import Path
+import os
+import runpy
+import sys
+
+decoder_script = Path(sys.argv[1]).resolve()
+workdir = Path(sys.argv[2]).resolve()
+refresh_database = sys.argv[3] == "1"
+
+sys.path.insert(0, str(decoder_script.parent))
+namespace = runpy.run_path(str(decoder_script))
+
+database_update = namespace.get("database_update")
+concatenate_files = namespace.get("concatenate_files")
+concatenate_rbr_files = namespace.get("concatenate_rbr_files")
+
+workdir_str = str(workdir) + os.sep
+if refresh_database and callable(database_update):
+    database_update(None)
+if callable(concatenate_files):
+    concatenate_files(workdir_str)
+if callable(concatenate_rbr_files):
+    concatenate_rbr_files(workdir_str)
+"""
+    result = subprocess.run(
+        [
+            str(config.python_executable),
+            "-c",
+            harness,
+            str(config.decoder_script),
+            str(workdir),
+            "1" if refresh_database else "0",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        stdout = result.stdout.strip()
+        detail = stderr or stdout or f"exit code {result.returncode}"
+        raise Bin2LogError(f"External decoder failed: {detail}")
+
+
+def decode_workspace_logs(workdir: Path, *, config: Bin2LogConfig) -> list[Path]:
+    """Decode all BIN files currently present in a prepared workspace into LOG files."""
+
+    _validate_decoder_paths(config)
+    if not workdir.exists():
+        raise FileNotFoundError(workdir)
+    if not workdir.is_dir():
+        raise Bin2LogError(f"Decode workspace is not a directory: {workdir}")
+
+    _run_log_decoder(workdir, config)
+    return sorted(workdir.glob("*.LOG"))
+
+
 def iter_decoded_log_lines(path: Path, *, config: Bin2LogConfig) -> Iterator[str]:
     """Yield decoded LOG text lines for one raw .BIN file.
 
     Observed manufacturer decoder I/O contract:
 
     - `preprocess.py` decodes `.BIN` files into `.LOG` files via `decrypt_all(...)`
+    - database refresh and concatenate steps are separate upstream preflight work
+      and should be run once per copied batch workspace, not once per BIN
     - the later `convert_in_cycle(...)` step derives `CYCLE` files from decoded LOGs
     - the manufacturer workflow may delete the working-copy `.BIN`
 
     The adapter therefore:
 
     - copies the requested `.BIN` into a temporary working directory
-    - invokes only the LOG decode step in a subprocess
+    - invokes only the actual BIN->LOG decode step for one copied BIN
     - reads emitted `.LOG` artifact(s)
     - leaves the original source `.BIN` untouched
     """
@@ -63,6 +173,12 @@ def _validate_inputs(path: Path, config: Bin2LogConfig) -> None:
         raise FileNotFoundError(path)
     if not path.is_file():
         raise Bin2LogError(f"BIN input is not a file: {path}")
+    _validate_decoder_paths(config)
+
+
+def _validate_decoder_paths(config: Bin2LogConfig) -> None:
+    """Validate configured decoder executable and script paths."""
+
     if not config.python_executable.exists():
         raise FileNotFoundError(config.python_executable)
     if not config.decoder_script.exists():
@@ -98,7 +214,7 @@ def _decoded_log_workspace(path: Path, config: Bin2LogConfig) -> _DecodedLogWork
 
 
 def _run_log_decoder(workdir: Path, config: Bin2LogConfig) -> None:
-    """Invoke the external decoder script for the BIN->LOG step only."""
+    """Invoke the external decoder script for the actual BIN->LOG decode step."""
 
     harness = """
 from pathlib import Path
