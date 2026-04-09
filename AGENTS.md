@@ -115,6 +115,7 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 - `mer_data_blocks`
 - `acquisition_intervals`
 - `measurement_records`
+- `gps_records`
 - `unclassified_operational_records`
 
 Do not fully implement these families unless the current code naturally supports them, but prefer names and module roles that leave room for this direction.
@@ -129,6 +130,8 @@ For acquisition evidence prototypes, preserve the distinction between exact tran
 Do not infer intervals from assertion lines in the normalization layer.
 
 For ascent-request prototypes, classify only explicit request outcomes such as `ascent request accepted` and `ascent request rejected`. Do not infer ascent-request state from other ascent-related lines.
+
+For GPS prototypes, emit one record per clearly GPS-related LOG line such as `GPS fix...`, raw latitude/longitude lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. Do not group lines into fixes or compute derived position/timing values in the normalization layer.
 
 Use `cycle` in names only when referring to the concrete derived artifact types `CYCLE` or `.CYCLE.h`. Shared parser and normalization surfaces should prefer `operational` naming instead.
 

@@ -18,6 +18,7 @@ OUTPUT_FILENAMES = {
     "operational": "operational_records.jsonl",
     "acquisition": "acquisition_records.jsonl",
     "ascent_request": "ascent_request_records.jsonl",
+    "gps": "gps_records.jsonl",
     "transmission": "transmission_records.jsonl",
     "measurement": "measurement_records.jsonl",
     "unclassified": "unclassified_operational_records.jsonl",
@@ -39,6 +40,13 @@ _OUTFLOW_RE = re.compile(
 )
 _PRESSURE_VALUE_RE = re.compile(r"\bP\s*(?P<pressure>[+-]?\d+)mbar\b")
 _GPS_RE = re.compile(r"\bgps\b|\$GPS|GPRMC|hdop|vdop|lat|lon", re.IGNORECASE)
+_GPS_POSITION_RE = re.compile(
+    r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)"
+)
+_HDOP_RE = re.compile(r"\bhdop\s+(?P<hdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
+_VDOP_RE = re.compile(r"\bvdop\s+(?P<vdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
+_GPSACK_RE = re.compile(r"\$?GPSACK:(?P<payload>[^;]+)")
+_GPSOFF_RE = re.compile(r"\$?GPSOFF:(?P<offset>[+-]?\d+)")
 
 
 @dataclass(slots=True)
@@ -49,6 +57,7 @@ class LogJsonlPrototypeSummary:
     operational_records: int
     acquisition_records: int
     ascent_request_records: int
+    gps_records: int
     transmission_records: int
     measurement_records: int
     unclassified_records: int
@@ -57,6 +66,8 @@ class LogJsonlPrototypeSummary:
     acquisition_examples: dict[str, dict[str, object]]
     ascent_request_state_counts: dict[str, int]
     ascent_request_examples: dict[str, dict[str, object]]
+    gps_record_kind_counts: dict[str, int]
+    gps_examples: dict[str, dict[str, object]]
     transmission_examples: list[dict[str, object]]
     measurement_examples: list[dict[str, object]]
     unclassified_examples: list[dict[str, object]]
@@ -78,6 +89,7 @@ def write_log_jsonl_prototypes(
     operational_count = 0
     acquisition_count = 0
     ascent_request_count = 0
+    gps_count = 0
     transmission_count = 0
     measurement_count = 0
     unclassified_count = 0
@@ -86,6 +98,8 @@ def write_log_jsonl_prototypes(
     acquisition_examples: dict[str, dict[str, object]] = {}
     ascent_request_state_counter: Counter[str] = Counter()
     ascent_request_examples: dict[str, dict[str, object]] = {}
+    gps_record_kind_counter: Counter[str] = Counter()
+    gps_examples: dict[str, dict[str, object]] = {}
     transmission_examples: list[dict[str, object]] = []
     measurement_examples: list[dict[str, object]] = []
     unclassified_examples: list[dict[str, object]] = []
@@ -97,6 +111,7 @@ def write_log_jsonl_prototypes(
         output_paths["operational"].open("w", encoding="utf-8") as operational_handle,
         output_paths["acquisition"].open("w", encoding="utf-8") as acquisition_handle,
         output_paths["ascent_request"].open("w", encoding="utf-8") as ascent_request_handle,
+        output_paths["gps"].open("w", encoding="utf-8") as gps_handle,
         output_paths["transmission"].open("w", encoding="utf-8") as transmission_handle,
         output_paths["measurement"].open("w", encoding="utf-8") as measurement_handle,
         output_paths["unclassified"].open("w", encoding="utf-8") as unclassified_handle,
@@ -109,6 +124,7 @@ def write_log_jsonl_prototypes(
                 total_records += 1
                 acquisition_record = _classify_acquisition(entry)
                 ascent_request_record = _classify_ascent_request(entry)
+                gps_record = _classify_gps(entry)
                 transmission_record = _classify_transmission(entry)
                 measurement_record = _classify_measurement(entry)
                 severity = _severity(entry.message)
@@ -116,6 +132,7 @@ def write_log_jsonl_prototypes(
                     entry,
                     has_acquisition=acquisition_record is not None,
                     has_ascent_request=ascent_request_record is not None,
+                    has_gps=gps_record is not None,
                     has_transmission=transmission_record is not None,
                     has_measurement=measurement_record is not None,
                 )
@@ -162,6 +179,13 @@ def write_log_jsonl_prototypes(
                         ascent_request_record["ascent_request_state"],
                         ascent_request_record,
                     )
+
+                if gps_record is not None:
+                    _write_jsonl_line(gps_handle, gps_record)
+                    gps_count += 1
+                    classified = True
+                    gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
+                    gps_examples.setdefault(gps_record["gps_record_kind"], gps_record)
 
                 if transmission_record is not None:
                     _write_jsonl_line(transmission_handle, transmission_record)
@@ -213,6 +237,7 @@ def write_log_jsonl_prototypes(
         operational_records=operational_count,
         acquisition_records=acquisition_count,
         ascent_request_records=ascent_request_count,
+        gps_records=gps_count,
         transmission_records=transmission_count,
         measurement_records=measurement_count,
         unclassified_records=unclassified_count,
@@ -221,6 +246,8 @@ def write_log_jsonl_prototypes(
         acquisition_examples=acquisition_examples,
         ascent_request_state_counts=dict(ascent_request_state_counter),
         ascent_request_examples=ascent_request_examples,
+        gps_record_kind_counts=dict(gps_record_kind_counter),
+        gps_examples=gps_examples,
         transmission_examples=transmission_examples,
         measurement_examples=measurement_examples,
         unclassified_examples=unclassified_examples,
@@ -233,6 +260,7 @@ def _message_kind(
     *,
     has_acquisition: bool,
     has_ascent_request: bool,
+    has_gps: bool,
     has_transmission: bool,
     has_measurement: bool,
 ) -> str:
@@ -240,16 +268,18 @@ def _message_kind(
         return "acquisition"
     if has_ascent_request:
         return "status"
+    if has_gps:
+        return "gps"
     if has_transmission:
         return "upload"
     if has_measurement:
         return "measurement"
     message = entry.message
     lowered = message.lower()
-    if _GPS_RE.search(message):
-        return "gps"
     if lowered.startswith("sleep") or lowered.startswith("wake") or "timeout" in lowered:
         return "status"
+    if _GPS_RE.search(message):
+        return "gps"
     return "raw"
 
 
@@ -306,6 +336,57 @@ def _classify_ascent_request(entry: OperationalLogEntry) -> dict[str, object] | 
         "subsystem": entry.subsystem,
         "code": entry.code,
         "ascent_request_state": ascent_request_state,
+        "message": entry.message,
+        "raw_line": entry.raw_line,
+    }
+
+
+def _classify_gps(entry: OperationalLogEntry) -> dict[str, object] | None:
+    message = entry.message.strip()
+    gps_record_kind: str | None = None
+    raw_values: dict[str, str] | None = None
+
+    if "GPS fix..." in message:
+        gps_record_kind = "fix_attempt"
+    else:
+        position_match = _GPS_POSITION_RE.search(message)
+        hdop_match = _HDOP_RE.search(message)
+        vdop_match = _VDOP_RE.search(message)
+        gpsack_match = _GPSACK_RE.search(message)
+        gpsoff_match = _GPSOFF_RE.search(message)
+
+        if position_match is not None:
+            gps_record_kind = "fix_position"
+            raw_values = {
+                "latitude": position_match.group("latitude"),
+                "longitude": position_match.group("longitude"),
+            }
+        elif hdop_match is not None or vdop_match is not None:
+            gps_record_kind = "dop"
+            raw_values = {}
+            if hdop_match is not None:
+                raw_values["hdop"] = hdop_match.group("hdop")
+            if vdop_match is not None:
+                raw_values["vdop"] = vdop_match.group("vdop")
+        elif gpsack_match is not None:
+            gps_record_kind = "gps_ack"
+            raw_values = {"gpsack": gpsack_match.group("payload")}
+        elif gpsoff_match is not None:
+            gps_record_kind = "gps_off"
+            raw_values = {"gpsoff": gpsoff_match.group("offset")}
+
+    if gps_record_kind is None:
+        return None
+
+    return {
+        "time": entry.time.isoformat(),
+        "float_id": _float_id(entry.source_file),
+        "source_container": "log",
+        "source_file": entry.source_file.as_posix(),
+        "subsystem": entry.subsystem,
+        "code": entry.code,
+        "gps_record_kind": gps_record_kind,
+        "raw_values": raw_values,
         "message": entry.message,
         "raw_line": entry.raw_line,
     }

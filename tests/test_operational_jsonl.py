@@ -34,6 +34,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     assert summary.operational_records == 6
     assert summary.acquisition_records == 0
     assert summary.ascent_request_records == 0
+    assert summary.gps_records == 0
     assert summary.transmission_records == 2
     assert summary.measurement_records == 2
     assert summary.unclassified_records == 2
@@ -41,6 +42,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "acquisition_records.jsonl")
     ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
     transmission_records = _read_jsonl(output_dir / "transmission_records.jsonl")
     measurement_records = _read_jsonl(output_dir / "measurement_records.jsonl")
     unclassified_records = _read_jsonl(
@@ -50,6 +52,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     assert len(operational_records) == 6
     assert acquisition_records == []
     assert ascent_request_records == []
+    assert gps_records == []
     assert len(transmission_records) == 2
     assert len(measurement_records) == 2
     assert len(unclassified_records) == 2
@@ -98,6 +101,7 @@ def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
     assert summary.total_records == 2
     assert summary.measurement_records == 2
     assert summary.ascent_request_records == 0
+    assert summary.gps_records == 0
     assert summary.unclassified_records == 0
     assert [record["measurement_kind"] for record in measurement_records] == [
         "pump_duration",
@@ -128,6 +132,7 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
     summary = write_log_jsonl_prototypes([log_path], output_dir)
     operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "acquisition_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
     unclassified_records = _read_jsonl(
         output_dir / "unclassified_operational_records.jsonl"
     )
@@ -136,7 +141,8 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
     assert summary.operational_records == 5
     assert summary.acquisition_records == 4
     assert summary.ascent_request_records == 0
-    assert summary.unclassified_records == 1
+    assert summary.gps_records == 1
+    assert summary.unclassified_records == 0
     assert summary.acquisition_state_counts == {"started": 2, "stopped": 2}
     assert summary.acquisition_evidence_kind_counts == {
         "transition": 2,
@@ -156,7 +162,9 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
         ("started", "assertion"),
         ("stopped", "assertion"),
     }
-    assert [record["message"] for record in unclassified_records] == ["GPS fix..."]
+    assert gps_records[0]["gps_record_kind"] == "fix_attempt"
+    assert gps_records[0]["raw_values"] is None
+    assert unclassified_records == []
 
 
 def test_write_log_jsonl_prototypes_emits_ascent_request_records(
@@ -179,6 +187,7 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
     summary = write_log_jsonl_prototypes([log_path], output_dir)
     operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
     ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
     unclassified_records = _read_jsonl(
         output_dir / "unclassified_operational_records.jsonl"
     )
@@ -186,6 +195,7 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
     assert summary.total_records == 3
     assert summary.operational_records == 3
     assert summary.ascent_request_records == 2
+    assert summary.gps_records == 1
     assert summary.ascent_request_state_counts == {
         "accepted": 1,
         "rejected": 1,
@@ -197,7 +207,67 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
     }
     assert operational_records[0]["message_kind"] == "status"
     assert operational_records[1]["message_kind"] == "status"
-    assert [record["message"] for record in unclassified_records] == ["GPS fix..."]
+    assert gps_records[0]["gps_record_kind"] == "fix_attempt"
+    assert unclassified_records == []
+
+
+def test_write_log_jsonl_prototypes_emits_gps_records(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_gps.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[SURF  ,0022]GPS fix...",
+                "1700000001:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn",
+                "1700000002:[SURF  ,0084]hdop 0.820, vdop 1.180",
+                "1700000003:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;",
+                "1700000004:[MRMAID,0052]$GPSOFF:3686327;",
+                "1700000005:[MAIN  ,0007]buoy 467.174-T-0100",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
+    unclassified_records = _read_jsonl(
+        output_dir / "unclassified_operational_records.jsonl"
+    )
+
+    assert summary.total_records == 6
+    assert summary.gps_records == 5
+    assert summary.gps_record_kind_counts == {
+        "dop": 1,
+        "fix_attempt": 1,
+        "fix_position": 1,
+        "gps_ack": 1,
+        "gps_off": 1,
+    }
+    assert summary.unclassified_records == 1
+    assert len(gps_records) == 5
+    assert [record["message_kind"] for record in operational_records[:5]] == [
+        "gps",
+        "gps",
+        "gps",
+        "gps",
+        "gps",
+    ]
+    assert gps_records[0]["gps_record_kind"] == "fix_attempt"
+    assert gps_records[0]["raw_values"] is None
+    assert gps_records[1]["raw_values"] == {
+        "latitude": "N35deg19.262mn",
+        "longitude": "E139deg39.043mn",
+    }
+    assert gps_records[2]["raw_values"] == {"hdop": "0.820", "vdop": "1.180"}
+    assert gps_records[3]["raw_values"] == {"gpsack": "+0,+0,+0,+0,+0,+0,-30"}
+    assert gps_records[4]["raw_values"] == {"gpsoff": "3686327"}
+    assert [record["message"] for record in unclassified_records] == [
+        "buoy 467.174-T-0100"
+    ]
 
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:

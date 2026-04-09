@@ -35,6 +35,7 @@ def main() -> int:
     print(f"  operational_records.jsonl: {summary.operational_records}")
     print(f"  acquisition_records.jsonl: {summary.acquisition_records}")
     print(f"  ascent_request_records.jsonl: {summary.ascent_request_records}")
+    print(f"  gps_records.jsonl: {summary.gps_records}")
     print(f"  transmission_records.jsonl: {summary.transmission_records}")
     print(f"  measurement_records.jsonl: {summary.measurement_records}")
     print(
@@ -55,6 +56,10 @@ def main() -> int:
     for key, value in sorted(summary.ascent_request_state_counts.items()):
         print(f"  {key}: {value}")
     _print_ascent_request_examples(summary.ascent_request_examples)
+    print("GPS counts by record kind:")
+    for key, value in sorted(summary.gps_record_kind_counts.items()):
+        print(f"  {key}: {value}")
+    _print_gps_examples(summary.gps_examples)
     _print_examples("Transmission examples", summary.transmission_examples)
     _print_examples("Measurement examples", summary.measurement_examples)
     _print_examples("Unclassified examples", summary.unclassified_examples)
@@ -103,6 +108,18 @@ def _print_ascent_request_examples(
 ) -> None:
     print("Ascent request examples:")
     for key in ["accepted", "rejected"]:
+        record = examples.get(key)
+        if record is None:
+            print(f"  - {key}: (none)")
+            continue
+        print(f"  - {key}: {record['time']} {record['message']}")
+
+
+def _print_gps_examples(
+    examples: dict[str, dict[str, object]],
+) -> None:
+    print("GPS examples:")
+    for key in ["fix_attempt", "fix_position", "dop", "gps_ack", "gps_off"]:
         record = examples.get(key)
         if record is None:
             print(f"  - {key}: (none)")
