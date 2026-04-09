@@ -18,7 +18,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from mermaid_timeline.bin2cycle import Bin2CycleConfig, iter_decoded_cycle_lines
-from mermaid_timeline.cycle_raw import iter_cycle_events
+from mermaid_timeline.operational_raw import iter_cycle_events
 from mermaid_timeline.discovery import iter_bin_files
 
 

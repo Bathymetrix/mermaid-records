@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .cycle_raw import iter_operational_log_entries
+from .operational_raw import iter_operational_log_entries
 from .mer_raw import iter_mer_data_blocks
 
 

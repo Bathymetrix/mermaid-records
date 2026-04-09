@@ -25,7 +25,7 @@ def iter_bin_files(root: Path) -> Iterator[Path]:
 
 
 def iter_cycle_files(root: Path) -> Iterator[Path]:
-    """Backward-compatible alias for iterating processed .CYCLE.h files."""
+    """Legacy compatibility alias for iterating processed .CYCLE.h files."""
 
     yield from iter_processed_cycle_h_files(root)
 
@@ -55,7 +55,7 @@ def iter_mer_files(root: Path) -> Iterator[Path]:
 
 
 def iter_mer_env_files(root: Path) -> Iterator[Path]:
-    """Backward-compatible alias for iterating processed .MER.env files."""
+    """Legacy compatibility alias for iterating processed .MER.env files."""
 
     yield from iter_processed_mer_env_files(root)
 

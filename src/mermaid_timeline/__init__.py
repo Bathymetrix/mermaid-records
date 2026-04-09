@@ -18,7 +18,7 @@ from .audit import (
     audit_server_mer,
 )
 from .bin2cycle import Bin2CycleConfig, Bin2CycleError, iter_decoded_cycle_lines
-from .cycle_raw import iter_cycle_events, iter_operational_log_entries
+from .operational_raw import iter_cycle_events, iter_operational_log_entries
 from .discovery import (
     iter_bin_files,
     iter_cycle_files,

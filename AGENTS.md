@@ -26,7 +26,7 @@
 
 ## Project Purpose
 
-`mermaid-timeline` is a Python package for conservative parsing, decode adapters, discovery, audit, and normalization of MERMAID artifacts.
+`mermaid-timeline` is a Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
 
 Supported inputs currently include:
 
@@ -102,6 +102,8 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 
 Do not fully implement these families unless the current code naturally supports them, but prefer names and module roles that leave room for this direction.
 
+Use `cycle` in names only when referring to the concrete derived artifact types `CYCLE` or `.CYCLE.h`. Shared parser and normalization surfaces should prefer `operational` naming instead.
+
 Acquisition windows may be extracted only from explicit:
 
 - `acq started`
@@ -135,6 +137,8 @@ For event blocks:
 ## Current File/Layout Assumptions
 
 - Use one common operational-line parser/model across `LOG`, `CYCLE`, and `.CYCLE.h`.
+- The primary shared parser module is `src/mermaid_timeline/operational_raw.py`.
+- `src/mermaid_timeline/cycle_raw.py` remains only as a legacy compatibility shim.
 - Code-facing names may still use `cycle` in legacy modules, but the parsed operational record type is `OperationalLogEntry`.
 - Code-facing names for upstream decode should make the `BIN` -> `CYCLE` transformation explicit.
 - Textual docs/help may still refer to `.CYCLE.h` explicitly.

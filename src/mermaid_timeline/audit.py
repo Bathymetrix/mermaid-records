@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .cycle_raw import iter_operational_log_entries
+from .operational_raw import iter_operational_log_entries
 from .discovery import iter_mer_files, iter_processed_cycle_h_files
 from .mer_raw import parse_mer_file
 
@@ -57,7 +57,7 @@ def audit_server_mer(root: Path) -> MerCorpusStats:
 
 
 def audit_processed_cycle(root: Path) -> CycleCorpusStats:
-    """Backward-compatible alias for auditing processed .CYCLE.h files."""
+    """Legacy compatibility alias for auditing processed .CYCLE.h files."""
 
     return audit_processed_cycle_h(root)
 

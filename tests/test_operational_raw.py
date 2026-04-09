@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-from mermaid_timeline.cycle_raw import iter_cycle_events, iter_operational_log_entries
+from mermaid_timeline.cycle_raw import iter_cycle_events
+from mermaid_timeline.operational_raw import iter_operational_log_entries
 
 
 def test_iter_operational_log_entries_parses_log_fixture_line() -> None:
@@ -46,3 +47,13 @@ def test_iter_cycle_events_remains_backward_compatible() -> None:
     first_entry = next(iter_cycle_events(path))
 
     assert first_entry.source_kind == "cycle"
+
+
+def test_legacy_cycle_raw_import_reexports_shared_parser() -> None:
+    from mermaid_timeline.cycle_raw import iter_operational_log_entries as legacy_import
+
+    from mermaid_timeline.operational_raw import (
+        iter_operational_log_entries as primary_import,
+    )
+
+    assert legacy_import is primary_import
