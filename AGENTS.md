@@ -111,6 +111,7 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 - `location_records`
 - `transmission_records`
 - `acquisition_records`
+- `ascent_request_records`
 - `mer_data_blocks`
 - `acquisition_intervals`
 - `measurement_records`
@@ -126,6 +127,8 @@ For acquisition evidence prototypes, preserve the distinction between exact tran
 - `acq already started` / `acq already stopped` are assertion evidence
 
 Do not infer intervals from assertion lines in the normalization layer.
+
+For ascent-request prototypes, classify only explicit request outcomes such as `ascent request accepted` and `ascent request rejected`. Do not infer ascent-request state from other ascent-related lines.
 
 Use `cycle` in names only when referring to the concrete derived artifact types `CYCLE` or `.CYCLE.h`. Shared parser and normalization surfaces should prefer `operational` naming instead.
 

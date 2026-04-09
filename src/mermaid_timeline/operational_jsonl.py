@@ -17,6 +17,7 @@ from .operational_raw import iter_operational_log_entries
 OUTPUT_FILENAMES = {
     "operational": "operational_records.jsonl",
     "acquisition": "acquisition_records.jsonl",
+    "ascent_request": "ascent_request_records.jsonl",
     "transmission": "transmission_records.jsonl",
     "measurement": "measurement_records.jsonl",
     "unclassified": "unclassified_operational_records.jsonl",
@@ -47,12 +48,15 @@ class LogJsonlPrototypeSummary:
     total_records: int
     operational_records: int
     acquisition_records: int
+    ascent_request_records: int
     transmission_records: int
     measurement_records: int
     unclassified_records: int
     acquisition_state_counts: dict[str, int]
     acquisition_evidence_kind_counts: dict[str, int]
     acquisition_examples: dict[str, dict[str, object]]
+    ascent_request_state_counts: dict[str, int]
+    ascent_request_examples: dict[str, dict[str, object]]
     transmission_examples: list[dict[str, object]]
     measurement_examples: list[dict[str, object]]
     unclassified_examples: list[dict[str, object]]
@@ -73,12 +77,15 @@ def write_log_jsonl_prototypes(
     total_records = 0
     operational_count = 0
     acquisition_count = 0
+    ascent_request_count = 0
     transmission_count = 0
     measurement_count = 0
     unclassified_count = 0
     acquisition_state_counter: Counter[str] = Counter()
     acquisition_evidence_kind_counter: Counter[str] = Counter()
     acquisition_examples: dict[str, dict[str, object]] = {}
+    ascent_request_state_counter: Counter[str] = Counter()
+    ascent_request_examples: dict[str, dict[str, object]] = {}
     transmission_examples: list[dict[str, object]] = []
     measurement_examples: list[dict[str, object]] = []
     unclassified_examples: list[dict[str, object]] = []
@@ -89,6 +96,7 @@ def write_log_jsonl_prototypes(
     with (
         output_paths["operational"].open("w", encoding="utf-8") as operational_handle,
         output_paths["acquisition"].open("w", encoding="utf-8") as acquisition_handle,
+        output_paths["ascent_request"].open("w", encoding="utf-8") as ascent_request_handle,
         output_paths["transmission"].open("w", encoding="utf-8") as transmission_handle,
         output_paths["measurement"].open("w", encoding="utf-8") as measurement_handle,
         output_paths["unclassified"].open("w", encoding="utf-8") as unclassified_handle,
@@ -100,12 +108,14 @@ def write_log_jsonl_prototypes(
 
                 total_records += 1
                 acquisition_record = _classify_acquisition(entry)
+                ascent_request_record = _classify_ascent_request(entry)
                 transmission_record = _classify_transmission(entry)
                 measurement_record = _classify_measurement(entry)
                 severity = _severity(entry.message)
                 message_kind = _message_kind(
                     entry,
                     has_acquisition=acquisition_record is not None,
+                    has_ascent_request=ascent_request_record is not None,
                     has_transmission=transmission_record is not None,
                     has_measurement=measurement_record is not None,
                 )
@@ -140,6 +150,18 @@ def write_log_jsonl_prototypes(
                         f"{acquisition_record['acquisition_evidence_kind']}"
                     )
                     acquisition_examples.setdefault(example_key, acquisition_record)
+
+                if ascent_request_record is not None:
+                    _write_jsonl_line(ascent_request_handle, ascent_request_record)
+                    ascent_request_count += 1
+                    classified = True
+                    ascent_request_state_counter[
+                        ascent_request_record["ascent_request_state"]
+                    ] += 1
+                    ascent_request_examples.setdefault(
+                        ascent_request_record["ascent_request_state"],
+                        ascent_request_record,
+                    )
 
                 if transmission_record is not None:
                     _write_jsonl_line(transmission_handle, transmission_record)
@@ -190,12 +212,15 @@ def write_log_jsonl_prototypes(
         total_records=total_records,
         operational_records=operational_count,
         acquisition_records=acquisition_count,
+        ascent_request_records=ascent_request_count,
         transmission_records=transmission_count,
         measurement_records=measurement_count,
         unclassified_records=unclassified_count,
         acquisition_state_counts=dict(acquisition_state_counter),
         acquisition_evidence_kind_counts=dict(acquisition_evidence_kind_counter),
         acquisition_examples=acquisition_examples,
+        ascent_request_state_counts=dict(ascent_request_state_counter),
+        ascent_request_examples=ascent_request_examples,
         transmission_examples=transmission_examples,
         measurement_examples=measurement_examples,
         unclassified_examples=unclassified_examples,
@@ -207,11 +232,14 @@ def _message_kind(
     entry: OperationalLogEntry,
     *,
     has_acquisition: bool,
+    has_ascent_request: bool,
     has_transmission: bool,
     has_measurement: bool,
 ) -> str:
     if has_acquisition:
         return "acquisition"
+    if has_ascent_request:
+        return "status"
     if has_transmission:
         return "upload"
     if has_measurement:
@@ -255,6 +283,29 @@ def _classify_acquisition(entry: OperationalLogEntry) -> dict[str, object] | Non
         "code": entry.code,
         "acquisition_state": acquisition_state,
         "acquisition_evidence_kind": acquisition_evidence_kind,
+        "message": entry.message,
+        "raw_line": entry.raw_line,
+    }
+
+
+def _classify_ascent_request(entry: OperationalLogEntry) -> dict[str, object] | None:
+    normalized_message = " ".join(entry.message.lower().split())
+    mapping = {
+        "ascent request accepted": "accepted",
+        "ascent request rejected": "rejected",
+    }
+    ascent_request_state = mapping.get(normalized_message)
+    if ascent_request_state is None:
+        return None
+
+    return {
+        "time": entry.time.isoformat(),
+        "float_id": _float_id(entry.source_file),
+        "source_container": "log",
+        "source_file": entry.source_file.as_posix(),
+        "subsystem": entry.subsystem,
+        "code": entry.code,
+        "ascent_request_state": ascent_request_state,
         "message": entry.message,
         "raw_line": entry.raw_line,
     }

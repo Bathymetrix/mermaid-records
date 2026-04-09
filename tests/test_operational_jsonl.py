@@ -33,12 +33,14 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     assert summary.total_records == 6
     assert summary.operational_records == 6
     assert summary.acquisition_records == 0
+    assert summary.ascent_request_records == 0
     assert summary.transmission_records == 2
     assert summary.measurement_records == 2
     assert summary.unclassified_records == 2
 
     operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "acquisition_records.jsonl")
+    ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
     transmission_records = _read_jsonl(output_dir / "transmission_records.jsonl")
     measurement_records = _read_jsonl(output_dir / "measurement_records.jsonl")
     unclassified_records = _read_jsonl(
@@ -47,6 +49,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
 
     assert len(operational_records) == 6
     assert acquisition_records == []
+    assert ascent_request_records == []
     assert len(transmission_records) == 2
     assert len(measurement_records) == 2
     assert len(unclassified_records) == 2
@@ -94,6 +97,7 @@ def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
 
     assert summary.total_records == 2
     assert summary.measurement_records == 2
+    assert summary.ascent_request_records == 0
     assert summary.unclassified_records == 0
     assert [record["measurement_kind"] for record in measurement_records] == [
         "pump_duration",
@@ -131,6 +135,7 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
     assert summary.total_records == 5
     assert summary.operational_records == 5
     assert summary.acquisition_records == 4
+    assert summary.ascent_request_records == 0
     assert summary.unclassified_records == 1
     assert summary.acquisition_state_counts == {"started": 2, "stopped": 2}
     assert summary.acquisition_evidence_kind_counts == {
@@ -151,6 +156,47 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
         ("started", "assertion"),
         ("stopped", "assertion"),
     }
+    assert [record["message"] for record in unclassified_records] == ["GPS fix..."]
+
+
+def test_write_log_jsonl_prototypes_emits_ascent_request_records(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_ascent.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[MRMAID,0583]ascent request accepted",
+                "1700000001:[MRMAID,0005]ascent request rejected",
+                "1700000002:[SURF  ,0022]GPS fix...",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
+    ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
+    unclassified_records = _read_jsonl(
+        output_dir / "unclassified_operational_records.jsonl"
+    )
+
+    assert summary.total_records == 3
+    assert summary.operational_records == 3
+    assert summary.ascent_request_records == 2
+    assert summary.ascent_request_state_counts == {
+        "accepted": 1,
+        "rejected": 1,
+    }
+    assert len(ascent_request_records) == 2
+    assert {record["ascent_request_state"] for record in ascent_request_records} == {
+        "accepted",
+        "rejected",
+    }
+    assert operational_records[0]["message_kind"] == "status"
+    assert operational_records[1]["message_kind"] == "status"
     assert [record["message"] for record in unclassified_records] == ["GPS fix..."]
 
 

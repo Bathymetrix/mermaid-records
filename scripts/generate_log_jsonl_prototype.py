@@ -34,6 +34,7 @@ def main() -> int:
     print(f"Processed {summary.total_records} parsed LOG records.")
     print(f"  operational_records.jsonl: {summary.operational_records}")
     print(f"  acquisition_records.jsonl: {summary.acquisition_records}")
+    print(f"  ascent_request_records.jsonl: {summary.ascent_request_records}")
     print(f"  transmission_records.jsonl: {summary.transmission_records}")
     print(f"  measurement_records.jsonl: {summary.measurement_records}")
     print(
@@ -50,6 +51,10 @@ def main() -> int:
         print(f"  {key}: {value}")
 
     _print_acquisition_examples(summary.acquisition_examples)
+    print("Ascent request counts by state:")
+    for key, value in sorted(summary.ascent_request_state_counts.items()):
+        print(f"  {key}: {value}")
+    _print_ascent_request_examples(summary.ascent_request_examples)
     _print_examples("Transmission examples", summary.transmission_examples)
     _print_examples("Measurement examples", summary.measurement_examples)
     _print_examples("Unclassified examples", summary.unclassified_examples)
@@ -86,6 +91,18 @@ def _print_acquisition_examples(
         "stopped:assertion",
     ]
     for key in ordered_keys:
+        record = examples.get(key)
+        if record is None:
+            print(f"  - {key}: (none)")
+            continue
+        print(f"  - {key}: {record['time']} {record['message']}")
+
+
+def _print_ascent_request_examples(
+    examples: dict[str, dict[str, object]],
+) -> None:
+    print("Ascent request examples:")
+    for key in ["accepted", "rejected"]:
         record = examples.get(key)
         if record is None:
             print(f"  - {key}: (none)")
