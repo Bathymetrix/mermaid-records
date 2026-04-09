@@ -39,15 +39,15 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     assert summary.measurement_records == 2
     assert summary.unclassified_records == 2
 
-    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
-    acquisition_records = _read_jsonl(output_dir / "acquisition_records.jsonl")
-    ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
-    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
-    transmission_records = _read_jsonl(output_dir / "transmission_records.jsonl")
-    measurement_records = _read_jsonl(output_dir / "measurement_records.jsonl")
-    unclassified_records = _read_jsonl(
-        output_dir / "unclassified_operational_records.jsonl"
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
+    ascent_request_records = _read_jsonl(
+        output_dir / "log_ascent_request_records.jsonl"
     )
+    gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
+    transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
+    measurement_records = _read_jsonl(output_dir / "log_measurement_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert len(operational_records) == 6
     assert acquisition_records == []
@@ -93,10 +93,8 @@ def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_prototypes([log_path], output_dir)
-    measurement_records = _read_jsonl(output_dir / "measurement_records.jsonl")
-    unclassified_records = _read_jsonl(
-        output_dir / "unclassified_operational_records.jsonl"
-    )
+    measurement_records = _read_jsonl(output_dir / "log_measurement_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 2
     assert summary.measurement_records == 2
@@ -130,12 +128,10 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_prototypes([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
-    acquisition_records = _read_jsonl(output_dir / "acquisition_records.jsonl")
-    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
-    unclassified_records = _read_jsonl(
-        output_dir / "unclassified_operational_records.jsonl"
-    )
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 5
     assert summary.operational_records == 5
@@ -185,12 +181,12 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_prototypes([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
-    ascent_request_records = _read_jsonl(output_dir / "ascent_request_records.jsonl")
-    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
-    unclassified_records = _read_jsonl(
-        output_dir / "unclassified_operational_records.jsonl"
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    ascent_request_records = _read_jsonl(
+        output_dir / "log_ascent_request_records.jsonl"
     )
+    gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 3
     assert summary.operational_records == 3
@@ -232,11 +228,9 @@ def test_write_log_jsonl_prototypes_emits_gps_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_prototypes([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "operational_records.jsonl")
-    gps_records = _read_jsonl(output_dir / "gps_records.jsonl")
-    unclassified_records = _read_jsonl(
-        output_dir / "unclassified_operational_records.jsonl"
-    )
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 6
     assert summary.gps_records == 5

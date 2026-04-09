@@ -10,6 +10,7 @@
 - Prefer small, coherent commits and always tell the user when the current state is a good time to commit.
 - Any time suggesting a commit, also suggest a matching commit comment/message.
 - Treat this file as the persistent handoff document for future Codex sessions and update it whenever assumptions, boundaries, fixtures, or workflow rules change.
+- As the package nears completion, explicitly remind the user to revisit the pending BIN decode policy discussion: whether full-package decode workflows should require live `database_update(...)` or support an offline/cached mode.
 - Add the exact Bathymetrix header only to `src/mermaid_timeline/__init__.py` and `src/mermaid_timeline/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
 - When referring to an output cycle file, call it `CYCLE` (parallel to `BIN`, `LOG`, and `MER`).
@@ -132,6 +133,8 @@ Do not infer intervals from assertion lines in the normalization layer.
 For ascent-request prototypes, classify only explicit request outcomes such as `ascent request accepted` and `ascent request rejected`. Do not infer ascent-request state from other ascent-related lines.
 
 For GPS prototypes, emit one record per clearly GPS-related LOG line such as `GPS fix...`, raw latitude/longitude lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. Do not group lines into fixes or compute derived position/timing values in the normalization layer.
+
+For generated JSONL filenames, prefix low-level LOG-derived outputs with `log_` and reserve analogous `mer_` prefixes for future MER-derived JSONL outputs. Do not treat this as a package/module naming rule.
 
 Use `cycle` in names only when referring to the concrete derived artifact types `CYCLE` or `.CYCLE.h`. Shared parser and normalization surfaces should prefer `operational` naming instead.
 

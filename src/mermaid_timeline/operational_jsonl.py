@@ -15,13 +15,13 @@ from .models import OperationalLogEntry
 from .operational_raw import iter_operational_log_entries
 
 OUTPUT_FILENAMES = {
-    "operational": "operational_records.jsonl",
-    "acquisition": "acquisition_records.jsonl",
-    "ascent_request": "ascent_request_records.jsonl",
-    "gps": "gps_records.jsonl",
-    "transmission": "transmission_records.jsonl",
-    "measurement": "measurement_records.jsonl",
-    "unclassified": "unclassified_operational_records.jsonl",
+    "operational": "log_operational_records.jsonl",
+    "acquisition": "log_acquisition_records.jsonl",
+    "ascent_request": "log_ascent_request_records.jsonl",
+    "gps": "log_gps_records.jsonl",
+    "transmission": "log_transmission_records.jsonl",
+    "measurement": "log_measurement_records.jsonl",
+    "unclassified": "log_unclassified_records.jsonl",
 }
 
 _UPLOADED_ARTIFACT_RE = re.compile(r'"(?P<artifact>[^"]+)" uploaded at (?P<rate>\d+)bytes/s')

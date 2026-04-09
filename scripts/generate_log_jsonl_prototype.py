@@ -32,14 +32,14 @@ def main() -> int:
     summary = write_log_jsonl_prototypes(log_paths, args.output_dir)
 
     print(f"Processed {summary.total_records} parsed LOG records.")
-    print(f"  operational_records.jsonl: {summary.operational_records}")
-    print(f"  acquisition_records.jsonl: {summary.acquisition_records}")
-    print(f"  ascent_request_records.jsonl: {summary.ascent_request_records}")
-    print(f"  gps_records.jsonl: {summary.gps_records}")
-    print(f"  transmission_records.jsonl: {summary.transmission_records}")
-    print(f"  measurement_records.jsonl: {summary.measurement_records}")
+    print(f"  log_operational_records.jsonl: {summary.operational_records}")
+    print(f"  log_acquisition_records.jsonl: {summary.acquisition_records}")
+    print(f"  log_ascent_request_records.jsonl: {summary.ascent_request_records}")
+    print(f"  log_gps_records.jsonl: {summary.gps_records}")
+    print(f"  log_transmission_records.jsonl: {summary.transmission_records}")
+    print(f"  log_measurement_records.jsonl: {summary.measurement_records}")
     print(
-        "  unclassified_operational_records.jsonl: "
+        "  log_unclassified_records.jsonl: "
         f"{summary.unclassified_records}"
     )
 
