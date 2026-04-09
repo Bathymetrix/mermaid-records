@@ -10,6 +10,7 @@ from collections import Counter
 from dataclasses import asdict, dataclass
 import json
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 
@@ -19,8 +20,8 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_timeline.bin2cycle import Bin2CycleConfig, iter_decoded_cycle_lines
-from mermaid_timeline.bin2log import update_decoder_database
+from mermaid_timeline.bin2cycle import Bin2CycleConfig, derive_workspace_cycles
+from mermaid_timeline.bin2log import decode_workspace_logs, prepare_decode_workspace
 from mermaid_timeline.operational_raw import iter_cycle_events
 from mermaid_timeline.discovery import iter_bin_files
 
@@ -81,13 +82,14 @@ def main() -> int:
         python_executable=args.decoder_python,
         decoder_script=args.decoder_script,
     )
-    update_decoder_database(config)
 
     paths = iter_bin_files(args.bin_root)
     if args.limit is not None:
         paths = _limited(paths, args.limit)
+    else:
+        paths = list(paths)
 
-    records = [audit_bin(path, config=config) for path in paths]
+    records = audit_bins(paths, config=config)
     summary = summarize(records)
 
     print_summary(summary)
@@ -104,48 +106,82 @@ def main() -> int:
     return 0
 
 
-def audit_bin(path: Path, *, config: Bin2CycleConfig) -> BinAuditRecord:
-    """Audit one BIN file through decode and cycle parsing."""
+def audit_bins(paths: list[Path], *, config: Bin2CycleConfig) -> list[BinAuditRecord]:
+    """Audit a batch of BIN files through shared decode and cycle parsing."""
 
-    decoded_lines: list[str] = []
-    try:
-        decoded_lines = list(iter_decoded_cycle_lines(path, config=config))
-    except Exception as exc:  # pragma: no cover - real corpus workflow
-        return BinAuditRecord(
-            path=str(path),
-            decode_success=False,
-            parse_success=False,
-            decoded_line_count=None,
-            parsed_entry_count=None,
-            error_stage="decode",
-            error_type=type(exc).__name__,
-            error_message=str(exc),
-        )
+    if not paths:
+        return []
+
+    decoded_cycle_index: dict[str, list[str]] = {}
+    batch_decode_error: str | None = None
+    batch_error_type: str | None = None
 
     try:
-        parsed_entry_count = _parse_cycle_line_count(decoded_lines)
+        with tempfile.TemporaryDirectory(prefix="mermaid-cycle-audit-batch-") as tmpdir:
+            workdir = Path(tmpdir)
+            for path in paths:
+                shutil.copy2(path, workdir / path.name)
+            prepare_decode_workspace(workdir, config=config, refresh_database=True)
+            decode_workspace_logs(workdir, config=config)
+            for cycle_path in derive_workspace_cycles(workdir, config=config):
+                identifier = _extract_identifier(cycle_path)
+                decoded_cycle_index[identifier] = cycle_path.read_text(
+                    encoding="utf-8"
+                ).splitlines()
     except Exception as exc:  # pragma: no cover - real corpus workflow
-        return BinAuditRecord(
-            path=str(path),
-            decode_success=True,
-            parse_success=False,
-            decoded_line_count=len(decoded_lines),
-            parsed_entry_count=None,
-            error_stage="parse",
-            error_type=type(exc).__name__,
-            error_message=str(exc),
+        batch_decode_error = str(exc)
+        batch_error_type = type(exc).__name__
+
+    records: list[BinAuditRecord] = []
+    for path in paths:
+        identifier = _extract_identifier(path)
+        decoded_lines = decoded_cycle_index.get(identifier)
+        if batch_decode_error is not None or decoded_lines is None:
+            records.append(
+                BinAuditRecord(
+                    path=str(path),
+                    decode_success=False,
+                    parse_success=False,
+                    decoded_line_count=None if decoded_lines is None else len(decoded_lines),
+                    parsed_entry_count=None,
+                    error_stage="decode",
+                    error_type=batch_error_type or "Bin2CycleError",
+                    error_message=batch_decode_error or f"No emitted CYCLE for {identifier}",
+                )
+            )
+            continue
+
+        try:
+            parsed_entry_count = _parse_cycle_line_count(decoded_lines)
+        except Exception as exc:  # pragma: no cover - real corpus workflow
+            records.append(
+                BinAuditRecord(
+                    path=str(path),
+                    decode_success=True,
+                    parse_success=False,
+                    decoded_line_count=len(decoded_lines),
+                    parsed_entry_count=None,
+                    error_stage="parse",
+                    error_type=type(exc).__name__,
+                    error_message=str(exc),
+                )
+            )
+            continue
+
+        records.append(
+            BinAuditRecord(
+                path=str(path),
+                decode_success=True,
+                parse_success=True,
+                decoded_line_count=len(decoded_lines),
+                parsed_entry_count=parsed_entry_count,
+                error_stage=None,
+                error_type=None,
+                error_message=None,
+            )
         )
 
-    return BinAuditRecord(
-        path=str(path),
-        decode_success=True,
-        parse_success=True,
-        decoded_line_count=len(decoded_lines),
-        parsed_entry_count=parsed_entry_count,
-        error_stage=None,
-        error_type=None,
-        error_message=None,
-    )
+    return records
 
 
 def summarize(records: list[BinAuditRecord]) -> dict[str, object]:
@@ -208,6 +244,13 @@ def _limited(paths: object, limit: int) -> list[Path]:
         if len(result) >= limit:
             break
     return result
+
+
+def _extract_identifier(path: Path) -> str:
+    """Extract the shared hex-like identifier from a fixture filename."""
+
+    basename = path.name.split(".", maxsplit=1)[0]
+    return basename.split("_", maxsplit=1)[1]
 
 
 def _default_decoder_script() -> Path | None:

@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 
@@ -17,8 +18,8 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_timeline.bin2cycle import Bin2CycleConfig, iter_decoded_cycle_lines
-from mermaid_timeline.bin2log import update_decoder_database
+from mermaid_timeline.bin2cycle import Bin2CycleConfig, derive_workspace_cycles
+from mermaid_timeline.bin2log import decode_workspace_logs, prepare_decode_workspace
 from mermaid_timeline.operational_raw import iter_cycle_events
 from mermaid_timeline.discovery import iter_bin_files
 
@@ -85,79 +86,96 @@ def main() -> int:
         python_executable=args.decoder_python,
         decoder_script=args.decoder_script,
     )
-    update_decoder_database(config)
     bins = sorted(iter_bin_files(args.fixtures_root))[: args.limit]
     cycle_index = _index_processed_cycles(args.processed_root)
-
-    reports = [validate_sample(path, config=config, cycle_index=cycle_index) for path in bins]
+    reports = validate_samples(bins, config=config, cycle_index=cycle_index)
     _print_reports(reports)
     return 0
 
 
-def validate_sample(
-    path: Path,
+def validate_samples(
+    paths: list[Path],
     *,
     config: Bin2CycleConfig,
     cycle_index: dict[str, list[Path]],
-) -> SampleReport:
-    """Validate one BIN sample against decoded and processed cycle text."""
+) -> list[SampleReport]:
+    """Validate a batch of BIN samples against decoded and processed cycle text."""
 
-    identifier = _extract_identifier(path)
-    processed_matches = cycle_index.get(identifier, [])
-    processed_cycle = sorted(processed_matches)[0] if processed_matches else None
-
-    decoded_lines: list[str] = []
-    decode_success = False
-    decode_error: str | None = None
-    decoded_parse_success = False
-    decoded_parse_error: str | None = None
-    decoded_parsed_entry_count: int | None = None
+    decoded_cycle_index: dict[str, list[str]] = {}
+    batch_decode_error: str | None = None
 
     try:
-        decoded_lines = list(iter_decoded_cycle_lines(path, config=config))
-        decode_success = True
+        with tempfile.TemporaryDirectory(prefix="mermaid-cycle-validate-batch-") as tmpdir:
+            workdir = Path(tmpdir)
+            for path in paths:
+                shutil.copy2(path, workdir / path.name)
+            prepare_decode_workspace(workdir, config=config, refresh_database=True)
+            decode_workspace_logs(workdir, config=config)
+            for cycle_path in derive_workspace_cycles(workdir, config=config):
+                identifier = _extract_identifier(cycle_path)
+                decoded_cycle_index[identifier] = cycle_path.read_text(
+                    encoding="utf-8"
+                ).splitlines()
     except Exception as exc:  # pragma: no cover - real workflow path
-        decode_error = repr(exc)
-    else:
-        try:
-            decoded_parsed_entry_count = _parse_cycle_line_count(decoded_lines)
-        except Exception as exc:  # pragma: no cover - real workflow path
-            decoded_parse_error = repr(exc)
-        else:
-            decoded_parse_success = True
+        batch_decode_error = repr(exc)
 
-    processed_parse_success: bool | None = None
-    processed_parse_error: str | None = None
-    processed_line_count: int | None = None
-    processed_parsed_entry_count: int | None = None
+    reports: list[SampleReport] = []
+    for path in paths:
+        identifier = _extract_identifier(path)
+        processed_matches = cycle_index.get(identifier, [])
+        processed_cycle = sorted(processed_matches)[0] if processed_matches else None
 
-    if processed_cycle is not None:
-        processed_lines = processed_cycle.read_text(encoding="utf-8").splitlines()
-        processed_line_count = len(processed_lines)
-        try:
-            processed_parsed_entry_count = sum(1 for _ in iter_cycle_events(processed_cycle))
-        except Exception as exc:  # pragma: no cover - real workflow path
-            processed_parse_success = False
-            processed_parse_error = repr(exc)
-        else:
-            processed_parse_success = True
+        decoded_lines = decoded_cycle_index.get(identifier, [])
+        decode_success = batch_decode_error is None and identifier in decoded_cycle_index
+        decode_error = None if decode_success else batch_decode_error
+        decoded_parse_success = False
+        decoded_parse_error: str | None = None
+        decoded_parsed_entry_count: int | None = None
 
-    return SampleReport(
-        bin_file=path,
-        identifier=identifier,
-        decode_success=decode_success,
-        decode_error=decode_error,
-        decoded_line_count=len(decoded_lines),
-        decoded_parse_success=decoded_parse_success,
-        decoded_parse_error=decoded_parse_error,
-        decoded_parsed_entry_count=decoded_parsed_entry_count,
-        processed_cycle_found=processed_cycle is not None,
-        processed_cycle_file=processed_cycle,
-        processed_parse_success=processed_parse_success,
-        processed_parse_error=processed_parse_error,
-        processed_line_count=processed_line_count,
-        processed_parsed_entry_count=processed_parsed_entry_count,
-    )
+        if decode_success:
+            try:
+                decoded_parsed_entry_count = _parse_cycle_line_count(decoded_lines)
+            except Exception as exc:  # pragma: no cover - real workflow path
+                decoded_parse_error = repr(exc)
+            else:
+                decoded_parse_success = True
+
+        processed_parse_success: bool | None = None
+        processed_parse_error: str | None = None
+        processed_line_count: int | None = None
+        processed_parsed_entry_count: int | None = None
+
+        if processed_cycle is not None:
+            processed_lines = processed_cycle.read_text(encoding="utf-8").splitlines()
+            processed_line_count = len(processed_lines)
+            try:
+                processed_parsed_entry_count = sum(1 for _ in iter_cycle_events(processed_cycle))
+            except Exception as exc:  # pragma: no cover - real workflow path
+                processed_parse_success = False
+                processed_parse_error = repr(exc)
+            else:
+                processed_parse_success = True
+
+        reports.append(
+            SampleReport(
+                bin_file=path,
+                identifier=identifier,
+                decode_success=decode_success,
+                decode_error=decode_error,
+                decoded_line_count=len(decoded_lines),
+                decoded_parse_success=decoded_parse_success,
+                decoded_parse_error=decoded_parse_error,
+                decoded_parsed_entry_count=decoded_parsed_entry_count,
+                processed_cycle_found=processed_cycle is not None,
+                processed_cycle_file=processed_cycle,
+                processed_parse_success=processed_parse_success,
+                processed_parse_error=processed_parse_error,
+                processed_line_count=processed_line_count,
+                processed_parsed_entry_count=processed_parsed_entry_count,
+            )
+        )
+
+    return reports
 
 
 def _default_decoder_script() -> Path | None:

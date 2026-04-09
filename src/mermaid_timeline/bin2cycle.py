@@ -11,8 +11,9 @@ from typing import Iterator
 from .bin2log import (
     Bin2LogConfig,
     Bin2LogError,
-    _decoded_log_workspace,
     _validate_inputs,
+    decode_workspace_logs,
+    prepare_decode_workspace,
 )
 
 Bin2CycleConfig = Bin2LogConfig
@@ -37,14 +38,15 @@ def iter_decoded_cycle_lines(path: Path, *, config: Bin2CycleConfig) -> Iterator
     _validate_inputs(path, config)
 
     try:
-        with _decoded_log_workspace(path, config) as workdir:
-            _run_cycle_grouping(workdir, config)
+        from tempfile import TemporaryDirectory
+        import shutil
 
-            cycle_paths = sorted(workdir.glob("*.CYCLE"))
-            if not cycle_paths:
-                raise Bin2CycleError(
-                    f"External decoder did not emit any .CYCLE files for {path}."
-                )
+        with TemporaryDirectory(prefix="mermaid-bin2cycle-") as tmpdir:
+            workdir = Path(tmpdir)
+            shutil.copy2(path, workdir / path.name)
+            prepare_decode_workspace(workdir, config=config, refresh_database=False)
+            decode_workspace_logs(workdir, config=config)
+            cycle_paths = derive_workspace_cycles(workdir, config=config)
 
             for cycle_path in cycle_paths:
                 with cycle_path.open("r", encoding="utf-8") as handle:
@@ -92,3 +94,20 @@ convert_in_cycle(workdir_str, utc_class(0), utc_class(32503680000))
         stdout = result.stdout.strip()
         detail = stderr or stdout or f"exit code {result.returncode}"
         raise Bin2CycleError(f"External decoder failed: {detail}")
+
+
+def derive_workspace_cycles(workdir: Path, *, config: Bin2CycleConfig) -> list[Path]:
+    """Derive CYCLE files from decoded LOGs already present in a prepared workspace."""
+
+    if not workdir.exists():
+        raise FileNotFoundError(workdir)
+    if not workdir.is_dir():
+        raise Bin2CycleError(f"Cycle workspace is not a directory: {workdir}")
+
+    _run_cycle_grouping(workdir, config)
+    cycle_paths = sorted(workdir.glob("*.CYCLE"))
+    if not cycle_paths:
+        raise Bin2CycleError(
+            f"External decoder did not emit any .CYCLE files for {workdir}."
+        )
+    return cycle_paths
