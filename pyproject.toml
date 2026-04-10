@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mermaid-timeline"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Scaffold for parsing and summarizing MERMAID timeline data."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -24,6 +24,9 @@ mermaid-timeline = "mermaid_timeline.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
+
+[tool.setuptools.dynamic]
+version = {attr = "mermaid_timeline.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -26,6 +26,12 @@
 - Use `Bathymetrix™` only in approved file headers and rare top-level visible branding. Do not use the trademark marker in identifiers, module names, imports, docstrings, or inline comments.
 - Package authorship/licensing metadata must live in exactly one location: `src/mermaid_timeline/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
 
+## Versioning Rule — Single Source of Truth
+
+- The canonical version must live in `src/mermaid_timeline/__init__.py` as `__version__`.
+- `pyproject.toml` must use dynamic versioning via `[tool.setuptools.dynamic]` with `version = {attr = "mermaid_timeline.__version__"}`.
+- No other hardcoded package version strings are allowed in the repo.
+
 ## Project Purpose
 
 `mermaid-timeline` is a Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.

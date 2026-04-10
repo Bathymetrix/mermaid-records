@@ -6,6 +6,7 @@
 
 """Top-level package for mermaid_timeline."""
 
+__version__ = "0.1.0"
 __author__ = "Joel D. Simon"
 __license__ = "MIT"
 __copyright__ = "© 2026 Bathymetrix, LLC"
@@ -85,5 +86,3 @@ __all__ = [
     "iter_server_mer",
     "parse_mer_file",
 ]
-
-__version__ = "0.1.0"
