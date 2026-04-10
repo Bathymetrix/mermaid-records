@@ -214,3 +214,35 @@ Current fixture corpus note:
 
 - If the work shifts toward higher-level API design, abstraction tradeoffs, naming strategy, or broader architecture, say when it may be a good moment to consult ChatGPT and provide a concise handoff summary.
 - Do not be territorial about tool choice; suggest ChatGPT when it is likely to help with design-space exploration.
+
+## Module Naming Rule — Action First
+
+All transformation and processing modules should use action-first naming.
+
+Definition:
+
+- start module names with the verb describing what the module does
+- follow with the source or target object
+
+Examples:
+
+- `normalize_log.py`
+- `normalize_mer.py`
+- `parse_log.py`
+- `parse_mer.py`
+
+Avoid:
+
+- `log_normalize.py`
+- `mer_normalize.py`
+
+Rationale:
+
+- groups modules by behavior rather than data type
+- scales cleanly as new pipelines are added
+- improves discoverability and consistency across the package
+
+Additional rule:
+
+- keep module names lowercase
+- use underscores only when needed for readability

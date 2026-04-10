@@ -7,7 +7,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from mermaid_timeline.operational_jsonl import write_log_jsonl_prototypes
+from mermaid_timeline.normalize_log import write_log_jsonl_prototypes
 
 
 def main() -> int:

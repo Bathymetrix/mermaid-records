@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 
-"""Prototype JSONL normalization helpers for LOG-derived operational records."""
+"""LOG-to-JSONL normalization helpers for prototype record-family outputs."""
 
 from __future__ import annotations
 
