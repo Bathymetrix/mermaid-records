@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from mermaid_timeline.acq_windows import extract_acquisition_windows
-from mermaid_timeline.cycle_raw import iter_cycle_events
+from mermaid_records.acq_windows import extract_acquisition_windows
+from mermaid_records.cycle_raw import iter_cycle_events
 
 
 def test_extract_acquisition_windows_from_fixture() -> None:

@@ -4,7 +4,7 @@
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
 # SPDX-License-Identifier: MIT
 
-"""Top-level package for mermaid_timeline."""
+"""Top-level package for mermaid_records."""
 
 __version__ = "0.1.0"
 __author__ = "Joel D. Simon"

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from mermaid_timeline.discovery import (
+from mermaid_records.discovery import (
     iter_bin_files,
     iter_cycle_files,
     iter_log_files,

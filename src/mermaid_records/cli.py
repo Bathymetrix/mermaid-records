@@ -4,7 +4,7 @@
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
 # SPDX-License-Identifier: MIT
 
-"""Command line interface for mermaid_timeline."""
+"""Command line interface for mermaid_records."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
 
     parser = argparse.ArgumentParser(
-        prog="mermaid-timeline",
+        prog="mermaid-records",
         description="Bathymetrix™ CLI for conservative MERMAID raw parsing.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)

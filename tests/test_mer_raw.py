@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from mermaid_timeline.mer_raw import parse_mer_file
+from mermaid_records.mer_raw import parse_mer_file
 
 
 def test_parse_mer_file_extracts_metadata_and_blocks() -> None:

@@ -1,11 +1,11 @@
 # RENAME HANDOFF
 
-This repo is being prepared for a clean rename only. Do not preserve the old repo path in working assumptions once the filesystem rename is done.
+This rename handoff has been completed. Treat the new repo/package names below as canonical, and do not preserve the old repo path in working assumptions.
 
-Current repo path:
+Previous repo path:
 - `/Users/jdsimon/programs/mermaid-timeline`
 
-Planned new repo path:
+Current repo path:
 - `/Users/jdsimon/programs/mermaid-records`
 
 ## Current Architecture
@@ -25,11 +25,11 @@ Derived/reference artifacts still supported:
 - processed `.MER.env`
 
 Current key layers:
-- discovery: `src/mermaid_timeline/discovery.py`
-- decode: `src/mermaid_timeline/bin2log.py`, `src/mermaid_timeline/bin2cycle.py`
-- parsing: `src/mermaid_timeline/operational_raw.py`, `src/mermaid_timeline/mer_raw.py`
-- LOG normalization prototype: `src/mermaid_timeline/normalize_log.py`
-- audit/dev workflows: `src/mermaid_timeline/audit.py`, `scripts/`
+- discovery: `src/mermaid_records/discovery.py`
+- decode: `src/mermaid_records/bin2log.py`, `src/mermaid_records/bin2cycle.py`
+- parsing: `src/mermaid_records/operational_raw.py`, `src/mermaid_records/mer_raw.py`
+- LOG normalization prototype: `src/mermaid_records/normalize_log.py`
+- audit/dev workflows: `src/mermaid_records/audit.py`, `scripts/`
 
 ## Current LOG JSONL Outputs
 
@@ -57,7 +57,7 @@ Keep these conceptual decisions:
 ## Current Compatibility Shims
 
 Still present on purpose:
-- `src/mermaid_timeline/cycle_raw.py` remains as a legacy compatibility shim
+- `src/mermaid_records/cycle_raw.py` remains as a legacy compatibility shim
 - `CycleLogEntry = OperationalLogEntry`
 - `iter_cycle_events(...)`
 - `iter_cycle_files(...)`
@@ -92,9 +92,9 @@ Not yet implemented:
 Post-rename next step:
 - begin MER normalization work
 
-## Exact Rename Targets
+## Rename Result
 
-Rename these when doing the actual rename:
+Completed rename targets:
 - repo dir:
   - `mermaid-timeline` -> `mermaid-records`
 - src package dir:
@@ -106,46 +106,23 @@ Rename these when doing the actual rename:
 - CLI command:
   - `mermaid-timeline` -> `mermaid-records`
 
-## Rename-Sensitive References To Update
-
-1. `pyproject.toml`
-- `[project].name = "mermaid-timeline"`
-- `[project.scripts] mermaid-timeline = "mermaid_timeline.cli:main"`
-- `[tool.setuptools.dynamic] version = {attr = "mermaid_timeline.__version__"}`
-
-2. Source package directory
-- `src/mermaid_timeline/`
-
-3. Imports across repo
-- imports under `src/`, `tests/`, and `scripts/` currently use `mermaid_timeline`
-- direct import updates are required across:
-  - `scripts/`
-  - `tests/`
-  - package-internal imports if any absolute package imports are introduced later
-
-4. CLI references
-- `src/mermaid_timeline/cli.py`
-  - module docstring mentions `mermaid_timeline`
-  - `argparse.ArgumentParser(prog="mermaid-timeline")`
-
-5. `AGENTS.md`
-- contains explicit path references such as:
-  - `src/mermaid_timeline/__init__.py`
-  - `src/mermaid_timeline/cli.py`
-  - `src/mermaid_timeline/operational_raw.py`
-  - `src/mermaid_timeline/cycle_raw.py`
-- contains package-name text:
-  - ``mermaid-timeline``
-  - ``mermaid_timeline``
-
-6. `README.md`
-- title and prose mention `mermaid-timeline`
-- CLI usage examples use `mermaid-timeline`
-
-7. Package metadata/runtime surface
-- `src/mermaid_timeline/__init__.py`
-  - top-level package docstring mentions `mermaid_timeline`
-  - canonical version path will need to move to `src/mermaid_records/__init__.py`
+Updated rename-sensitive surfaces:
+- `pyproject.toml`
+  - `[project].name = "mermaid-records"`
+  - `[project.scripts] mermaid-records = "mermaid_records.cli:main"`
+  - `[tool.setuptools.dynamic] version = {attr = "mermaid_records.__version__"}`
+- source package directory now lives at `src/mermaid_records/`
+- imports under `src/`, `tests/`, and `scripts/` now use `mermaid_records`
+- `src/mermaid_records/cli.py`
+  - module docstring now mentions `mermaid_records`
+  - `argparse.ArgumentParser(prog="mermaid-records")`
+- `AGENTS.md`
+  - package-path references updated to `src/mermaid_records/...`
+- `README.md`
+  - title and CLI usage examples now use `mermaid-records`
+- `src/mermaid_records/__init__.py`
+  - top-level package docstring now mentions `mermaid_records`
+  - canonical version path now lives at `src/mermaid_records/__init__.py`
 
 ## Things That Should Not Change During Rename
 
@@ -155,21 +132,19 @@ Do not change during the rename unless separately intended:
 - representative fixture filenames
 - parser function names unless there is a separate cleanup decision
 
-## After Filesystem Rename, Do These In The New Codex Project
+## Validation Completed
 
-1. Open Codex on:
-   - `/Users/jdsimon/programs/mermaid-records`
-2. Verify the detected project root is the renamed Git root.
-3. Perform the actual package rename:
-   - repo/distribution/import package/CLI
-4. Reinstall editable package:
+Completed verification steps in the renamed repo:
+1. Confirmed project root is `/Users/jdsimon/programs/mermaid-records`.
+2. Reinstalled the editable package:
    - `./.venv/bin/python -m pip install -e . --no-build-isolation`
-5. Run tests:
+3. Ran tests:
    - `./.venv/bin/python -m pytest -q`
-6. Verify CLI help:
+4. Verified CLI help:
    - `./.venv/bin/python -m mermaid_records.cli --help`
-   - and/or installed command help for `mermaid-records`
-7. Then begin MER normalization work.
+   - `./.venv/bin/mermaid-records --help`
+5. Next planned work remains:
+   - begin MER normalization work
 
 ## Practical Notes
 

@@ -1,6 +1,6 @@
-# mermaid-timeline
+# mermaid-records
 
-`mermaid-timeline` is a small Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
+`mermaid-records` is a small Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
 
 The package intentionally separates decode, parsing, normalization-oriented extraction, and later interpretation:
 
@@ -34,13 +34,13 @@ pip install -e .[dev]
 Inspect a MER file:
 
 ```bash
-mermaid-timeline inspect-mer /path/to/file.MER
+mermaid-records inspect-mer /path/to/file.MER
 ```
 
 Inspect an operational `LOG`, `CYCLE`, or `.CYCLE.h` file:
 
 ```bash
-mermaid-timeline inspect-cycle /path/to/file.LOG
+mermaid-records inspect-cycle /path/to/file.LOG
 ```
 
 Both commands currently expose conservative parser stubs intended to preserve raw information without overcommitting to a specific decode format.

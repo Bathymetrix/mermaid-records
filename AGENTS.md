@@ -11,7 +11,7 @@
 - Any time suggesting a commit, also suggest a matching commit comment/message.
 - Treat this file as the persistent handoff document for future Codex sessions and update it whenever assumptions, boundaries, fixtures, or workflow rules change.
 - As the package nears completion, explicitly remind the user to revisit the pending BIN decode policy discussion: whether full-package decode workflows should require live `database_update(...)` or support an offline/cached mode.
-- Add the exact Bathymetrix header only to `src/mermaid_timeline/__init__.py` and `src/mermaid_timeline/cli.py`.
+- Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
 - When referring to an output cycle file, call it `CYCLE` (parallel to `BIN`, `LOG`, and `MER`).
 - Never delete source raw files from their original path. This includes `.BIN`, `.MER`, and future raw formats such as `.vit`. If an external decoder is destructive, it must run only on copied files in a temporary workspace.
@@ -22,19 +22,19 @@
 - Always push back, disagree, or suggest a better alternative when warranted. Do not agree reflexively. When suggesting a different path, give the reason plainly and concretely.
 - Package license defaults to MIT. A root `LICENSE` file must exist.
 - Every Python source file must include `SPDX-License-Identifier: MIT`, but must not include the full license text.
-- The exact Bathymetrix header belongs only in `src/mermaid_timeline/__init__.py` and `src/mermaid_timeline/cli.py`, unless the user explicitly expands that set.
+- The exact Bathymetrix header belongs only in `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`, unless the user explicitly expands that set.
 - Use `Bathymetrix™` only in approved file headers and rare top-level visible branding. Do not use the trademark marker in identifiers, module names, imports, docstrings, or inline comments.
-- Package authorship/licensing metadata must live in exactly one location: `src/mermaid_timeline/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
+- Package authorship/licensing metadata must live in exactly one location: `src/mermaid_records/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
 
 ## Versioning Rule — Single Source of Truth
 
-- The canonical version must live in `src/mermaid_timeline/__init__.py` as `__version__`.
-- `pyproject.toml` must use dynamic versioning via `[tool.setuptools.dynamic]` with `version = {attr = "mermaid_timeline.__version__"}`.
+- The canonical version must live in `src/mermaid_records/__init__.py` as `__version__`.
+- `pyproject.toml` must use dynamic versioning via `[tool.setuptools.dynamic]` with `version = {attr = "mermaid_records.__version__"}`.
 - No other hardcoded package version strings are allowed in the repo.
 
 ## Project Purpose
 
-`mermaid-timeline` is a Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
+`mermaid-records` is a Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
 
 Supported inputs currently include:
 
@@ -177,8 +177,8 @@ For event blocks:
 ## Current File/Layout Assumptions
 
 - Use one common operational-line parser/model across `LOG`, `CYCLE`, and `.CYCLE.h`.
-- The primary shared parser module is `src/mermaid_timeline/operational_raw.py`.
-- `src/mermaid_timeline/cycle_raw.py` remains only as a legacy compatibility shim.
+- The primary shared parser module is `src/mermaid_records/operational_raw.py`.
+- `src/mermaid_records/cycle_raw.py` remains only as a legacy compatibility shim.
 - Code-facing names may still use `cycle` in legacy modules, but the parsed operational record type is `OperationalLogEntry`.
 - Code-facing names for upstream decode should make the `BIN` -> `CYCLE` transformation explicit.
 - Textual docs/help may still refer to `.CYCLE.h` explicitly.
@@ -188,7 +188,7 @@ For event blocks:
 - `.CYCLE.h` and `.MER` may still be treated as parallel parser inputs when needed, but processed `.CYCLE.h` is secondary/reference-oriented.
 - Their mutual references may be useful later, but parsing must not depend on them matching.
 - A single `.MER` may include DET data from the current dive plus REG/REQ data from previous dives. Do not infer dive membership from `MerDataBlock.date` during parsing.
-- The Bathymetrix header currently belongs only in `src/mermaid_timeline/__init__.py` and `src/mermaid_timeline/cli.py`.
+- The Bathymetrix header currently belongs only in `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 
 ## Current Fixtures
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 
-from mermaid_timeline.models import TimelineStatus
-from mermaid_timeline.timeline_status import collect_timeline_statuses
+from mermaid_records.models import TimelineStatus
+from mermaid_records.timeline_status import collect_timeline_statuses
 
 
 def test_collect_timeline_statuses_returns_list() -> None:

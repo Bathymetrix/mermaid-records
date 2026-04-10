@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from mermaid_timeline.bin2cycle import Bin2CycleConfig, Bin2CycleError, iter_decoded_cycle_lines
+from mermaid_records.bin2cycle import Bin2CycleConfig, Bin2CycleError, iter_decoded_cycle_lines
 
 
 def test_iter_decoded_cycle_lines_yields_lines_from_emitted_cycle(tmp_path: Path) -> None:

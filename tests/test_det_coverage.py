@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 
-from mermaid_timeline.det_coverage import collect_detected_coverage
-from mermaid_timeline.models import ProductCoverage
+from mermaid_records.det_coverage import collect_detected_coverage
+from mermaid_records.models import ProductCoverage
 
 
 def test_collect_detected_coverage_returns_list() -> None:

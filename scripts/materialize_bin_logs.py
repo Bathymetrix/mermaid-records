@@ -18,7 +18,7 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_timeline.bin2log import (
+from mermaid_records.bin2log import (
     Bin2LogConfig,
     decode_workspace_logs,
     prepare_decode_workspace,

@@ -3,12 +3,12 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mermaid-timeline"
+name = "mermaid-records"
 dynamic = ["version"]
-description = "Scaffold for parsing and summarizing MERMAID timeline data."
+description = "Scaffold for parsing and summarizing MERMAID record data."
 readme = "README.md"
 requires-python = ">=3.12"
-keywords = ["mermaid", "timeline", "parsing", "cli"]
+keywords = ["mermaid", "records", "parsing", "cli"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -20,13 +20,13 @@ dependencies = []
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-mermaid-timeline = "mermaid_timeline.cli:main"
+mermaid-records = "mermaid_records.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
 
 [tool.setuptools.dynamic]
-version = {attr = "mermaid_timeline.__version__"}
+version = {attr = "mermaid_records.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

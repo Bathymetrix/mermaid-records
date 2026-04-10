@@ -20,10 +20,10 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_timeline.bin2cycle import Bin2CycleConfig, derive_workspace_cycles
-from mermaid_timeline.bin2log import decode_workspace_logs, prepare_decode_workspace
-from mermaid_timeline.operational_raw import iter_cycle_events
-from mermaid_timeline.discovery import iter_bin_files
+from mermaid_records.bin2cycle import Bin2CycleConfig, derive_workspace_cycles
+from mermaid_records.bin2log import decode_workspace_logs, prepare_decode_workspace
+from mermaid_records.operational_raw import iter_cycle_events
+from mermaid_records.discovery import iter_bin_files
 
 
 @dataclass(slots=True)

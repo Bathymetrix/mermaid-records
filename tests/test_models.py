@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from mermaid_timeline.models import (
+from mermaid_records.models import (
     AcquisitionWindow,
     EvidenceRecord,
     MerDataBlock,

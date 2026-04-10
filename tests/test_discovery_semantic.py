@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from mermaid_timeline.discovery import (
+from mermaid_records.discovery import (
     iter_emitted_cycle_files,
     iter_processed_cycle,
     iter_processed_cycle_h_files,

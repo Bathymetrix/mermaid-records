@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from mermaid_timeline.bin2log import Bin2LogConfig, Bin2LogError, iter_decoded_log_lines
+from mermaid_records.bin2log import Bin2LogConfig, Bin2LogError, iter_decoded_log_lines
 
 
 def test_iter_decoded_log_lines_yields_lines_from_emitted_log(tmp_path: Path) -> None:

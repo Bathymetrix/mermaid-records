@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from mermaid_timeline.audit import (
+from mermaid_records.audit import (
     audit_processed_cycle,
     audit_processed_cycle_h,
     audit_server_mer,
