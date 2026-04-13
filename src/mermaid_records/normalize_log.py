@@ -74,6 +74,22 @@ class LogJsonlPrototypeSummary:
     common_unclassified_patterns: list[dict[str, object]]
 
 
+def _common_log_record_fields(entry: OperationalLogEntry) -> dict[str, object]:
+    """Return shared provenance and source fields for LOG-derived records."""
+
+    return {
+        "record_time": entry.time.isoformat(),
+        "log_epoch_time": _log_epoch_time(entry),
+        "float_id": _float_id(entry.source_file),
+        "source_container": "log",
+        "source_file": entry.source_file.as_posix(),
+        "subsystem": entry.subsystem,
+        "code": entry.code,
+        "message": entry.message,
+        "raw_line": entry.raw_line,
+    }
+
+
 def write_log_jsonl_prototypes(
     log_paths: Iterable[Path],
     output_dir: Path,
@@ -136,18 +152,11 @@ def write_log_jsonl_prototypes(
                     has_transmission=transmission_record is not None,
                     has_measurement=measurement_record is not None,
                 )
+                common_fields = _common_log_record_fields(entry)
                 operational_record = {
-                    "record_time": entry.time.isoformat(),
-                    "log_epoch_time": _log_epoch_time(entry),
-                    "float_id": _float_id(entry.source_file),
-                    "source_container": "log",
-                    "source_file": entry.source_file.as_posix(),
-                    "subsystem": entry.subsystem,
-                    "code": entry.code,
+                    **common_fields,
                     "severity": severity,
                     "message_kind": message_kind,
-                    "message": entry.message,
-                    "raw_line": entry.raw_line,
                 }
                 _write_jsonl_line(operational_handle, operational_record)
                 operational_count += 1
@@ -204,16 +213,8 @@ def write_log_jsonl_prototypes(
 
                 if not classified:
                     unclassified_record = {
-                        "record_time": entry.time.isoformat(),
-                        "log_epoch_time": _log_epoch_time(entry),
-                        "float_id": _float_id(entry.source_file),
-                        "source_container": "log",
-                        "source_file": entry.source_file.as_posix(),
-                        "subsystem": entry.subsystem,
-                        "code": entry.code,
+                        **common_fields,
                         "severity": severity,
-                        "message": entry.message,
-                        "raw_line": entry.raw_line,
                         "unclassified_reason": "no_family_match",
                     }
                     _write_jsonl_line(unclassified_handle, unclassified_record)
@@ -307,17 +308,9 @@ def _classify_acquisition(entry: OperationalLogEntry) -> dict[str, object] | Non
 
     acquisition_state, acquisition_evidence_kind = details
     return {
-        "record_time": entry.time.isoformat(),
-        "log_epoch_time": _log_epoch_time(entry),
-        "float_id": _float_id(entry.source_file),
-        "source_container": "log",
-        "source_file": entry.source_file.as_posix(),
-        "subsystem": entry.subsystem,
-        "code": entry.code,
+        **_common_log_record_fields(entry),
         "acquisition_state": acquisition_state,
         "acquisition_evidence_kind": acquisition_evidence_kind,
-        "message": entry.message,
-        "raw_line": entry.raw_line,
     }
 
 
@@ -332,16 +325,8 @@ def _classify_ascent_request(entry: OperationalLogEntry) -> dict[str, object] | 
         return None
 
     return {
-        "record_time": entry.time.isoformat(),
-        "log_epoch_time": _log_epoch_time(entry),
-        "float_id": _float_id(entry.source_file),
-        "source_container": "log",
-        "source_file": entry.source_file.as_posix(),
-        "subsystem": entry.subsystem,
-        "code": entry.code,
+        **_common_log_record_fields(entry),
         "ascent_request_state": ascent_request_state,
-        "message": entry.message,
-        "raw_line": entry.raw_line,
     }
 
 
@@ -383,17 +368,9 @@ def _classify_gps(entry: OperationalLogEntry) -> dict[str, object] | None:
         return None
 
     return {
-        "record_time": entry.time.isoformat(),
-        "log_epoch_time": _log_epoch_time(entry),
-        "float_id": _float_id(entry.source_file),
-        "source_container": "log",
-        "source_file": entry.source_file.as_posix(),
-        "subsystem": entry.subsystem,
-        "code": entry.code,
+        **_common_log_record_fields(entry),
         "gps_record_kind": gps_record_kind,
         "raw_values": raw_values,
-        "message": entry.message,
-        "raw_line": entry.raw_line,
     }
 
 
@@ -401,18 +378,10 @@ def _classify_transmission(entry: OperationalLogEntry) -> dict[str, object] | No
     message = entry.message
     if "Upload data files" in message:
         return {
-            "record_time": entry.time.isoformat(),
-            "log_epoch_time": _log_epoch_time(entry),
-            "float_id": _float_id(entry.source_file),
-            "source_container": "log",
-            "source_file": entry.source_file.as_posix(),
-            "subsystem": entry.subsystem,
-            "code": entry.code,
+            **_common_log_record_fields(entry),
             "transmission_kind": "upload_batch",
             "referenced_artifact": None,
             "rate_bytes_per_s": None,
-            "message": entry.message,
-            "raw_line": entry.raw_line,
         }
 
     uploaded_match = _UPLOADED_ARTIFACT_RE.search(message)
@@ -420,18 +389,10 @@ def _classify_transmission(entry: OperationalLogEntry) -> dict[str, object] | No
         return None
 
     return {
-        "record_time": entry.time.isoformat(),
-        "log_epoch_time": _log_epoch_time(entry),
-        "float_id": _float_id(entry.source_file),
-        "source_container": "log",
-        "source_file": entry.source_file.as_posix(),
-        "subsystem": entry.subsystem,
-        "code": entry.code,
+        **_common_log_record_fields(entry),
         "transmission_kind": "upload_artifact",
         "referenced_artifact": uploaded_match.group("artifact"),
         "rate_bytes_per_s": int(uploaded_match.group("rate")),
-        "message": entry.message,
-        "raw_line": entry.raw_line,
     }
 
 
@@ -487,17 +448,9 @@ def _classify_measurement(entry: OperationalLogEntry) -> dict[str, object] | Non
         return None
 
     return {
-        "record_time": entry.time.isoformat(),
-        "log_epoch_time": _log_epoch_time(entry),
-        "float_id": _float_id(entry.source_file),
-        "source_container": "log",
-        "source_file": entry.source_file.as_posix(),
-        "subsystem": entry.subsystem,
-        "code": entry.code,
+        **_common_log_record_fields(entry),
         "measurement_kind": measurement_kind,
         "raw_values": raw_values,
-        "message": entry.message,
-        "raw_line": entry.raw_line,
     }
 
 
