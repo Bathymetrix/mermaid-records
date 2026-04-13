@@ -223,6 +223,7 @@ Current fixture corpus note:
 
 - If the work shifts toward higher-level API design, abstraction tradeoffs, naming strategy, or broader architecture, say when it may be a good moment to consult ChatGPT and provide a concise handoff summary.
 - Do not be territorial about tool choice; suggest ChatGPT when it is likely to help with design-space exploration.
+- Keep legacy `CYCLE` support in a quarantine state unless the user explicitly reopens it: do not expose `CYCLE` in the installed CLI, README, or top-level package exports, even if legacy compatibility modules remain in the repo.
 
 ## Module Naming Rule — Action First
 

@@ -42,33 +42,6 @@ Run the normalization pipeline with `BIN` decode enabled:
 MERMAID=/Users/jdsimon/mermaid mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/conda/env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
-Inspect a raw `MER` file:
-
-```bash
-mermaid-records inspect-mer /path/to/file.MER
-```
-
-Inspect a parsed operational `LOG` file:
-
-```bash
-mermaid-records inspect-cycle /path/to/file.LOG
-```
-
-`inspect-mer` prints one line per parsed MER event block with:
-
-- block `date` when present
-- literal `EVENT`
-- payload byte count
-
-`inspect-cycle` is the current operational-text inspection command name. It prints one line per parsed operational record with:
-
-- parsed canonical timestamp
-- source kind
-- subsystem and code
-- message text
-
-Even though the command name is still `inspect-cycle`, use it for `LOG` inspection in the current README examples.
-
 The `normalize` command writes:
 
 - `log_jsonl/`
@@ -201,7 +174,5 @@ Current MER JSONL outputs are:
 Additional helper scripts currently in the repo:
 
 - `scripts/materialize_bin_logs.py`
-- `scripts/validate_bin2cycle.py`
-- `scripts/audit_bin2cycle_corpus.py`
 
 These are dev-facing workflow utilities around the current external decoder adapters.

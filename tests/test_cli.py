@@ -5,7 +5,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mermaid_records.cli import main
+from mermaid_records.cli import build_parser, main
+
+
+def test_cli_help_exposes_only_normalize_subcommand() -> None:
+    help_text = build_parser().format_help()
+
+    assert "normalize" in help_text
+    assert "inspect-mer" not in help_text
+    assert "inspect-cycle" not in help_text
 
 
 def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) -> None:

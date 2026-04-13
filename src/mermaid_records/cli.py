@@ -14,8 +14,6 @@ from pathlib import Path
 
 from .bin2log import Bin2LogConfig
 from .normalize_pipeline import run_normalization_pipeline
-from .operational_raw import iter_operational_log_entries
-from .mer_raw import iter_mer_data_blocks
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -23,24 +21,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="mermaid-records",
-        description="Bathymetrix™ CLI for conservative MERMAID raw parsing.",
+        description="Bathymetrix™ CLI for the MERMAID normalization pipeline.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
-
-    inspect_mer = subparsers.add_parser("inspect-mer", help="Inspect raw MER records.")
-    inspect_mer.add_argument("path", type=Path, help="Path to a MER file.")
-    inspect_mer.set_defaults(handler=_handle_inspect_mer)
-
-    inspect_cycle = subparsers.add_parser(
-        "inspect-cycle",
-        help="Inspect parsed operational LOG/CYCLE/CYCLE.h events.",
-    )
-    inspect_cycle.add_argument(
-        "path",
-        type=Path,
-        help="Path to a LOG, CYCLE, or CYCLE.h file.",
-    )
-    inspect_cycle.set_defaults(handler=_handle_inspect_cycle)
 
     normalize = subparsers.add_parser(
         "normalize",
@@ -90,30 +73,6 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     handler = getattr(args, "handler")
     return handler(args)
-
-
-def _handle_inspect_mer(args: argparse.Namespace) -> int:
-    """Handle the inspect-mer subcommand."""
-
-    for block in iter_mer_data_blocks(args.path):
-        time_text = block.date.isoformat() if block.date else "-"
-        payload_length = len(block.data_payload) if block.data_payload is not None else 0
-        print(f"{time_text}\tEVENT\t{payload_length}")
-    return 0
-
-
-def _handle_inspect_cycle(args: argparse.Namespace) -> int:
-    """Handle the inspect-cycle subcommand."""
-
-    for entry in iter_operational_log_entries(args.path):
-        code_text = entry.code or "-"
-        print(
-            f"{entry.time.isoformat()}\t"
-            f"{entry.source_kind}\t"
-            f"{entry.subsystem}:{code_text}\t"
-            f"{entry.message}"
-        )
-    return 0
 
 
 def _handle_normalize(args: argparse.Namespace) -> int:
