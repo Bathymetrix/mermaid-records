@@ -16,6 +16,12 @@ The package keeps decode, parsing, normalization, and later interpretation separ
 pip install -e .[dev]
 ```
 
+If you use `zsh`, quote the extras spec so the shell does not treat brackets as a glob:
+
+```zsh
+python -m pip install -e '.[dev]'
+```
+
 ## Package CLI
 
 Show the installed CLI help:
