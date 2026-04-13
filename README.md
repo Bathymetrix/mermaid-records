@@ -14,37 +14,39 @@ The package keeps decode, parsing, normalization, and later interpretation separ
 
 Create a fresh local virtual environment from the repo root:
 
-```zsh
-/opt/homebrew/opt/python@3.14/bin/python3.14 -m venv .venv
+```sh
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e '.[dev]'
 ```
 
-If your shell already resolves `python` cleanly, the key editable install step is still:
+If the virtual environment is not activated, you can invoke its interpreter directly as:
 
-```zsh
-python -m pip install -e '.[dev]'
+```sh
+./.venv/bin/python -m mermaid_records.cli --help
 ```
+
+After activation, the remainder of the README uses plain `python`.
 
 ## Package CLI
 
 Show the installed CLI help:
 
-```bash
+```sh
 mermaid-records --help
 ```
 
 Run the normalization pipeline from raw inputs to JSONL outputs:
 
-```bash
+```sh
 mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir
 ```
 
 Run the normalization pipeline with `BIN` decode enabled:
 
-```bash
-MERMAID=/Users/jdsimon/mermaid mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/conda/env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
+```sh
+MERMAID=/path/to/mermaid mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
 The `normalize` command writes:
@@ -64,7 +66,7 @@ The package does not auto-detect a conda environment name. Callers must supply:
 
 In practice this looks like:
 
-```bash
+```sh
 --decoder-python /path/to/conda/env/bin/python
 --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
@@ -94,14 +96,14 @@ Profile one fixture root from raw source artifacts through JSONL outputs:
 
 Older-generation canonical fixture root:
 
-```bash
-./.venv/bin/python scripts/profile_normalization_pipeline.py data/fixtures/452.020-P-06
+```sh
+python scripts/profile_normalization_pipeline.py data/fixtures/452.020-P-06
 ```
 
 Newer-generation canonical fixture root with `BIN` decode enabled:
 
-```bash
-MERMAID=/Users/jdsimon/mermaid ./.venv/bin/python scripts/profile_normalization_pipeline.py data/fixtures/467.174-T-0100 --decoder-python /Users/jdsimon/miniconda3/envs/pymaid3.10/bin/python --decoder-script /Users/jdsimon/programs/automaid/scripts/preprocess.py
+```sh
+MERMAID=/path/to/mermaid python scripts/profile_normalization_pipeline.py data/fixtures/467.174-T-0100 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
 This prints one flat JSON object with counts and timings for:
@@ -116,16 +118,16 @@ This prints one flat JSON object with counts and timings for:
 
 Profile the current batch decode workflow on the newer-generation fixture family:
 
-```bash
-MERMAID=/Users/jdsimon/mermaid ./.venv/bin/python scripts/profile_bin2log_fixture.py 1 --decoder-python /Users/jdsimon/miniconda3/envs/pymaid3.10/bin/python --decoder-script /Users/jdsimon/programs/automaid/scripts/preprocess.py
+```sh
+MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 1 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
-```bash
-MERMAID=/Users/jdsimon/mermaid ./.venv/bin/python scripts/profile_bin2log_fixture.py 5 --decoder-python /Users/jdsimon/miniconda3/envs/pymaid3.10/bin/python --decoder-script /Users/jdsimon/programs/automaid/scripts/preprocess.py
+```sh
+MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 5 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
-```bash
-MERMAID=/Users/jdsimon/mermaid ./.venv/bin/python scripts/profile_bin2log_fixture.py 20 --decoder-python /Users/jdsimon/miniconda3/envs/pymaid3.10/bin/python --decoder-script /Users/jdsimon/programs/automaid/scripts/preprocess.py
+```sh
+MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 20 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
 This prints one JSON summary per run with phase timings for the current wrapped decode batch path.
@@ -134,13 +136,13 @@ This prints one JSON summary per run with phase timings for the current wrapped 
 
 Generate the current LOG-derived JSONL families from the representative LOG subset:
 
-```bash
-./.venv/bin/python scripts/generate_log_jsonl_prototype.py
+```sh
+python scripts/generate_log_jsonl_prototype.py
 ```
 
 Outputs are written under:
 
-```bash
+```sh
 data/fixtures/log_examples_representative_06_0100/jsonl_prototype/
 ```
 
@@ -158,13 +160,13 @@ Current LOG JSONL outputs are:
 
 Generate the current MER-derived JSONL families from the representative MER subset:
 
-```bash
-./.venv/bin/python scripts/generate_mer_jsonl_prototype.py
+```sh
+python scripts/generate_mer_jsonl_prototype.py
 ```
 
 Outputs are written under:
 
-```bash
+```sh
 data/fixtures/mer_examples_representative_06_0100/jsonl_prototype/
 ```
 
