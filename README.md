@@ -12,6 +12,8 @@ The package keeps decode, parsing, normalization, and later interpretation separ
 
 ## Installation
 
+Use Python 3.12 or newer.
+
 Create a fresh local virtual environment from the repo root:
 
 ```sh
@@ -21,10 +23,10 @@ python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e '.[dev]'
 ```
 
-If the virtual environment is not activated, you can invoke its interpreter directly as:
+If the virtual environment is not activated, you can invoke the installed CLI directly as:
 
 ```sh
-./.venv/bin/python -m mermaid_records.cli --help
+./.venv/bin/mermaid-records --help
 ```
 
 After activation, the remainder of the README uses plain `python`.
