@@ -24,6 +24,18 @@ Show the installed CLI help:
 mermaid-records --help
 ```
 
+Run the normalization pipeline from raw inputs to JSONL outputs:
+
+```bash
+mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir
+```
+
+Run the normalization pipeline with `BIN` decode enabled:
+
+```bash
+MERMAID=/Users/jdsimon/mermaid mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/conda/env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
+```
+
 Inspect a raw `MER` file:
 
 ```bash
@@ -50,6 +62,12 @@ mermaid-records inspect-cycle /path/to/file.LOG
 - message text
 
 Even though the command name is still `inspect-cycle`, use it for `LOG` inspection in the current README examples.
+
+The `normalize` command writes:
+
+- `log_jsonl/`
+- `mer_jsonl/`
+- `preflight_status.json` when BIN decode preflight runs
 
 ## Decoder Requirements
 

@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: MIT
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from mermaid_records.cli import main
+
+
+def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+
+    log_path = input_root / "sample.LOG"
+    log_path.write_text(
+        "1700000000:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+
+    mer_path = input_root / "0100_sample.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<MISC UPLOAD_MAX=100kB />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 FNAME=2024-02-07T22_47_22.000000 "
+            "SMP_OFFSET=614054 TRUE_FS=40.014107 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=4832 />\n"
+            "\t<DATA>ABC</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_dir = tmp_path / "output"
+
+    result = main(
+        [
+            "normalize",
+            "-i",
+            str(input_root),
+            "-o",
+            str(output_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["input_root"] == input_root.as_posix()
+    assert payload["output_dir"] == output_dir.as_posix()
+    assert payload["bin_count"] == 0
+    assert payload["log_count"] == 1
+    assert payload["mer_count"] == 1
+    assert payload["decoded_log_count"] == 0
+    assert (output_dir / "log_jsonl" / "log_operational_records.jsonl").exists()
+    assert (output_dir / "mer_jsonl" / "mer_environment_records.jsonl").exists()
+    assert not (output_dir / "preflight_status.json").exists()

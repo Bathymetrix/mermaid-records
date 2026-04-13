@@ -9,8 +9,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
+from .bin2log import Bin2LogConfig
+from .normalize_pipeline import run_normalization_pipeline
 from .operational_raw import iter_operational_log_entries
 from .mer_raw import iter_mer_data_blocks
 
@@ -38,6 +41,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to a LOG, CYCLE, or CYCLE.h file.",
     )
     inspect_cycle.set_defaults(handler=_handle_inspect_cycle)
+
+    normalize = subparsers.add_parser(
+        "normalize",
+        help="Run the normalization pipeline from raw inputs to JSONL outputs.",
+    )
+    normalize.add_argument(
+        "-i",
+        "--input-root",
+        type=Path,
+        required=True,
+        help="Root directory containing BIN, LOG, and/or MER inputs.",
+    )
+    normalize.add_argument(
+        "-o",
+        "--output-dir",
+        type=Path,
+        required=True,
+        help="Directory where normalized JSONL outputs will be written.",
+    )
+    normalize.add_argument(
+        "--decoder-python",
+        type=Path,
+        default=None,
+        help="Python executable for the external manufacturer decoder environment.",
+    )
+    normalize.add_argument(
+        "--decoder-script",
+        type=Path,
+        default=None,
+        help="Path to external preprocess.py decoder script.",
+    )
+    normalize.add_argument(
+        "--preflight-mode",
+        choices=("strict", "cached"),
+        default="strict",
+        help="BIN decode preflight policy: strict requires successful live refresh; cached warns and continues on cached decoder state.",
+    )
+    normalize.set_defaults(handler=_handle_normalize)
 
     return parser
 
@@ -72,4 +113,26 @@ def _handle_inspect_cycle(args: argparse.Namespace) -> int:
             f"{entry.subsystem}:{code_text}\t"
             f"{entry.message}"
         )
+    return 0
+
+
+def _handle_normalize(args: argparse.Namespace) -> int:
+    """Handle the normalize subcommand."""
+
+    config = None
+    if args.decoder_python is not None or args.decoder_script is not None:
+        if args.decoder_python is None or args.decoder_script is None:
+            raise SystemExit("--decoder-python and --decoder-script must be provided together")
+        config = Bin2LogConfig(
+            python_executable=args.decoder_python,
+            decoder_script=args.decoder_script,
+            preflight_mode=args.preflight_mode,
+        )
+
+    summary = run_normalization_pipeline(
+        args.input_root,
+        output_dir=args.output_dir,
+        config=config,
+    )
+    print(json.dumps(summary.to_dict(), sort_keys=True))
     return 0

@@ -51,6 +51,10 @@ from .models import (
 from .mer_raw import iter_mer_data_blocks, parse_mer_file
 from .normalize_log import LogJsonlPrototypeSummary, write_log_jsonl_prototypes
 from .normalize_mer import MerJsonlPrototypeSummary, write_mer_jsonl_prototypes
+from .normalize_pipeline import (
+    NormalizationPipelineSummary,
+    run_normalization_pipeline,
+)
 
 __all__ = [
     "AcquisitionWindow",
@@ -68,6 +72,7 @@ __all__ = [
     "ProductCoverage",
     "TimelineStatus",
     "LogJsonlPrototypeSummary",
+    "NormalizationPipelineSummary",
     "audit_processed_cycle",
     "audit_processed_cycle_h",
     "audit_server_mer",
@@ -91,4 +96,5 @@ __all__ = [
     "parse_mer_file",
     "write_log_jsonl_prototypes",
     "write_mer_jsonl_prototypes",
+    "run_normalization_pipeline",
 ]
