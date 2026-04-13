@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -23,6 +25,7 @@ class Bin2LogConfig:
     python_executable: Path
     decoder_script: Path
     preflight_mode: BinDecodePreflightMode = "strict"
+    preflight_status_dir: Path | None = None
 
     def __post_init__(self) -> None:
         """Validate the configured preflight mode."""
@@ -67,11 +70,22 @@ if callable(database_update):
         check=False,
     )
     if result.returncode != 0:
+        _write_preflight_status(
+            config,
+            effective_mode=config.preflight_mode,
+            database_update_succeeded=False,
+            continued_after_failure=False,
+            failure_detail=_format_subprocess_failure(
+                result.returncode,
+                result.stdout,
+                result.stderr,
+            ),
+        )
         raise Bin2LogError(
             _format_subprocess_failure(result.returncode, result.stdout, result.stderr)
         )
     _handle_database_update_result(
-        config.preflight_mode,
+        config,
         stdout=result.stdout,
         stderr=result.stderr,
     )
@@ -130,12 +144,24 @@ if callable(concatenate_rbr_files):
         check=False,
     )
     if result.returncode != 0:
+        if refresh_database:
+            _write_preflight_status(
+                config,
+                effective_mode=config.preflight_mode,
+                database_update_succeeded=False,
+                continued_after_failure=False,
+                failure_detail=_format_subprocess_failure(
+                    result.returncode,
+                    result.stdout,
+                    result.stderr,
+                ),
+            )
         raise Bin2LogError(
             _format_subprocess_failure(result.returncode, result.stdout, result.stderr)
         )
     if refresh_database:
         _handle_database_update_result(
-            config.preflight_mode,
+            config,
             stdout=result.stdout,
             stderr=result.stderr,
         )
@@ -274,7 +300,7 @@ decrypt_all(workdir_str)
 
 
 def _handle_database_update_result(
-    mode: BinDecodePreflightMode,
+    config: Bin2LogConfig,
     *,
     stdout: str,
     stderr: str,
@@ -283,12 +309,66 @@ def _handle_database_update_result(
 
     problem_detail = _database_update_problem_detail(stdout, stderr)
     if problem_detail is None:
+        _write_preflight_status(
+            config,
+            effective_mode=config.preflight_mode,
+            database_update_succeeded=True,
+            continued_after_failure=False,
+            failure_detail=None,
+        )
         return
-    if mode == "strict":
+    if config.preflight_mode == "strict":
+        _write_preflight_status(
+            config,
+            effective_mode="strict",
+            database_update_succeeded=False,
+            continued_after_failure=False,
+            failure_detail=problem_detail,
+        )
         raise Bin2LogError(
             f"External decoder database update failed: {problem_detail}"
         )
+    _write_preflight_status(
+        config,
+        effective_mode="cached_degraded",
+        database_update_succeeded=False,
+        continued_after_failure=True,
+        failure_detail=problem_detail,
+    )
     _warn_cached_preflight(problem_detail)
+
+
+def _write_preflight_status(
+    config: Bin2LogConfig,
+    *,
+    effective_mode: Literal["strict", "cached", "cached_degraded"],
+    database_update_succeeded: bool,
+    continued_after_failure: bool,
+    failure_detail: str | None,
+) -> None:
+    """Persist database update status when a durable output directory is configured."""
+
+    status_dir = config.preflight_status_dir
+    if status_dir is None:
+        return
+
+    status_dir.mkdir(parents=True, exist_ok=True)
+    status_path = status_dir / "preflight_status.json"
+    payload = {
+        "requested_mode": config.preflight_mode,
+        "effective_mode": effective_mode,
+        "database_update_attempted": True,
+        "database_update_succeeded": database_update_succeeded,
+        "continued_after_failure": continued_after_failure,
+        "failure_detail": failure_detail,
+        "decoder_python": str(config.python_executable),
+        "decoder_script": str(config.decoder_script),
+        "written_at": datetime.now(timezone.utc).isoformat(),
+    }
+    status_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _database_update_problem_detail(stdout: str, stderr: str) -> str | None:

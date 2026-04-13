@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 from pathlib import Path
 import shutil
@@ -134,6 +135,15 @@ def profile_pipeline(
     total_mer_bytes = 0
 
     try:
+        if output_dir is None:
+            temp_output_dir = tempfile.TemporaryDirectory(prefix="mermaid-normalize-output-")
+            output_root = Path(temp_output_dir.name)
+        else:
+            output_root = output_dir
+            output_root.mkdir(parents=True, exist_ok=True)
+        if config is not None:
+            config = replace(config, preflight_status_dir=output_root)
+
         started = time.perf_counter()
         bin_paths = sorted(iter_bin_files(fixture_root))
         discovered_log_paths = sorted(iter_log_files(fixture_root))
@@ -175,13 +185,6 @@ def profile_pipeline(
                 _classify_transmission(entry)
                 _classify_measurement(entry)
         phase_seconds["normalize_log"] = time.perf_counter() - started
-
-        if output_dir is None:
-            temp_output_dir = tempfile.TemporaryDirectory(prefix="mermaid-normalize-output-")
-            output_root = Path(temp_output_dir.name)
-        else:
-            output_root = output_dir
-            output_root.mkdir(parents=True, exist_ok=True)
 
         started = time.perf_counter()
         log_summary = write_log_jsonl_prototypes(all_log_paths, output_root / "log_jsonl")

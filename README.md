@@ -78,6 +78,10 @@ BIN decode preflight supports exactly two modes:
   - still attempts `database_update(...)`
   - if refresh fails, emits a warning and continues using cached local decoder state
 
+When BIN decode preflight runs with a durable output directory, the wrapper also writes
+`preflight_status.json` there so non-interactive runs can audit whether refresh succeeded,
+failed closed, or continued in cached-degraded mode.
+
 ## Helper Scripts
 
 These scripts are repo helper entry points rather than installed package subcommands.

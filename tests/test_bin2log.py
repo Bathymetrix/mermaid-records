@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 
+import json
 from pathlib import Path
 import sys
 
@@ -86,6 +87,7 @@ def test_prepare_decode_workspace_strict_mode_fails_on_database_update_error(
     tmp_path: Path,
 ) -> None:
     script = _write_database_warning_decoder(tmp_path)
+    status_dir = tmp_path / "status"
     workdir = tmp_path / "workspace"
     workdir.mkdir()
 
@@ -93,10 +95,18 @@ def test_prepare_decode_workspace_strict_mode_fails_on_database_update_error(
         python_executable=Path(sys.executable),
         decoder_script=script,
         preflight_mode="strict",
+        preflight_status_dir=status_dir,
     )
 
     with pytest.raises(Bin2LogError, match="External decoder database update failed"):
         prepare_decode_workspace(workdir, config=config, refresh_database=True)
+
+    status = _read_preflight_status(status_dir)
+    assert status["requested_mode"] == "strict"
+    assert status["effective_mode"] == "strict"
+    assert status["database_update_succeeded"] is False
+    assert status["continued_after_failure"] is False
+    assert status["failure_detail"] is not None
 
 
 def test_prepare_decode_workspace_default_mode_is_strict(tmp_path: Path) -> None:
@@ -118,6 +128,7 @@ def test_prepare_decode_workspace_cached_mode_warns_and_decode_continues(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     script = _write_database_warning_decoder(tmp_path)
+    status_dir = tmp_path / "status"
     workdir = tmp_path / "workspace"
     workdir.mkdir()
     bin_file = workdir / "0000_TEST.BIN"
@@ -127,6 +138,7 @@ def test_prepare_decode_workspace_cached_mode_warns_and_decode_continues(
         python_executable=Path(sys.executable),
         decoder_script=script,
         preflight_mode="cached",
+        preflight_status_dir=status_dir,
     )
 
     prepare_decode_workspace(workdir, config=config, refresh_database=True)
@@ -135,6 +147,60 @@ def test_prepare_decode_workspace_cached_mode_warns_and_decode_continues(
     captured = capsys.readouterr()
     assert "WARNING: database_update failed; continuing in cached preflight mode" in captured.err
     assert [path.name for path in log_paths] == ["0000_TEST.LOG"]
+    status = _read_preflight_status(status_dir)
+    assert status["requested_mode"] == "cached"
+    assert status["effective_mode"] == "cached_degraded"
+    assert status["database_update_succeeded"] is False
+    assert status["continued_after_failure"] is True
+
+
+def test_prepare_decode_workspace_strict_success_writes_status_file(
+    tmp_path: Path,
+) -> None:
+    script = _write_database_success_decoder(tmp_path)
+    status_dir = tmp_path / "status"
+    workdir = tmp_path / "workspace"
+    workdir.mkdir()
+
+    config = Bin2LogConfig(
+        python_executable=Path(sys.executable),
+        decoder_script=script,
+        preflight_status_dir=status_dir,
+    )
+
+    prepare_decode_workspace(workdir, config=config, refresh_database=True)
+
+    status = _read_preflight_status(status_dir)
+    assert status["requested_mode"] == "strict"
+    assert status["effective_mode"] == "strict"
+    assert status["database_update_succeeded"] is True
+    assert status["continued_after_failure"] is False
+    assert status["failure_detail"] is None
+
+
+def test_prepare_decode_workspace_cached_success_writes_status_file(
+    tmp_path: Path,
+) -> None:
+    script = _write_database_success_decoder(tmp_path)
+    status_dir = tmp_path / "status"
+    workdir = tmp_path / "workspace"
+    workdir.mkdir()
+
+    config = Bin2LogConfig(
+        python_executable=Path(sys.executable),
+        decoder_script=script,
+        preflight_mode="cached",
+        preflight_status_dir=status_dir,
+    )
+
+    prepare_decode_workspace(workdir, config=config, refresh_database=True)
+
+    status = _read_preflight_status(status_dir)
+    assert status["requested_mode"] == "cached"
+    assert status["effective_mode"] == "cached"
+    assert status["database_update_succeeded"] is True
+    assert status["continued_after_failure"] is False
+    assert status["failure_detail"] is None
 
 
 def test_bin2log_config_rejects_unknown_preflight_mode(tmp_path: Path) -> None:
@@ -174,3 +240,33 @@ def decrypt_all(path):
         encoding="utf-8",
     )
     return script
+
+
+def _write_database_success_decoder(tmp_path: Path) -> Path:
+    script = tmp_path / "fake_decoder_database_success.py"
+    script.write_text(
+        """
+from pathlib import Path
+
+def database_update(_arg):
+    print("Update Databases")
+
+def concatenate_files(path):
+    return [path]
+
+def concatenate_rbr_files(path):
+    return [path]
+
+def decrypt_all(path):
+    workdir = Path(path)
+    log = workdir / "0000_TEST.LOG"
+    log.write_text("line one\\nline two\\n", encoding="utf-8")
+    return [path]
+""",
+        encoding="utf-8",
+    )
+    return script
+
+
+def _read_preflight_status(status_dir: Path) -> dict[str, object]:
+    return json.loads((status_dir / "preflight_status.json").read_text(encoding="utf-8"))
