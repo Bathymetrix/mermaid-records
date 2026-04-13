@@ -109,158 +109,145 @@ def profile_pipeline(
     total_started = time.perf_counter()
     temp_output_dir: tempfile.TemporaryDirectory[str] | None = None
     decoded_workspace: tempfile.TemporaryDirectory[str] | None = None
+    output_root: Path | None = None
+    error_type: str | None = None
+    error_message: str | None = None
 
-    started = time.perf_counter()
-    bin_paths = sorted(iter_bin_files(fixture_root))
-    discovered_log_paths = sorted(iter_log_files(fixture_root))
-    mer_paths = sorted(iter_mer_files(fixture_root))
-    phase_seconds["discover_inputs"] = time.perf_counter() - started
-
+    bin_paths: list[Path] = []
+    discovered_log_paths: list[Path] = []
+    mer_paths: list[Path] = []
     decoded_log_paths: list[Path] = []
-    if bin_paths:
-        if config is None:
-            raise ValueError("decoder config is required when BIN inputs are present")
-        started = time.perf_counter()
-        decoded_workspace = tempfile.TemporaryDirectory(prefix="mermaid-normalize-decode-")
-        workdir = Path(decoded_workspace.name)
-        for path in bin_paths:
-            shutil.copy2(path, workdir / path.name)
-        prepare_decode_workspace(workdir, config=config, refresh_database=True)
-        decoded_log_paths = decode_workspace_logs(workdir, config=config)
-        phase_seconds["decode_bin_to_log"] = time.perf_counter() - started
-
-    all_log_paths = sorted({path.resolve(): path for path in [*discovered_log_paths, *decoded_log_paths]}.values())
-
-    started = time.perf_counter()
+    all_log_paths: list[Path] = []
     log_record_count = 0
-    for path in all_log_paths:
-        for entry in iter_operational_log_entries(path):
-            if entry.source_kind == "log":
-                log_record_count += 1
-    phase_seconds["parse_log"] = time.perf_counter() - started
-
-    started = time.perf_counter()
-    log_family_counts = {
-        "operational": 0,
-        "acquisition": 0,
-        "ascent_request": 0,
-        "gps": 0,
-        "transmission": 0,
-        "measurement": 0,
-        "unclassified": 0,
-    }
-    for path in all_log_paths:
-        for entry in iter_operational_log_entries(path):
-            if entry.source_kind != "log":
-                continue
-            log_family_counts["operational"] += 1
-            classified = False
-            if _classify_acquisition(entry) is not None:
-                log_family_counts["acquisition"] += 1
-                classified = True
-            if _classify_ascent_request(entry) is not None:
-                log_family_counts["ascent_request"] += 1
-                classified = True
-            if _classify_gps(entry) is not None:
-                log_family_counts["gps"] += 1
-                classified = True
-            if _classify_transmission(entry) is not None:
-                log_family_counts["transmission"] += 1
-                classified = True
-            if _classify_measurement(entry) is not None:
-                log_family_counts["measurement"] += 1
-                classified = True
-            if not classified:
-                log_family_counts["unclassified"] += 1
-    phase_seconds["normalize_log"] = time.perf_counter() - started
-
-    if output_dir is None:
-        temp_output_dir = tempfile.TemporaryDirectory(prefix="mermaid-normalize-output-")
-        output_root = Path(temp_output_dir.name)
-    else:
-        output_root = output_dir
-        output_root.mkdir(parents=True, exist_ok=True)
-
-    started = time.perf_counter()
-    log_summary = write_log_jsonl_prototypes(all_log_paths, output_root / "log_jsonl")
-    phase_seconds["write_log_jsonl"] = time.perf_counter() - started
-
-    started = time.perf_counter()
-    parsed_mer_files: list[tuple[Path, object, object]] = []
-    for path in mer_paths:
-        metadata, blocks = parse_mer_file(path)
-        parsed_mer_files.append((path, metadata, blocks))
-    phase_seconds["parse_mer"] = time.perf_counter() - started
-
-    started = time.perf_counter()
     mer_environment_record_count = 0
     mer_parameter_record_count = 0
     mer_data_record_count = 0
-    for path, metadata, blocks in parsed_mer_files:
-        float_id = path.stem.split("_", maxsplit=1)[0]
-        for line in metadata.raw_environment_lines:
-            _build_environment_record(float_id=float_id, path=path, line=line)
-            mer_environment_record_count += 1
-        for line in metadata.raw_parameter_lines:
-            _build_parameter_record(float_id=float_id, path=path, line=line)
-            mer_parameter_record_count += 1
-        for block_index, block in enumerate(blocks):
-            _build_data_record(
-                float_id=float_id,
-                path=path,
-                block_index=block_index,
-                raw_info_line=block.raw_info_line,
-                raw_format_line=block.raw_format_line,
-                data_payload=block.data_payload,
-            )
-            mer_data_record_count += 1
-    phase_seconds["normalize_mer"] = time.perf_counter() - started
+    total_bin_bytes = 0
+    total_log_bytes = 0
+    total_mer_bytes = 0
 
-    started = time.perf_counter()
-    mer_summary = write_mer_jsonl_prototypes(mer_paths, output_root / "mer_jsonl")
-    phase_seconds["write_mer_jsonl"] = time.perf_counter() - started
+    try:
+        started = time.perf_counter()
+        bin_paths = sorted(iter_bin_files(fixture_root))
+        discovered_log_paths = sorted(iter_log_files(fixture_root))
+        mer_paths = sorted(iter_mer_files(fixture_root))
+        total_bin_bytes = sum(path.stat().st_size for path in bin_paths)
+        total_mer_bytes = sum(path.stat().st_size for path in mer_paths)
+        phase_seconds["discover_inputs"] = time.perf_counter() - started
 
-    phase_seconds["total"] = time.perf_counter() - total_started
+        if bin_paths:
+            if config is None:
+                raise ValueError("decoder config is required when BIN inputs are present")
+            started = time.perf_counter()
+            decoded_workspace = tempfile.TemporaryDirectory(prefix="mermaid-normalize-decode-")
+            workdir = Path(decoded_workspace.name)
+            for path in bin_paths:
+                shutil.copy2(path, workdir / path.name)
+            prepare_decode_workspace(workdir, config=config, refresh_database=True)
+            decoded_log_paths = decode_workspace_logs(workdir, config=config)
+            phase_seconds["decode_bin_to_log"] = time.perf_counter() - started
 
-    if decoded_workspace is not None:
-        decoded_workspace.cleanup()
-    if temp_output_dir is not None:
-        temp_output_dir.cleanup()
+        all_log_paths = sorted({path.resolve(): path for path in [*discovered_log_paths, *decoded_log_paths]}.values())
+        total_log_bytes = sum(path.stat().st_size for path in all_log_paths)
 
-    return {
-        "fixture_root": fixture_root.as_posix(),
-        "output_dir": output_root.as_posix(),
+        started = time.perf_counter()
+        for path in all_log_paths:
+            for entry in iter_operational_log_entries(path):
+                if entry.source_kind == "log":
+                    log_record_count += 1
+        phase_seconds["parse_log"] = time.perf_counter() - started
+
+        started = time.perf_counter()
+        for path in all_log_paths:
+            for entry in iter_operational_log_entries(path):
+                if entry.source_kind != "log":
+                    continue
+                _classify_acquisition(entry)
+                _classify_ascent_request(entry)
+                _classify_gps(entry)
+                _classify_transmission(entry)
+                _classify_measurement(entry)
+        phase_seconds["normalize_log"] = time.perf_counter() - started
+
+        if output_dir is None:
+            temp_output_dir = tempfile.TemporaryDirectory(prefix="mermaid-normalize-output-")
+            output_root = Path(temp_output_dir.name)
+        else:
+            output_root = output_dir
+            output_root.mkdir(parents=True, exist_ok=True)
+
+        started = time.perf_counter()
+        log_summary = write_log_jsonl_prototypes(all_log_paths, output_root / "log_jsonl")
+        phase_seconds["write_log_jsonl"] = time.perf_counter() - started
+
+        started = time.perf_counter()
+        parsed_mer_files: list[tuple[Path, object, object]] = []
+        for path in mer_paths:
+            metadata, blocks = parse_mer_file(path)
+            parsed_mer_files.append((path, metadata, blocks))
+        phase_seconds["parse_mer"] = time.perf_counter() - started
+
+        started = time.perf_counter()
+        for path, metadata, blocks in parsed_mer_files:
+            float_id = path.stem.split("_", maxsplit=1)[0]
+            for line in metadata.raw_environment_lines:
+                _build_environment_record(float_id=float_id, path=path, line=line)
+                mer_environment_record_count += 1
+            for line in metadata.raw_parameter_lines:
+                _build_parameter_record(float_id=float_id, path=path, line=line)
+                mer_parameter_record_count += 1
+            for block_index, block in enumerate(blocks):
+                _build_data_record(
+                    float_id=float_id,
+                    path=path,
+                    block_index=block_index,
+                    raw_info_line=block.raw_info_line,
+                    raw_format_line=block.raw_format_line,
+                    data_payload=block.data_payload,
+                )
+                mer_data_record_count += 1
+        phase_seconds["normalize_mer"] = time.perf_counter() - started
+
+        started = time.perf_counter()
+        mer_summary = write_mer_jsonl_prototypes(mer_paths, output_root / "mer_jsonl")
+        phase_seconds["write_mer_jsonl"] = time.perf_counter() - started
+    except Exception as exc:
+        error_type = type(exc).__name__
+        error_message = str(exc)
+    finally:
+        phase_seconds["total"] = time.perf_counter() - total_started
+        if decoded_workspace is not None:
+            decoded_workspace.cleanup()
+        if temp_output_dir is not None:
+            temp_output_dir.cleanup()
+
+    result = {
+        "root": fixture_root.as_posix(),
         "bin_count": len(bin_paths),
         "log_count": len(discovered_log_paths),
         "mer_count": len(mer_paths),
         "decoded_log_count": len(decoded_log_paths),
+        "total_bin_bytes": total_bin_bytes,
+        "total_log_bytes": total_log_bytes,
+        "total_mer_bytes": total_mer_bytes,
+        "discover_inputs_s": phase_seconds["discover_inputs"],
+        "decode_bin_to_log_s": phase_seconds["decode_bin_to_log"],
+        "parse_log_s": phase_seconds["parse_log"],
+        "normalize_log_s": phase_seconds["normalize_log"],
+        "write_log_jsonl_s": phase_seconds["write_log_jsonl"],
+        "parse_mer_s": phase_seconds["parse_mer"],
+        "normalize_mer_s": phase_seconds["normalize_mer"],
+        "write_mer_jsonl_s": phase_seconds["write_mer_jsonl"],
         "log_record_count": log_record_count,
         "mer_environment_record_count": mer_environment_record_count,
         "mer_parameter_record_count": mer_parameter_record_count,
         "mer_data_record_count": mer_data_record_count,
-        "total_bin_bytes": sum(path.stat().st_size for path in bin_paths),
-        "total_log_bytes": sum(path.stat().st_size for path in all_log_paths),
-        "total_mer_bytes": sum(path.stat().st_size for path in mer_paths),
-        "phase_discover_inputs_seconds": phase_seconds["discover_inputs"],
-        "phase_decode_bin_to_log_seconds": phase_seconds["decode_bin_to_log"],
-        "phase_parse_log_seconds": phase_seconds["parse_log"],
-        "phase_normalize_log_seconds": phase_seconds["normalize_log"],
-        "phase_write_log_jsonl_seconds": phase_seconds["write_log_jsonl"],
-        "phase_parse_mer_seconds": phase_seconds["parse_mer"],
-        "phase_normalize_mer_seconds": phase_seconds["normalize_mer"],
-        "phase_write_mer_jsonl_seconds": phase_seconds["write_mer_jsonl"],
-        "phase_total_seconds": phase_seconds["total"],
-        "log_operational_record_count": log_summary.operational_records,
-        "log_acquisition_record_count": log_summary.acquisition_records,
-        "log_ascent_request_record_count": log_summary.ascent_request_records,
-        "log_gps_record_count": log_summary.gps_records,
-        "log_transmission_record_count": log_summary.transmission_records,
-        "log_measurement_record_count": log_summary.measurement_records,
-        "log_unclassified_record_count": log_summary.unclassified_records,
-        "mer_summary_environment_record_count": mer_summary.environment_records,
-        "mer_summary_parameter_record_count": mer_summary.parameter_records,
-        "mer_summary_data_record_count": mer_summary.data_records,
+        "total_s": phase_seconds["total"],
     }
+    if error_type is not None:
+        result["error_type"] = error_type
+        result["error_message"] = error_message
+    return result
 
 
 if __name__ == "__main__":

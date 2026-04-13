@@ -11,6 +11,7 @@
 - Any time suggesting a commit, also suggest a matching commit comment/message.
 - Treat this file as the persistent handoff document for future Codex sessions and update it whenever assumptions, boundaries, fixtures, or workflow rules change.
 - As the package nears completion, explicitly remind the user to revisit the pending BIN decode policy discussion: whether full-package decode workflows should require live `database_update(...)` or support an offline/cached mode.
+  Current observed caveat: Codex/sandboxed runs may report preflight refresh failures during `database_update(...)` even when the wrapped decode path still works from a normal user shell with the same decoder environment and cached local database state.
 - Before publishing v1.0.0, do a final package-streamlining pass and ask of each public module/surface: is this necessary or useful in the core package? Borderline derived-product helpers such as coverage/interval-style modules may belong in a separate package if they do not support the streamlined parsing/normalization core.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
