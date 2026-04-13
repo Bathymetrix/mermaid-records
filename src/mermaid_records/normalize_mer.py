@@ -93,6 +93,16 @@ class MerJsonlPrototypeSummary:
     example_data_with_trigger_fields: dict[str, object] | None
 
 
+def _common_mer_record_fields(float_id: str, path: Path) -> dict[str, object]:
+    """Return shared provenance fields for MER-derived records."""
+
+    return {
+        "float_id": float_id,
+        "source_container": "mer",
+        "source_file": path.as_posix(),
+    }
+
+
 def write_mer_jsonl_prototypes(
     mer_paths: Iterable[Path],
     output_dir: Path,
@@ -245,9 +255,7 @@ def _build_environment_record(
     raw_values = _environment_raw_values(tag_name, stripped_line, attrs)
     return (
         {
-            "float_id": float_id,
-            "source_container": "mer",
-            "source_file": path.as_posix(),
+            **_common_mer_record_fields(float_id, path),
             "environment_kind": environment_kind,
             "gpsinfo_date": attrs.get("DATE") if tag_name == "GPSINFO" else None,
             "raw_values": raw_values,
@@ -270,9 +278,7 @@ def _build_parameter_record(
     raw_values = {key.lower(): value for key, value in attrs.items()} or None
     return (
         {
-            "float_id": float_id,
-            "source_container": "mer",
-            "source_file": path.as_posix(),
+            **_common_mer_record_fields(float_id, path),
             "parameter_kind": parameter_kind,
             "raw_values": raw_values,
             "line": line,
@@ -296,9 +302,7 @@ def _build_data_record(
     unknown_format_keys = set(format_attrs) - set(_FORMAT_FIELDS)
 
     record = {
-        "float_id": float_id,
-        "source_container": "mer",
-        "source_file": path.as_posix(),
+        **_common_mer_record_fields(float_id, path),
         "block_index": block_index,
         "date": info_attrs.get("DATE"),
         "pressure": info_attrs.get("PRESSURE"),
