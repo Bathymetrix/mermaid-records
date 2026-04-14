@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import sys
 
 from .bin2log import Bin2LogConfig
 from .normalize_pipeline import run_normalization_pipeline
@@ -112,6 +113,7 @@ def _handle_normalize(args: argparse.Namespace) -> int:
         config=config,
         input_files=_parse_input_files(args.input_file),
         dry_run=args.dry_run,
+        progress=_cli_progress,
     )
     payload = summary.to_dict()
     if args.dry_run and not args.json:
@@ -171,6 +173,10 @@ def _format_diff_row(row: dict[str, object]) -> str:
     if row["change_kind"] == "changed":
         return f"{name} (hash changed, {previous_size} B -> {current_size} B)"
     return f"{name} ({previous_size} B -> {current_size} B)"
+
+
+def _cli_progress(message: str) -> None:
+    print(message, file=sys.stderr)
 
 
 if __name__ == "__main__":

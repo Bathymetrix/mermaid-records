@@ -10,6 +10,7 @@ import re
 import shutil
 import sys
 import tempfile
+from typing import Callable
 
 from .bin2log import Bin2LogConfig, decode_workspace_logs, prepare_decode_workspace
 from .discovery import iter_bin_files, iter_log_files, iter_mer_files
@@ -29,6 +30,7 @@ from .parse_float_name import FloatName, float_name_from_vit_path, maybe_parse_f
 
 
 type ExecutionMode = str
+type ProgressCallback = Callable[[str], None]
 
 
 @dataclass(slots=True)
@@ -97,9 +99,11 @@ def run_normalization_pipeline(
     config: Bin2LogConfig | None = None,
     input_files: list[Path] | None = None,
     dry_run: bool = False,
+    progress: ProgressCallback | None = None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     """Run the normalization pipeline in stateful or stateless mode."""
 
+    _emit_progress(progress, "Starting normalization")
     mode = _detect_mode(input_root=input_root, input_files=input_files)
     if mode == "stateful":
         assert input_root is not None
@@ -108,6 +112,7 @@ def run_normalization_pipeline(
             output_dir=output_dir,
             config=config,
             dry_run=dry_run,
+            progress=progress,
         )
     assert input_files is not None
     return _run_stateless(
@@ -115,6 +120,7 @@ def run_normalization_pipeline(
         output_dir=output_dir,
         config=config,
         dry_run=dry_run,
+        progress=progress,
     )
 
 
@@ -124,7 +130,9 @@ def _run_stateful(
     output_dir: Path,
     config: Bin2LogConfig | None,
     dry_run: bool,
+    progress: ProgressCallback | None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
+    _emit_progress(progress, f"Discovering inputs under {input_root}")
     serial_map = _float_names_from_vit(input_root)
     grouped_sources = _group_paths(
         [*sorted(iter_bin_files(input_root)), *sorted(iter_log_files(input_root)), *sorted(iter_mer_files(input_root))]
@@ -207,6 +215,7 @@ def _run_stateful(
         )
 
     if dry_run:
+        _emit_progress(progress, "Dry-run planning complete")
         return DryRunSummary(
             mode="stateful",
             input_root=input_root.as_posix(),
@@ -219,6 +228,7 @@ def _run_stateful(
     for plan in planned_floats:
         current_sources = plan.current_sources
         summary = plan.summary
+        _emit_progress(progress, f"Processing float {summary.float_id}")
 
         record_pruned_sources(
             float_output_dir=plan.float_output_dir,
@@ -245,17 +255,20 @@ def _run_stateful(
                 bin_paths=_rewrite_paths(summary.log_action, current_sources, plan.log_diff, "bin"),
                 config=config,
                 float_id=summary.float_id,
+                progress=progress,
             )
             _execute_mer_family(
                 float_output_dir=plan.float_output_dir,
                 action=summary.mer_action,
                 mer_paths=_rewrite_paths(summary.mer_action, current_sources, plan.mer_diff, "mer"),
                 float_id=summary.float_id,
+                progress=progress,
             )
         except BaseException as exc:
             error = exc
             raise
         finally:
+            _emit_progress(progress, f"Writing manifests for float {summary.float_id}")
             finalize_float_run(
                 context=run_context,
                 preflight_mode=config.preflight_mode if config is not None and _has_kind(current_sources, "bin") else None,
@@ -280,6 +293,7 @@ def _run_stateless(
     output_dir: Path,
     config: Bin2LogConfig | None,
     dry_run: bool,
+    progress: ProgressCallback | None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     if output_dir_contains_manifests(output_dir):
         raise ValueError(
@@ -287,6 +301,7 @@ def _run_stateless(
         )
 
     grouped_sources = _group_paths(input_files)
+    _emit_progress(progress, f"Discovering explicit input files ({len(input_files)})")
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
     normalization_version = _normalization_version()
@@ -348,6 +363,7 @@ def _run_stateless(
             )
             continue
 
+        _emit_progress(progress, f"Processing float {summary.float_id}")
         _execute_log_family(
             float_output_dir=float_output_dir,
             action="append",
@@ -355,16 +371,19 @@ def _run_stateless(
             bin_paths=_selected_paths(current_sources, {"bin"}),
             config=config,
             float_id=summary.float_id,
+            progress=progress,
         )
         _execute_mer_family(
             float_output_dir=float_output_dir,
             action="append",
             mer_paths=_selected_paths(current_sources, {"mer"}),
             float_id=summary.float_id,
+            progress=progress,
         )
         processed_floats.append(summary)
 
     if dry_run:
+        _emit_progress(progress, "Dry-run planning complete")
         return DryRunSummary(
             mode="stateless",
             input_root=None,
@@ -390,6 +409,7 @@ def _execute_log_family(
     bin_paths: list[Path],
     config: Bin2LogConfig | None,
     float_id: str,
+    progress: ProgressCallback | None,
 ) -> None:
     destinations = [float_output_dir / filename for filename in LOG_OUTPUT_FILENAMES.values()]
     if action == "noop":
@@ -402,12 +422,14 @@ def _execute_log_family(
     if bin_paths and config is None:
         raise ValueError("decoder config is required when BIN inputs are present")
 
+    _emit_progress(progress, f"Normalizing LOG for float {float_id}")
     float_output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mermaid-log-family-") as tmpdir:
         temp_dir = Path(tmpdir)
         rendered_paths = list(log_paths)
         if bin_paths:
             assert config is not None
+            _emit_progress(progress, f"Running BIN decode for float {float_id}")
             decode_config = Bin2LogConfig(
                 python_executable=config.python_executable,
                 decoder_script=config.decoder_script,
@@ -416,10 +438,16 @@ def _execute_log_family(
             )
             workdir = temp_dir / "decoded"
             workdir.mkdir(parents=True, exist_ok=True)
-            for path in bin_paths:
-                shutil.copy2(path, workdir / path.name)
-            prepare_decode_workspace(workdir, config=decode_config, refresh_database=True)
-            rendered_paths.extend(decode_workspace_logs(workdir, config=decode_config))
+            try:
+                for path in bin_paths:
+                    shutil.copy2(path, workdir / path.name)
+                prepare_decode_workspace(workdir, config=decode_config, refresh_database=True)
+                rendered_paths.extend(decode_workspace_logs(workdir, config=decode_config))
+            except Exception as exc:
+                paths_text = ", ".join(path.as_posix() for path in bin_paths)
+                raise ValueError(
+                    f"Error while decoding BIN source(s) {paths_text}: {exc}"
+                ) from exc
         write_log_jsonl_prototypes(rendered_paths, temp_dir, float_id=float_id)
         if action == "append":
             _append_rendered_outputs(
@@ -441,6 +469,7 @@ def _execute_mer_family(
     action: str,
     mer_paths: list[Path],
     float_id: str,
+    progress: ProgressCallback | None,
 ) -> None:
     destinations = [float_output_dir / filename for filename in MER_OUTPUT_FILENAMES.values()]
     if action == "noop":
@@ -451,6 +480,7 @@ def _execute_mer_family(
     if not mer_paths:
         return
 
+    _emit_progress(progress, f"Normalizing MER for float {float_id}")
     float_output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mermaid-mer-family-") as tmpdir:
         temp_dir = Path(tmpdir)
@@ -862,3 +892,8 @@ def _public_diff_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
 
 def _public_diff_row(row: dict[str, object]) -> dict[str, object]:
     return {key: value for key, value in row.items() if key != "_source_path"}
+
+
+def _emit_progress(progress: ProgressCallback | None, message: str) -> None:
+    if progress is not None:
+        progress(message)

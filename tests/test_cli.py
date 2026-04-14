@@ -65,6 +65,10 @@ def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) 
     assert payload["output_dir"] == output_dir.as_posix()
     assert payload["mode"] == "stateful"
     assert payload["processed_floats"][0]["float_id"] == "T0100"
+    assert "Starting normalization" in captured.err
+    assert "Processing float T0100" in captured.err
+    assert "Normalizing LOG for float T0100" in captured.err
+    assert "Normalizing MER for float T0100" in captured.err
     assert (output_dir / "467.174-T-0100" / "log_operational_records.jsonl").exists()
     assert (output_dir / "467.174-T-0100" / "mer_environment_records.jsonl").exists()
     assert not (output_dir / "467.174-T-0100" / "preflight_status.json").exists()
@@ -164,3 +168,22 @@ def test_normalize_cli_dry_run_json_output(tmp_path: Path, capsys) -> None:
     assert payload["floats"][0]["families"]["log"]["action"] == "append"
     assert payload["floats"][0]["families"]["log"]["file_diffs"][0]["change_kind"] == "new"
     assert not output_dir.exists()
+
+
+def test_run_normalization_pipeline_is_quiet_by_default(tmp_path: Path, capsys) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    (input_root / "0100_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "output"
+    from mermaid_records.normalize_pipeline import run_normalization_pipeline
+
+    run_normalization_pipeline(input_root, output_dir=output_dir)
+    captured = capsys.readouterr()
+
+    assert captured.out == ""
+    assert captured.err == ""

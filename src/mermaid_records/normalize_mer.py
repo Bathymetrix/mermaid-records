@@ -44,6 +44,7 @@ _PARAMETER_KIND_MAP = {
     "CDF24": "cdf24",
     "MODEL": "model",
     "ASCEND_THRESH": "ascend_thresh",
+    "STANFORD_PROCESS": "stanford_process",
     "MISC": "misc",
 }
 
@@ -52,6 +53,7 @@ _INFO_FIELDS = [
     "PRESSURE",
     "TEMPERATURE",
     "CRITERION",
+    "ROUNDS",
     "SNR",
     "TRIG",
     "DETRIG",
@@ -141,87 +143,91 @@ def write_mer_jsonl_prototypes(
         output_paths["data"].open("w", encoding="utf-8") as data_handle,
     ):
         for path in sorted(Path(path) for path in mer_paths):
-            total_mer_files += 1
-            metadata, blocks = parse_mer_file(path)
-            path_float_id = float_id or _fallback_float_id(path)
-            if not blocks:
-                zero_event_files += 1
+            try:
+                total_mer_files += 1
+                metadata, blocks = parse_mer_file(path)
+                path_float_id = float_id or _fallback_float_id(path)
+                if not blocks:
+                    zero_event_files += 1
 
-            for line in metadata.raw_environment_lines:
-                record, tag_name = _build_environment_record(
-                    float_id=path_float_id,
-                    path=path,
-                    line=line,
-                )
-                _write_jsonl_line(environment_handle, record)
-                environment_count += 1
-                environment_kind_counter[record["environment_kind"]] += 1
-                if record["environment_kind"] == "unknown":
-                    unknown_environment_tags.add(tag_name)
-                if (
-                    example_gpsinfo_environment is None
-                    and record["environment_kind"] == "gpsinfo"
-                ):
-                    example_gpsinfo_environment = record
-                if (
-                    example_drift_environment is None
-                    and record["environment_kind"] == "drift"
-                ):
-                    example_drift_environment = record
+                file_unknown_info_keys: set[str] = set()
+                file_unknown_format_keys: set[str] = set()
 
-            for line in metadata.raw_parameter_lines:
-                record, tag_name = _build_parameter_record(
-                    float_id=path_float_id,
-                    path=path,
-                    line=line,
-                )
-                _write_jsonl_line(parameter_handle, record)
-                parameter_count += 1
-                parameter_kind_counter[record["parameter_kind"]] += 1
-                if record["parameter_kind"] == "unknown":
-                    unknown_parameter_tags.add(tag_name)
-                if example_adc_parameter is None and record["parameter_kind"] == "adc":
-                    example_adc_parameter = record
-                if (
-                    example_model_parameter is None
-                    and record["parameter_kind"] == "model"
-                ):
-                    example_model_parameter = record
-
-            for block_index, block in enumerate(blocks):
-                record, block_unknown_info_keys, block_unknown_format_keys = (
-                    _build_data_record(
+                for line in metadata.raw_environment_lines:
+                    record, tag_name = _build_environment_record(
                         float_id=path_float_id,
                         path=path,
-                        block_index=block_index,
-                        raw_info_line=block.raw_info_line,
-                        raw_format_line=block.raw_format_line,
-                        data_payload=block.data_payload,
+                        line=line,
                     )
-                )
-                unknown_info_keys.update(block_unknown_info_keys)
-                unknown_format_keys.update(block_unknown_format_keys)
-                _write_jsonl_line(data_handle, record)
-                data_count += 1
-                if example_data_with_fname is None and record["fname"] is not None:
-                    example_data_with_fname = record
-                if (
-                    example_data_with_trigger_fields is None
-                    and record["pressure"] is not None
-                ):
-                    example_data_with_trigger_fields = record
+                    _write_jsonl_line(environment_handle, record)
+                    environment_count += 1
+                    environment_kind_counter[record["environment_kind"]] += 1
+                    if record["environment_kind"] == "unknown":
+                        unknown_environment_tags.add(tag_name)
+                    if (
+                        example_gpsinfo_environment is None
+                        and record["environment_kind"] == "gpsinfo"
+                    ):
+                        example_gpsinfo_environment = record
+                    if (
+                        example_drift_environment is None
+                        and record["environment_kind"] == "drift"
+                    ):
+                        example_drift_environment = record
 
-    if unknown_info_keys or unknown_format_keys:
-        details: list[str] = []
-        if unknown_info_keys:
-            details.append(
-                "INFO keys: " + ", ".join(sorted(unknown_info_keys))
-            )
-        if unknown_format_keys:
-            details.append(
-                "FORMAT keys: " + ", ".join(sorted(unknown_format_keys))
-            )
-        raise ValueError("Unhandled MER event fields observed: " + "; ".join(details))
+                for line in metadata.raw_parameter_lines:
+                    record, tag_name = _build_parameter_record(
+                        float_id=path_float_id,
+                        path=path,
+                        line=line,
+                    )
+                    _write_jsonl_line(parameter_handle, record)
+                    parameter_count += 1
+                    parameter_kind_counter[record["parameter_kind"]] += 1
+                    if record["parameter_kind"] == "unknown":
+                        unknown_parameter_tags.add(tag_name)
+                    if example_adc_parameter is None and record["parameter_kind"] == "adc":
+                        example_adc_parameter = record
+                    if (
+                        example_model_parameter is None
+                        and record["parameter_kind"] == "model"
+                    ):
+                        example_model_parameter = record
+
+                for block_index, block in enumerate(blocks):
+                    record, block_unknown_info_keys, block_unknown_format_keys = (
+                        _build_data_record(
+                            float_id=path_float_id,
+                            path=path,
+                            block_index=block_index,
+                            raw_info_line=block.raw_info_line,
+                            raw_format_line=block.raw_format_line,
+                            data_payload=block.data_payload,
+                        )
+                    )
+                    file_unknown_info_keys.update(block_unknown_info_keys)
+                    file_unknown_format_keys.update(block_unknown_format_keys)
+                    _write_jsonl_line(data_handle, record)
+                    data_count += 1
+                    if example_data_with_fname is None and record["fname"] is not None:
+                        example_data_with_fname = record
+                    if (
+                        example_data_with_trigger_fields is None
+                        and record["pressure"] is not None
+                    ):
+                        example_data_with_trigger_fields = record
+
+                if file_unknown_info_keys or file_unknown_format_keys:
+                    unknown_info_keys.update(file_unknown_info_keys)
+                    unknown_format_keys.update(file_unknown_format_keys)
+                    details: list[str] = []
+                    if file_unknown_info_keys:
+                        details.append("INFO keys: " + ", ".join(sorted(file_unknown_info_keys)))
+                    if file_unknown_format_keys:
+                        details.append("FORMAT keys: " + ", ".join(sorted(file_unknown_format_keys)))
+                    raise ValueError("Unhandled MER event fields observed: " + "; ".join(details))
+            except Exception as exc:
+                raise ValueError(f"Error while normalizing MER file {path}: {exc}") from exc
 
     return MerJsonlPrototypeSummary(
         environment_records=environment_count,
@@ -311,6 +317,7 @@ def _build_data_record(
         "pressure": info_attrs.get("PRESSURE"),
         "temperature": info_attrs.get("TEMPERATURE"),
         "criterion": info_attrs.get("CRITERION"),
+        "rounds": info_attrs.get("ROUNDS"),
         "snr": info_attrs.get("SNR"),
         "trig": info_attrs.get("TRIG"),
         "detrig": info_attrs.get("DETRIG"),

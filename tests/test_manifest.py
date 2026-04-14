@@ -294,6 +294,42 @@ def test_dry_run_is_side_effect_free_and_reports_file_diffs(tmp_path: Path) -> N
     assert {row["change_kind"] for row in float_payload["families"]["mer"]["file_diffs"]} == {"removed"}
 
 
+def test_bin_decode_failure_reports_offending_source_paths(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    bin_path = input_root / "0100_first.BIN"
+    bin_path.write_bytes(b"raw-bin")
+    decoder = tmp_path / "decoder_fail.py"
+    decoder.write_text(
+        """
+def database_update(_arg):
+    print("Update Databases")
+
+def concatenate_files(path):
+    return [path]
+
+def concatenate_rbr_files(path):
+    return [path]
+
+def decrypt_all(path):
+    raise RuntimeError("decoder boom")
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="Error while decoding BIN source\\(s\\)") as excinfo:
+        run_normalization_pipeline(
+            input_root,
+            output_dir=tmp_path / "output",
+            config=Bin2LogConfig(
+                python_executable=Path(sys.executable),
+                decoder_script=decoder,
+            ),
+        )
+
+    assert bin_path.as_posix() in str(excinfo.value)
+
+
 def test_first_run_diff_semantics_treat_previous_state_as_empty(tmp_path: Path) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()

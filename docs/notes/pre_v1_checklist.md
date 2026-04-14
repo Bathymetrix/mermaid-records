@@ -31,6 +31,7 @@ The goal is correctness, stability, and release clarity, not feature expansion.
 - [x] Audit `source_state.json`
 - [x] Audit `preflight_status.json`
 - [x] Confirm that all persisted schemas are documented at the level needed for release
+- [ ] Confirm the documented MER field surface includes the observed Stanford variant fields
 
 ## Incremental And Rerun Correctness
 

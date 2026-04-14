@@ -137,97 +137,100 @@ def write_log_jsonl_prototypes(
     ):
         for path in sorted_paths:
             path_float_id = float_id or _fallback_float_id(path)
-            for entry in iter_operational_log_entries(path):
-                if entry.source_kind != "log":
-                    continue
+            try:
+                for entry in iter_operational_log_entries(path):
+                    if entry.source_kind != "log":
+                        continue
 
-                total_records += 1
-                acquisition_record = _classify_acquisition(entry, float_id=path_float_id)
-                ascent_request_record = _classify_ascent_request(entry, float_id=path_float_id)
-                gps_record = _classify_gps(entry, float_id=path_float_id)
-                transmission_record = _classify_transmission(entry, float_id=path_float_id)
-                measurement_record = _classify_measurement(entry, float_id=path_float_id)
-                severity = _severity(entry.message)
-                message_kind = _message_kind(
-                    entry,
-                    has_acquisition=acquisition_record is not None,
-                    has_ascent_request=ascent_request_record is not None,
-                    has_gps=gps_record is not None,
-                    has_transmission=transmission_record is not None,
-                    has_measurement=measurement_record is not None,
-                )
-                common_fields = _common_log_record_fields(entry, float_id=path_float_id)
-                operational_record = {
-                    **common_fields,
-                    "severity": severity,
-                    "message_kind": message_kind,
-                }
-                _write_jsonl_line(operational_handle, operational_record)
-                operational_count += 1
-
-                classified = False
-                if acquisition_record is not None:
-                    _write_jsonl_line(acquisition_handle, acquisition_record)
-                    acquisition_count += 1
-                    classified = True
-                    acquisition_state_counter[
-                        acquisition_record["acquisition_state"]
-                    ] += 1
-                    acquisition_evidence_kind_counter[
-                        acquisition_record["acquisition_evidence_kind"]
-                    ] += 1
-                    example_key = (
-                        f"{acquisition_record['acquisition_state']}:"
-                        f"{acquisition_record['acquisition_evidence_kind']}"
+                    total_records += 1
+                    acquisition_record = _classify_acquisition(entry, float_id=path_float_id)
+                    ascent_request_record = _classify_ascent_request(entry, float_id=path_float_id)
+                    gps_record = _classify_gps(entry, float_id=path_float_id)
+                    transmission_record = _classify_transmission(entry, float_id=path_float_id)
+                    measurement_record = _classify_measurement(entry, float_id=path_float_id)
+                    severity = _severity(entry.message)
+                    message_kind = _message_kind(
+                        entry,
+                        has_acquisition=acquisition_record is not None,
+                        has_ascent_request=ascent_request_record is not None,
+                        has_gps=gps_record is not None,
+                        has_transmission=transmission_record is not None,
+                        has_measurement=measurement_record is not None,
                     )
-                    acquisition_examples.setdefault(example_key, acquisition_record)
-
-                if ascent_request_record is not None:
-                    _write_jsonl_line(ascent_request_handle, ascent_request_record)
-                    ascent_request_count += 1
-                    classified = True
-                    ascent_request_state_counter[
-                        ascent_request_record["ascent_request_state"]
-                    ] += 1
-                    ascent_request_examples.setdefault(
-                        ascent_request_record["ascent_request_state"],
-                        ascent_request_record,
-                    )
-
-                if gps_record is not None:
-                    _write_jsonl_line(gps_handle, gps_record)
-                    gps_count += 1
-                    classified = True
-                    gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
-                    gps_examples.setdefault(gps_record["gps_record_kind"], gps_record)
-
-                if transmission_record is not None:
-                    _write_jsonl_line(transmission_handle, transmission_record)
-                    transmission_count += 1
-                    classified = True
-                    if len(transmission_examples) < 3:
-                        transmission_examples.append(transmission_record)
-
-                if measurement_record is not None:
-                    _write_jsonl_line(measurement_handle, measurement_record)
-                    measurement_count += 1
-                    classified = True
-                    if len(measurement_examples) < 3:
-                        measurement_examples.append(measurement_record)
-
-                if not classified:
-                    unclassified_record = {
+                    common_fields = _common_log_record_fields(entry, float_id=path_float_id)
+                    operational_record = {
                         **common_fields,
                         "severity": severity,
-                        "unclassified_reason": "no_family_match",
+                        "message_kind": message_kind,
                     }
-                    _write_jsonl_line(unclassified_handle, unclassified_record)
-                    unclassified_count += 1
-                    if len(unclassified_examples) < 3:
-                        unclassified_examples.append(unclassified_record)
-                    unclassified_patterns[
-                        (entry.subsystem, entry.code, entry.message)
-                    ] += 1
+                    _write_jsonl_line(operational_handle, operational_record)
+                    operational_count += 1
+
+                    classified = False
+                    if acquisition_record is not None:
+                        _write_jsonl_line(acquisition_handle, acquisition_record)
+                        acquisition_count += 1
+                        classified = True
+                        acquisition_state_counter[
+                            acquisition_record["acquisition_state"]
+                        ] += 1
+                        acquisition_evidence_kind_counter[
+                            acquisition_record["acquisition_evidence_kind"]
+                        ] += 1
+                        example_key = (
+                            f"{acquisition_record['acquisition_state']}:"
+                            f"{acquisition_record['acquisition_evidence_kind']}"
+                        )
+                        acquisition_examples.setdefault(example_key, acquisition_record)
+
+                    if ascent_request_record is not None:
+                        _write_jsonl_line(ascent_request_handle, ascent_request_record)
+                        ascent_request_count += 1
+                        classified = True
+                        ascent_request_state_counter[
+                            ascent_request_record["ascent_request_state"]
+                        ] += 1
+                        ascent_request_examples.setdefault(
+                            ascent_request_record["ascent_request_state"],
+                            ascent_request_record,
+                        )
+
+                    if gps_record is not None:
+                        _write_jsonl_line(gps_handle, gps_record)
+                        gps_count += 1
+                        classified = True
+                        gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
+                        gps_examples.setdefault(gps_record["gps_record_kind"], gps_record)
+
+                    if transmission_record is not None:
+                        _write_jsonl_line(transmission_handle, transmission_record)
+                        transmission_count += 1
+                        classified = True
+                        if len(transmission_examples) < 3:
+                            transmission_examples.append(transmission_record)
+
+                    if measurement_record is not None:
+                        _write_jsonl_line(measurement_handle, measurement_record)
+                        measurement_count += 1
+                        classified = True
+                        if len(measurement_examples) < 3:
+                            measurement_examples.append(measurement_record)
+
+                    if not classified:
+                        unclassified_record = {
+                            **common_fields,
+                            "severity": severity,
+                            "unclassified_reason": "no_family_match",
+                        }
+                        _write_jsonl_line(unclassified_handle, unclassified_record)
+                        unclassified_count += 1
+                        if len(unclassified_examples) < 3:
+                            unclassified_examples.append(unclassified_record)
+                        unclassified_patterns[
+                            (entry.subsystem, entry.code, entry.message)
+                        ] += 1
+            except Exception as exc:
+                raise ValueError(f"Error while normalizing LOG file {path}: {exc}") from exc
 
     common_patterns = [
         {

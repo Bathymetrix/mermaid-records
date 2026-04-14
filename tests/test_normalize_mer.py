@@ -174,6 +174,107 @@ def test_write_mer_jsonl_prototypes_accepts_canonical_float_id_override(tmp_path
     assert data_records[0]["float_id"] == "T0100"
 
 
+def test_write_mer_jsonl_prototypes_supports_rounds_info_field(tmp_path: Path) -> None:
+    mer_path = tmp_path / "0100_rounds.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<MISC UPLOAD_MAX=100kB />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 ROUNDS=17 FNAME=2024-02-07T22_47_22.000000 "
+            "SMP_OFFSET=614054 TRUE_FS=40.014107 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=4832 />\n"
+            "\t<DATA>ABC</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_dir = tmp_path / "jsonl"
+    write_mer_jsonl_prototypes([mer_path], output_dir)
+    data_records = _read_jsonl(output_dir / "mer_data_records.jsonl")
+
+    assert data_records[0]["rounds"] == "17"
+
+
+def test_write_mer_jsonl_prototypes_supports_stanford_process_parameter(tmp_path: Path) -> None:
+    mer_path = tmp_path / "0100_stanford.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<STANFORD_PROCESS DURATION_H=12 PROCESS_PERIOD_H=1 WINDOW_LEN=3600 "
+            "WINDOW_TYPE=HANN OVERLAP_PERCENT=50 DB_OFFSET=120 />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 FNAME=2024-02-07T22_47_22.000000 "
+            "SMP_OFFSET=614054 TRUE_FS=40.014107 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=4832 />\n"
+            "\t<DATA>ABC</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_mer_jsonl_prototypes([mer_path], output_dir)
+    parameter_records = _read_jsonl(output_dir / "mer_parameter_records.jsonl")
+
+    assert summary.parameter_kind_counts == {"stanford_process": 1}
+    assert parameter_records[0]["parameter_kind"] == "stanford_process"
+    assert parameter_records[0]["raw_values"] == {
+        "db_offset": "120",
+        "duration_h": "12",
+        "overlap_percent": "50",
+        "process_period_h": "1",
+        "window_len": "3600",
+        "window_type": "HANN",
+    }
+    assert parameter_records[0]["line"] == (
+        "\t<STANFORD_PROCESS DURATION_H=12 PROCESS_PERIOD_H=1 WINDOW_LEN=3600 "
+        "WINDOW_TYPE=HANN OVERLAP_PERCENT=50 DB_OFFSET=120 />"
+    )
+
+
+def test_write_mer_jsonl_prototypes_reports_source_file_on_unhandled_field(tmp_path: Path) -> None:
+    mer_path = tmp_path / "0100_bad.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<MISC UPLOAD_MAX=100kB />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 BADKEY=17 FNAME=2024-02-07T22_47_22.000000 "
+            "SMP_OFFSET=614054 TRUE_FS=40.014107 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=4832 />\n"
+            "\t<DATA>ABC</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_dir = tmp_path / "jsonl"
+
+    try:
+        write_mer_jsonl_prototypes([mer_path], output_dir)
+    except ValueError as exc:
+        message = str(exc)
+    else:
+        raise AssertionError("Expected MER normalization failure")
+
+    assert mer_path.as_posix() in message
+    assert "BADKEY" in message
+
+
 def test_write_mer_jsonl_prototypes_counts_zero_event_files(tmp_path: Path) -> None:
     empty_mer = tmp_path / "0001_empty.MER"
     empty_mer.write_bytes(
