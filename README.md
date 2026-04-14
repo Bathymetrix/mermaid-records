@@ -43,7 +43,7 @@ Run the normalization pipeline from raw inputs to JSONL outputs:
 mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir
 ```
 
-Run the normalization pipeline in stateless file-list mode:
+Run the normalization pipeline in stateless file-list mode (comma and/or space separated):
 
 ```sh
 mermaid-records normalize --input-file /path/to/file1.LOG,/path/to/file2.MER /path/to/file3.LOG -o /path/to/output-dir
