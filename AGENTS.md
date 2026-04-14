@@ -82,7 +82,7 @@ Decode/parsing boundary:
 - parsing: consume raw `LOG`, emitted raw `CYCLE`, or processed `.CYCLE.h`
 - interpretation/timeline logic remains separate and should not be mixed into either layer
 
-For v1 normalization work, prefer the `BIN` -> `LOG` boundary as the primary decode seam. Treat `CYCLE` as the later derived grouping step built from decoded LOG content.
+For v1 normalization work, prefer the `BIN` -> `LOG` boundary as the canonical decode seam. `CYCLE` is a later derived grouping artifact and is not part of the normalization pipeline.
 
 Mirror the upstream preprocess call order responsibly:
 
@@ -92,7 +92,10 @@ Mirror the upstream preprocess call order responsibly:
 - `concatenate_rbr_files(...)` may also be part of preprocessing, but should not force interpretation into the decode layer
 
 Do not call `database_update(...)` once per `BIN`; prefer a single explicit refresh before a batch decode workflow.
-Preflight should fail closed. If `database_update(...)` or any other preprocess preflight step reports an error, stop the workflow instead of continuing with stale or partial state.
+Preflight policy is mode-dependent:
+
+- `strict`: fail closed. If `database_update(...)` or any other preprocess preflight step reports an error, stop the workflow instead of continuing with stale or partial state.
+- `cached`: allow explicit degraded continuation when live refresh fails, and record/report that degraded preflight state clearly.
 
 ### Operational Text Sources
 
@@ -182,7 +185,7 @@ For event blocks:
 - The primary shared parser module is `src/mermaid_records/operational_raw.py`.
 - `src/mermaid_records/cycle_raw.py` remains only as a legacy compatibility shim.
 - Code-facing names may still use `cycle` in legacy modules, but the parsed operational record type is `OperationalLogEntry`.
-- Code-facing names for upstream decode should make the `BIN` -> `CYCLE` transformation explicit.
+- Code-facing names for upstream decode should make the `BIN` -> `LOG` transformation explicit.
 - Textual docs/help may still refer to `.CYCLE.h` explicitly.
 - Discovery should support upstream/server-style raw inputs separately from processed/reference inputs.
 - `LOG` is the native per-dive operational source.
@@ -331,10 +334,11 @@ Future layers (SQLite, APIs, analysis tools) are responsible for abstraction.
 - The normalization pipeline has two execution modes:
   - `stateful`: directory input, manifests enabled, incremental rerun logic enabled
   - `stateless`: explicit file-list input, no manifests, no incremental logic, no pruning
+- Stateless mode must error if the target output directory already contains manifests.
 - Stateful incremental behavior is binary and conservative:
   - append only when the only change is newly added raw source files
   - rewrite when any previously seen raw source changes or is removed
   - decoder-state changes invalidate only BIN-derived outputs for BIN-dependent floats
-- JSONL outputs are source-ordered, not time-sorted.
+- JSONL outputs use deterministic processing order (e.g., discovery order plus in-file order), not time-order.
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.
 - Future dry-run/report behavior must be completely side-effect free, including no file writes of any kind.
