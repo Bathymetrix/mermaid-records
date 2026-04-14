@@ -4,7 +4,6 @@ This fixture family is organized from the canonical artifacts for float `452.020
 
 - `log/` contains canonical raw `LOG` files.
 - `mer/` contains canonical raw `MER` files.
-- `cycle/` contains canonical `CYCLE` files produced by automaid from concatenated `LOG` content.
 
 This is an older-generation float that sent `LOG` directly rather than encrypted `BIN`, so there is no `bin/` fixture branch for this family.
 

@@ -25,9 +25,7 @@ from .operational_raw import iter_operational_log_entries
 from .discovery import (
     iter_bin_files,
     iter_log_files,
-    iter_mer_env_files,
     iter_mer_files,
-    iter_processed_mer_env_files,
     iter_raw_inputs,
     iter_server_mer,
 )
@@ -68,9 +66,7 @@ __all__ = [
     "iter_operational_log_entries",
     "iter_decoded_log_lines",
     "update_decoder_database",
-    "iter_mer_env_files",
     "iter_mer_files",
-    "iter_processed_mer_env_files",
     "iter_mer_data_blocks",
     "iter_raw_inputs",
     "iter_server_mer",

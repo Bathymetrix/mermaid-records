@@ -6,7 +6,6 @@ This fixture family is organized from the canonical artifacts for float `467.174
 - `log/` contains canonical `LOG` files decoded from `BIN` by automaid `preprocess.py`.
 - `mer/` contains raw `MER` files copied from `~/mermaid/server`.
 - `s61/` contains canonical `S61` files decoded by automaid.
-- `cycle/` contains canonical `CYCLE` files produced by automaid from concatenated `LOG` content.
 
 Source revisions:
 

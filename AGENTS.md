@@ -8,27 +8,21 @@
 - Prefer generators for file parsing where practical.
 - Add or update tests with any real logic change.
 - Prefer small, coherent commits and always tell the user when the current state is a good time to commit.
-- Any time suggesting a commit, also suggest a matching commit comment/message.
-- Treat this file as the persistent handoff document for future Codex sessions and update it whenever assumptions, boundaries, fixtures, or workflow rules change.
-- As the package nears completion, explicitly remind the user to revisit the pending BIN decode policy discussion: whether full-package decode workflows should require live `database_update(...)` or support an offline/cached mode.
-  Current observed caveat: Codex/sandboxed runs may report preflight refresh failures during `database_update(...)` even when the wrapped decode path still works from a normal user shell with the same decoder environment and cached local database state.
-- Before publishing v1.0.0, do a final package-streamlining pass and ask of each public module/surface: is this necessary or useful in the core package? Borderline derived-product helpers such as coverage/interval-style modules may belong in a separate package if they do not support the streamlined parsing/normalization core.
+- Any time suggesting a commit, also suggest a matching commit message.
+- Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
-- When referring to an output cycle file, call it `CYCLE` (parallel to `BIN`, `LOG`, and `MER`).
-- Never delete source raw files from their original path. This includes `.BIN`, `.MER`, and future raw formats such as `.vit`. If an external decoder is destructive, it must run only on copied files in a temporary workspace.
-- In the corpus, raw input data live in `server`, and manufacturer-produced output used for audit/reference comparison lives in `processed`.
+- Never delete source raw files from their original path. This includes `.BIN`, `.LOG`, `.MER`, and future raw formats such as `.vit`. If an external decoder is destructive, it must run only on copied files in a temporary workspace.
 - Before writing a new audit workflow, first scan existing audit code for reusable logic and easy refactors instead of starting from a fresh script by default.
-- Keep code DRY. Check often for shared logic that should be refactored into reusable helpers, but verify behavior before and after any DRY-driven refactor instead of assuming equivalence.
-- When the user's intent is clear, rewrite their rules into cleaner internal guidance here rather than copying rough wording verbatim. If the intent is unclear, ask before recording the rule.
-- Always push back, disagree, or suggest a better alternative when warranted. Do not agree reflexively. When suggesting a different path, give the reason plainly and concretely.
+- Keep code DRY, but verify behavior before and after any DRY-driven refactor instead of assuming equivalence.
+- Always push back, disagree, or suggest a better alternative when warranted.
 - Package license defaults to MIT. A root `LICENSE` file must exist.
 - Every Python source file must include `SPDX-License-Identifier: MIT`, but must not include the full license text.
-- The exact Bathymetrix header belongs only in `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`, unless the user explicitly expands that set.
 - Use `Bathymetrix™` only in approved file headers and rare top-level visible branding. Do not use the trademark marker in identifiers, module names, imports, docstrings, or inline comments.
 - Package authorship/licensing metadata must live in exactly one location: `src/mermaid_records/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
+- `CYCLE` / `CYCLE.h` are out of scope for `mermaid-records` and must not be reintroduced unless the user explicitly requests it.
 
-## Versioning Rule — Single Source of Truth
+## Versioning Rule
 
 - The canonical version must live in `src/mermaid_records/__init__.py` as `__version__`.
 - `pyproject.toml` must use dynamic versioning via `[tool.setuptools.dynamic]` with `version = {attr = "mermaid_records.__version__"}`.
@@ -36,14 +30,12 @@
 
 ## Project Purpose
 
-`mermaid-records` is a Python package to normalize `LOG`/`BIN` and `MER` into parseable record families.
+`mermaid-records` is a Python package to normalize `BIN`, `LOG`, and `MER` into parseable record families.
 
 Supported inputs currently include:
 
 - `.BIN` files
 - `.LOG` files
-- `.CYCLE` text files
-- `.CYCLE.h` text files
 - `.MER` files
 
 This layer is strictly for parsing and structured extraction.
@@ -56,50 +48,39 @@ Do not add:
 - acquisition inference beyond explicit `acq started` / `acq stopped`
 - DET / REQ logic
 - higher-level timeline interpretation
-
-At this stage the package is primarily converting manufacturer formats into machine-parseable normalized record families while preserving provenance.
+- workflow-engine behavior beyond the normalization pipeline
 
 ## Current Parsing Scope
 
-Canonical long-term source model:
+Canonical source model:
 
 - upstream raw `.BIN`
 - upstream raw `.LOG`
 - upstream raw `.MER`
 
-Derived operational products:
-
-- emitted raw `.CYCLE`
-- processed `.CYCLE.h`
-
-Processed `.CYCLE` and `.CYCLE.h` remain supported as compatibility, reference, and comparison paths rather than canonical long-term primitives when raw `LOG` exists.
-
-Do not frame `LOG`/`BIN` as purely operational and `MER` as purely data. These containers can each carry mixed operational, location, transmission, and accounting signals. Distinguish them by source container and provenance, not by assuming clean semantic separation.
-
 Decode/parsing boundary:
 
-- decode: raw `BIN` -> decoded `LOG`, with optional later grouping to emitted raw `CYCLE`
-- parsing: consume raw `LOG`, emitted raw `CYCLE`, or processed `.CYCLE.h`
+- decode: raw `BIN` -> decoded `LOG`
+- parsing: consume raw `LOG` and raw `MER`
 - interpretation/timeline logic remains separate and should not be mixed into either layer
 
-For v1 normalization work, prefer the `BIN` -> `LOG` boundary as the canonical decode seam. `CYCLE` is a later derived grouping artifact and is not part of the normalization pipeline.
+For v1 normalization work, the canonical decode seam is `BIN` -> `LOG`.
 
 Mirror the upstream preprocess call order responsibly:
 
 - `database_update(...)` is a batch preflight step
 - `concatenate_files(...)` and `decrypt_all(...)` are part of the per-workspace `BIN` -> `LOG` decode path
-- `convert_in_cycle(...)` is the later derived `LOG` -> `CYCLE` step
 - `concatenate_rbr_files(...)` may also be part of preprocessing, but should not force interpretation into the decode layer
 
 Do not call `database_update(...)` once per `BIN`; prefer a single explicit refresh before a batch decode workflow.
 Preflight policy is mode-dependent:
 
-- `strict`: fail closed. If `database_update(...)` or any other preprocess preflight step reports an error, stop the workflow instead of continuing with stale or partial state.
-- `cached`: allow explicit degraded continuation when live refresh fails, and record/report that degraded preflight state clearly.
+- `strict`: fail closed
+- `cached`: allow explicit degraded continuation when live refresh fails, and record/report that degraded preflight state clearly
 
 ### Operational Text Sources
 
-Use one common `OperationalLogEntry` model for `LOG`, `CYCLE`, and `.CYCLE.h` with:
+Use one common `OperationalLogEntry` model for `LOG` with:
 
 - `time`
 - `subsystem`
@@ -109,13 +90,7 @@ Use one common `OperationalLogEntry` model for `LOG`, `CYCLE`, and `.CYCLE.h` wi
 - `raw_line`
 - `source_file`
 
-Preserve source identity via `source_kind`:
-
-- `log`
-- `cycle`
-- `cycle_h`
-
-Do not collapse `LOG`, `CYCLE`, and `.CYCLE.h` into one canonical source during parsing. Preserve provenance even when their content overlaps.
+Preserve source identity via `source_kind = "log"`.
 
 Normalized record-family direction to keep in mind during cleanup and naming:
 
@@ -130,8 +105,6 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 - `gps_records`
 - `unclassified_operational_records`
 
-Do not fully implement these families unless the current code naturally supports them, but prefer names and module roles that leave room for this direction.
-
 For derived operational-family prototypes, no parsed `OperationalLogEntry` should disappear silently. Each parsed operational line must end up either in one or more derived family streams or in `unclassified_operational_records`.
 
 For acquisition evidence prototypes, preserve the distinction between exact transitions and state assertions:
@@ -145,9 +118,7 @@ For ascent-request prototypes, classify only explicit request outcomes such as `
 
 For GPS prototypes, emit one record per clearly GPS-related LOG line such as `GPS fix...`, raw latitude/longitude lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. Do not group lines into fixes or compute derived position/timing values in the normalization layer.
 
-For generated JSONL filenames, prefix low-level LOG-derived outputs with `log_` and reserve analogous `mer_` prefixes for future MER-derived JSONL outputs. Do not treat this as a package/module naming rule.
-
-Use `cycle` in names only when referring to the concrete derived artifact types `CYCLE` or `.CYCLE.h`. Shared parser and normalization surfaces should prefer `operational` naming instead.
+For generated JSONL filenames, prefix LOG-derived outputs with `log_` and reserve analogous `mer_` prefixes for MER-derived outputs.
 
 Acquisition windows may be extracted only from explicit:
 
@@ -181,61 +152,34 @@ For event blocks:
 
 ## Current File/Layout Assumptions
 
-- Use one common operational-line parser/model across `LOG`, `CYCLE`, and `.CYCLE.h`.
-- The primary shared parser module is `src/mermaid_records/operational_raw.py`.
-- `src/mermaid_records/cycle_raw.py` remains only as a legacy compatibility shim.
-- Code-facing names may still use `cycle` in legacy modules, but the parsed operational record type is `OperationalLogEntry`.
-- Code-facing names for upstream decode should make the `BIN` -> `LOG` transformation explicit.
-- Textual docs/help may still refer to `.CYCLE.h` explicitly.
-- Discovery should support upstream/server-style raw inputs separately from processed/reference inputs.
+- The primary shared LOG parser module is `src/mermaid_records/operational_raw.py`.
+- Discovery should cover only raw `BIN`, `LOG`, and `MER` inputs relevant to this package.
 - `LOG` is the native per-dive operational source.
-- `CYCLE` and `.CYCLE.h` are derived or stitched operational products and are secondary/reference-oriented relative to raw `LOG`.
-- `.CYCLE.h` and `.MER` may still be treated as parallel parser inputs when needed, but processed `.CYCLE.h` is secondary/reference-oriented.
-- Their mutual references may be useful later, but parsing must not depend on them matching.
 - A single `.MER` may include DET data from the current dive plus REG/REQ data from previous dives. Do not infer dive membership from `MerDataBlock.date` during parsing.
-- The Bathymetrix header currently belongs only in `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 
 ## Current Fixtures
 
 Tracked fixtures currently include:
 
-- `data/fixtures/452.020-P-06/cycle/*.CYCLE`
 - `data/fixtures/452.020-P-06/log/*.LOG`
 - `data/fixtures/452.020-P-06/mer/*.MER`
 - `data/fixtures/452.020-P-06/README.md`
 - `data/fixtures/467.174-T-0100/bin/*.BIN`
-- `data/fixtures/467.174-T-0100/cycle/*.CYCLE`
 - `data/fixtures/467.174-T-0100/log/*.LOG`
 - `data/fixtures/467.174-T-0100/mer/*.MER`
 - `data/fixtures/467.174-T-0100/s61/*.S61`
 - `data/fixtures/467.174-T-0100/README.md`
 
-These fixtures are intentional parser fixtures and should generally remain tracked unless the user decides otherwise.
-
-Current fixture corpus note:
-
-- `data/fixtures/452.020-P-06/` mirrors top-level canonical artifacts for float `452.020-P-06`, grouped by artifact type for easier cross-checking.
-- This older-generation float is `LOG`-first, so the fixture family has no `BIN` branch.
-- `data/fixtures/467.174-T-0100/` mirrors top-level canonical artifacts for float `467.174-T-0100`, grouped by artifact type for easier cross-checking.
-- Raw `BIN` and `MER` files in this fixture family are copied from `~/mermaid/server`.
-- Treat this fixture family as the primary local fixture corpus unless the user asks for a different source set.
-- `data/fixtures/log_examples_representative_06_0100/` is the current representative LOG subset for JSONL prototype work, and generated JSONL prototypes may live under its `jsonl_prototype/` subdirectory for inspection.
-- `data/fixtures/mer_examples_representative_06_0100/` is the current representative MER subset for JSONL prototype work, and generated MER JSONL prototypes may live under its `jsonl_prototype/` subdirectory for inspection.
+The representative JSONL prototype fixture sets under `data/fixtures/log_examples_representative_06_0100/` and `data/fixtures/mer_examples_representative_06_0100/` remain in scope for inspection.
 
 ## Workflow Rules
 
-- If the work shifts toward higher-level API design, abstraction tradeoffs, naming strategy, or broader architecture, say when it may be a good moment to consult ChatGPT and provide a concise handoff summary.
+- If work shifts toward higher-level API design, abstraction tradeoffs, naming strategy, or broader architecture, say when it may be a good moment to consult ChatGPT and provide a concise handoff summary.
 - Do not be territorial about tool choice; suggest ChatGPT when it is likely to help with design-space exploration.
-- Keep legacy `CYCLE` support in a quarantine state unless the user explicitly reopens it: do not expose `CYCLE` in the installed CLI, README, or top-level package exports, even if legacy compatibility modules remain in the repo.
 
-## Module Naming Rule — Action First
+## Module Naming Rule
 
 All transformation and processing modules should use action-first naming.
-
-Definition:
-
-- start module names with the verb describing what the module does
-- follow with the source or target object
 
 Examples:
 
@@ -249,85 +193,14 @@ Avoid:
 - `log_normalize.py`
 - `mer_normalize.py`
 
-Rationale:
-
-- groups modules by behavior rather than data type
-- scales cleanly as new pipelines are added
-- improves discoverability and consistency across the package
-
-Additional rule:
-
-- keep module names lowercase
-- use underscores only when needed for readability
-
 ## Normalization Guardrails
 
-This package is a canonical normalization layer, not an analysis layer.
-
-These rules override convenience or refactoring instincts.
-
-### Source fidelity
-- Always preserve the original source representation
-- Always include the raw source line or block where applicable
-- Do not drop, merge, or reinterpret source records silently
-
-### Provenance
-Every record must preserve:
-- source_container
-- source_file
-- source ordering when it is genuinely useful (e.g., `block_index` for MER event-block records)
-
-### Time handling
-- Never omit a source time field when it exists
-- Do not invent timestamps
-- Do not rename source time fields to generic names
-- Use source-literal names (e.g., DATE → date, LOG epoch → log_epoch_time)
-- Only introduce derived time fields when clearly justified (e.g., LOG record_time)
-
-### Field naming
-- Prefer source-literal field names when they exist
-- Do not introduce prefixes (e.g., info_, format_) unless required to avoid collision
-- Avoid generic names like "time" when the source has a more specific meaning
-
-### Record design
-- One JSONL record should correspond to one real source unit:
-  - LOG line
-  - ENVIRONMENT line
-  - PARAMETERS line
-  - EVENT block
-- Do not aggregate multiple source units into one record
-
-### Normalization scope
-- Normalize structure, not meaning
-- Do not:
-  - infer DET vs REQ
-  - infer dive membership
-  - compute durations or intervals
-  - interpret scientific meaning
-
-### JSONL discipline
-- Prefer multiple small, precise record streams over large aggregated ones
-- Do not create a new JSONL stream unless:
-  - the meaning is stable
-  - the classification is unambiguous
-  - it is immediately useful
-
-### Anti-overengineering rule
-When choosing between:
-- a simple, source-faithful representation
-- a generalized or abstract design
-
-Always choose the simple, source-faithful representation.
-
-Future layers (SQLite, APIs, analysis tools) are responsible for abstraction.
-
-## Queue
-
-- Next rerun-detection step should compare current source/decoder state against `manifests/latest.json` at the whole-run level before any selective skipping work.
-- In mixed multi-float server corpora, decoder-state changes should invalidate only floats that actually depend on `BIN` decode; LOG/MER-only floats should not be forced to rerun from raw solely because decoder state changed.
-- We still need to design per-file incremental updates. Desired future behavior: if only a small subset of raw `LOG`/`MER`/`BIN` inputs change, the pipeline should be able to normalize only the affected files rather than discarding and rebuilding all outputs.
-- Open question for later: whether this package should accept an explicit decoder database directory override instead of relying only on `MERMAID/database`.
-- Incremental pipeline outputs are organized per float under the output root. For stateful corpus runs, the per-float directory name should be driven first by `<serial>.vit` files in the input root. Fall back to the short stem ID only when no authoritative full-serial mapping is available.
+- Always preserve the original source representation.
+- Always include the raw source line or block where applicable.
+- Do not drop, merge, or reinterpret source records silently.
+- Prefer source-literal field names when they exist.
+- One JSONL record should correspond to one real source unit.
+- Normalize structure, not meaning.
 
 ## Current Pipeline Rules
 
@@ -339,6 +212,6 @@ Future layers (SQLite, APIs, analysis tools) are responsible for abstraction.
   - append only when the only change is newly added raw source files
   - rewrite when any previously seen raw source changes or is removed
   - decoder-state changes invalidate only BIN-derived outputs for BIN-dependent floats
-- JSONL outputs use deterministic processing order (e.g., discovery order plus in-file order), not time-order.
+- JSONL outputs use deterministic processing order, not time-order.
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.
 - Future dry-run/report behavior must be completely side-effect free, including no file writes of any kind.

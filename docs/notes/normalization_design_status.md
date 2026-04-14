@@ -6,6 +6,8 @@
 
 `mermaid-records` currently centers on a normalization pipeline from raw `BIN`, `LOG`, and `MER` inputs to low-level JSONL record families.
 
+`CYCLE` and `CYCLE.h` are out of scope for this package.
+
 Execution modes:
 
 - `stateful`

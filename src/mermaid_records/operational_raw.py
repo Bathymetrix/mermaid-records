@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 
-"""Parser interfaces for operational LOG, CYCLE, and .CYCLE.h text files."""
+"""Parser interfaces for operational LOG text files."""
 
 from __future__ import annotations
 
@@ -9,24 +9,24 @@ from pathlib import Path
 import re
 from typing import Iterator
 
-from .models import OperationalLogEntry, OperationalSourceKind
+from .models import OperationalLogEntry
 
-_CYCLE_LINE_RE = re.compile(
+_LOG_LINE_RE = re.compile(
     r"^(?P<time>.+?):\[(?P<tag>[^\]]+)\](?P<message>.*)$"
 )
 
 
 def iter_operational_log_entries(path: Path) -> Iterator[OperationalLogEntry]:
-    """Yield parsed operational text lines as conservative structured entries."""
+    """Yield parsed LOG lines as conservative structured entries."""
 
-    source_kind = _detect_source_kind(path)
+    _validate_log_path(path)
 
     with path.open("r", encoding="utf-8", errors="replace") as handle:
         for raw_line in handle:
             line = raw_line.rstrip("\r\n")
             if not line.strip():
                 continue
-            match = _CYCLE_LINE_RE.match(line)
+            match = _LOG_LINE_RE.match(line)
             if not match:
                 continue
             tag = match.group("tag")
@@ -36,16 +36,10 @@ def iter_operational_log_entries(path: Path) -> Iterator[OperationalLogEntry]:
                 subsystem=subsystem,
                 code=code,
                 message=match.group("message"),
-                source_kind=source_kind,
+                source_kind="log",
                 raw_line=line,
                 source_file=path,
             )
-
-
-def iter_cycle_events(path: Path) -> Iterator[OperationalLogEntry]:
-    """Legacy compatibility alias for iterating parsed operational text lines."""
-
-    yield from iter_operational_log_entries(path)
 
 
 def _parse_tag(tag: str) -> tuple[str, str | None]:
@@ -57,17 +51,11 @@ def _parse_tag(tag: str) -> tuple[str, str | None]:
     return subsystem.strip(), code.strip() or None
 
 
-def _detect_source_kind(path: Path) -> OperationalSourceKind:
-    """Infer the operational source kind from the file name."""
+def _validate_log_path(path: Path) -> None:
+    """Validate that the parser is being used on a LOG file."""
 
-    name = path.name
-    if name.endswith(".CYCLE.h"):
-        return "cycle_h"
-    if name.endswith(".CYCLE"):
-        return "cycle"
-    if name.endswith(".LOG"):
-        return "log"
-    raise ValueError(f"Unsupported operational log source: {path}")
+    if path.suffix.upper() != ".LOG":
+        raise ValueError(f"Unsupported operational log source: {path}")
 
 
 def _parse_time_text(text: str) -> datetime:

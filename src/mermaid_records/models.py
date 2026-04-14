@@ -9,12 +9,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-type OperationalSourceKind = Literal["log", "cycle", "cycle_h"]
+type OperationalSourceKind = Literal["log"]
 
 
 @dataclass(slots=True)
 class OperationalLogEntry:
-    """One parsed operational log line from LOG, CYCLE, or .CYCLE.h text."""
+    """One parsed operational log line from a LOG file."""
 
     time: datetime
     subsystem: str
@@ -27,7 +27,7 @@ class OperationalLogEntry:
 
 @dataclass(slots=True)
 class AcquisitionWindow:
-    """Explicit acquisition start/stop pair from cycle text."""
+    """Explicit acquisition start/stop pair from operational log text."""
 
     start: datetime
     stop: datetime
@@ -88,9 +88,6 @@ class EvidenceRecord:
     source_file: Path | None = None
     raw_text: str | None = None
     metadata: dict[str, object] = field(default_factory=dict)
-
-
-CycleLogEntry = OperationalLogEntry
 
 
 @dataclass(slots=True)

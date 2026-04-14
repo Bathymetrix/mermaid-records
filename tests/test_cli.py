@@ -13,7 +13,6 @@ def test_cli_help_exposes_only_normalize_subcommand() -> None:
 
     assert "normalize" in help_text
     assert "inspect-mer" not in help_text
-    assert "inspect-cycle" not in help_text
 
 
 def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) -> None:

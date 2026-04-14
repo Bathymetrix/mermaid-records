@@ -8,7 +8,7 @@ Current source inputs:
 - `LOG`
 - `MER`
 
-The package keeps decode, parsing, normalization, and later interpretation separate. It is a canonical normalization layer, not an analysis layer.
+`CYCLE` and `CYCLE.h` are out of scope for this package. The package keeps decode, parsing, normalization, and later interpretation separate. It is a canonical normalization layer, not an analysis layer.
 
 ## Installation
 

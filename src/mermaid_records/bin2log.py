@@ -188,7 +188,6 @@ def iter_decoded_log_lines(path: Path, *, config: Bin2LogConfig) -> Iterator[str
     - `preprocess.py` decodes `.BIN` files into `.LOG` files via `decrypt_all(...)`
     - database refresh and concatenate steps are separate upstream preflight work
       and should be run once per copied batch workspace, not once per BIN
-    - the later `convert_in_cycle(...)` step derives `CYCLE` files from decoded LOGs
     - the manufacturer workflow may delete the working-copy `.BIN`
 
     The adapter therefore:

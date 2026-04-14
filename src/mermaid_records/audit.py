@@ -7,8 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from .operational_raw import iter_operational_log_entries
-from .discovery import iter_mer_files, iter_processed_cycle_h_files
+from .discovery import iter_mer_files
 from .mer_raw import parse_mer_file
 
 
@@ -20,15 +19,6 @@ class MerCorpusStats:
     parsed_ok: int
     empty_files: int
     non_empty_files: int
-
-
-@dataclass(slots=True)
-class CycleCorpusStats:
-    """Summary counts for a corpus of processed .CYCLE.h reference files."""
-
-    total_files: int
-    parsed_ok: int
-    parse_failures: int
 
 
 def audit_server_mer(root: Path) -> MerCorpusStats:
@@ -53,34 +43,4 @@ def audit_server_mer(root: Path) -> MerCorpusStats:
         parsed_ok=parsed_ok,
         empty_files=empty_files,
         non_empty_files=non_empty_files,
-    )
-
-
-def audit_processed_cycle(root: Path) -> CycleCorpusStats:
-    """Legacy compatibility alias for auditing processed .CYCLE.h files."""
-
-    return audit_processed_cycle_h(root)
-
-
-def audit_processed_cycle_h(root: Path) -> CycleCorpusStats:
-    """Audit a processed .CYCLE.h reference corpus rooted at ``root``."""
-
-    total_files = 0
-    parsed_ok = 0
-    parse_failures = 0
-
-    for path in iter_processed_cycle_h_files(root):
-        total_files += 1
-        try:
-            for _ in iter_operational_log_entries(path):
-                pass
-        except Exception:
-            parse_failures += 1
-        else:
-            parsed_ok += 1
-
-    return CycleCorpusStats(
-        total_files=total_files,
-        parsed_ok=parsed_ok,
-        parse_failures=parse_failures,
     )
