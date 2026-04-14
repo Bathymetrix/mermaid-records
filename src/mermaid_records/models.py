@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 
-"""Core typed models used across the package."""
+"""Core typed models used across the normalization package."""
 
 from __future__ import annotations
 
@@ -22,15 +22,6 @@ class OperationalLogEntry:
     message: str
     source_kind: OperationalSourceKind
     raw_line: str
-    source_file: Path
-
-
-@dataclass(slots=True)
-class AcquisitionWindow:
-    """Explicit acquisition start/stop pair from operational log text."""
-
-    start: datetime
-    stop: datetime
     source_file: Path
 
 
@@ -76,37 +67,3 @@ class MerDataBlock:
     raw_format_line: str | None
     data_payload: bytes | None
     source_file: Path
-
-
-@dataclass(slots=True)
-class EvidenceRecord:
-    """Minimal provenance-preserving evidence record for later correlation."""
-
-    kind: str
-    time: datetime | None = None
-    source_kind: str | None = None
-    source_file: Path | None = None
-    raw_text: str | None = None
-    metadata: dict[str, object] = field(default_factory=dict)
-
-
-@dataclass(slots=True)
-class ProductCoverage:
-    """Coverage summary for a derived or requested product."""
-
-    product_name: str
-    start: datetime | None = None
-    end: datetime | None = None
-    covered_fraction: float | None = None
-    metadata: dict[str, object] = field(default_factory=dict)
-
-
-@dataclass(slots=True)
-class TimelineStatus:
-    """Status summary for a timeline segment or product."""
-
-    kind: str = "unknown"
-    detail: str = ""
-    start: datetime | None = None
-    end: datetime | None = None
-    metadata: dict[str, object] = field(default_factory=dict)

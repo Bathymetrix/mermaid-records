@@ -64,11 +64,11 @@ The goal is correctness, stability, and release clarity, not feature expansion.
 
 ## Final Streamlining Pass
 
-- [ ] Remove dead or legacy internal clutter that should not ship into `v1.0.0`
-- [ ] Confirm no unnecessary modules remain in the package
-- [ ] Confirm no stale tests remain that preserve superseded behavior
+- [x] Remove dead or legacy internal clutter that should not ship into `v1.0.0`
+- [x] Confirm no unnecessary modules remain in the package
+- [x] Confirm no stale tests remain that preserve superseded behavior
 - [ ] Confirm no stale helper scripts remain that imply out-of-scope workflows
-- [ ] Confirm the package scope remains tightly limited to normalization only
+- [x] Confirm the package scope remains tightly limited to normalization only
 
 ## Must-Not-Forget
 

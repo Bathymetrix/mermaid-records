@@ -11,10 +11,6 @@ __author__ = "Joel D. Simon"
 __license__ = "MIT"
 __copyright__ = "© 2026 Bathymetrix, LLC"
 
-from .audit import (
-    MerCorpusStats,
-    audit_server_mer,
-)
 from .bin2log import (
     Bin2LogConfig,
     Bin2LogError,
@@ -31,13 +27,9 @@ from .discovery import (
     iter_server_mer,
 )
 from .models import (
-    AcquisitionWindow,
-    EvidenceRecord,
     MerDataBlock,
     MerFileMetadata,
     OperationalLogEntry,
-    ProductCoverage,
-    TimelineStatus,
 )
 from .mer_raw import iter_mer_data_blocks, parse_mer_file
 from .normalize_log import LogJsonlPrototypeSummary, write_log_jsonl_prototypes
@@ -48,21 +40,15 @@ from .normalize_pipeline import (
 )
 
 __all__ = [
-    "AcquisitionWindow",
     "Bin2LogConfig",
     "Bin2LogError",
-    "EvidenceRecord",
-    "MerCorpusStats",
     "MerDataBlock",
     "MerFileMetadata",
     "MerJsonlPrototypeSummary",
     "OperationalLogEntry",
-    "ProductCoverage",
-    "TimelineStatus",
     "LogJsonlPrototypeSummary",
     "FloatName",
     "NormalizationPipelineSummary",
-    "audit_server_mer",
     "iter_bin_files",
     "iter_log_files",
     "iter_operational_log_entries",

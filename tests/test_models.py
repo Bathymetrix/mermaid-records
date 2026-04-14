@@ -4,13 +4,9 @@ from datetime import datetime
 from pathlib import Path
 
 from mermaid_records.models import (
-    AcquisitionWindow,
-    EvidenceRecord,
     MerDataBlock,
     MerFileMetadata,
     OperationalLogEntry,
-    ProductCoverage,
-    TimelineStatus,
 )
 
 
@@ -23,11 +19,6 @@ def test_dataclasses_can_be_instantiated() -> None:
         message="acq started",
         source_kind="log",
         raw_line="2025-01-01T00:00:00:[MRMAID,0002]acq started",
-        source_file=source,
-    )
-    window = AcquisitionWindow(
-        start=datetime(2025, 1, 1, 0, 0, 0),
-        stop=datetime(2025, 1, 1, 0, 1, 0),
         source_file=source,
     )
     metadata = MerFileMetadata(
@@ -58,20 +49,7 @@ def test_dataclasses_can_be_instantiated() -> None:
         data_payload=b"abc",
         source_file=source,
     )
-    evidence = EvidenceRecord(
-        kind="operational",
-        time=datetime(2025, 1, 1, 0, 0, 0),
-        source_kind="log",
-        source_file=source,
-        raw_text="2025-01-01T00:00:00:[MRMAID,0002]acq started",
-    )
-    coverage = ProductCoverage(product_name="raw")
-    status = TimelineStatus(kind="ok", detail="ready")
 
     assert entry.subsystem == "MRMAID"
-    assert window.stop > window.start
     assert metadata.board == "452116600-A0"
     assert block.length_samples == 4448
-    assert evidence.kind == "operational"
-    assert coverage.product_name == "raw"
-    assert status.kind == "ok"
