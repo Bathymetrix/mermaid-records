@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 
+import pytest
 from mermaid_records.cli import build_parser, main
 
 
@@ -187,3 +189,226 @@ def test_run_normalization_pipeline_is_quiet_by_default(tmp_path: Path, capsys) 
 
     assert captured.out == ""
     assert captured.err == ""
+
+
+def test_output_dir_resolves_from_mermaid_env(tmp_path: Path, capsys, monkeypatch: pytest.MonkeyPatch) -> None:
+    input_root = tmp_path / "inputs"
+    mermaid_root = tmp_path / "mermaid"
+    input_root.mkdir()
+    mermaid_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    (input_root / "0100_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("MERMAID", mermaid_root.as_posix())
+
+    result = main(["normalize", "-i", str(input_root)])
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["output_dir"] == (mermaid_root / "records").as_posix()
+    assert (mermaid_root / "records" / "467.174-T-0100" / "log_operational_records.jsonl").exists()
+
+
+def test_missing_output_dir_and_mermaid_env_errors_clearly(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    (input_root / "0100_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("MERMAID", raising=False)
+
+    with pytest.raises(SystemExit, match="--output-dir was not given and MERMAID is not set"):
+        main(["normalize", "-i", str(input_root)])
+
+
+def test_decoder_python_resolves_from_env_for_bin_runs(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "0100_sample.BIN").write_bytes(b"raw-bin")
+    decoder = _write_decoder(tmp_path / "decoder.py", "decoded from env python")
+    mermaid_root = tmp_path / "mermaid"
+    database_root = mermaid_root / "database"
+    database_root.mkdir(parents=True)
+    (database_root / "Databases.json").write_text("[]\n", encoding="utf-8")
+    monkeypatch.setenv("MERMAID", mermaid_root.as_posix())
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_PYTHON", sys.executable)
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_SCRIPT", decoder.as_posix())
+
+    result = main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["processed_floats"][0]["float_id"] == "0100"
+    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    assert rows[0]["message"] == "decoded from env python"
+
+
+def test_decoder_script_resolves_from_env_for_bin_runs(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "0100_sample.BIN").write_bytes(b"raw-bin")
+    decoder = _write_decoder(tmp_path / "decoder.py", "decoded from env script")
+    mermaid_root = tmp_path / "mermaid"
+    database_root = mermaid_root / "database"
+    database_root.mkdir(parents=True)
+    (database_root / "Databases.json").write_text("[]\n", encoding="utf-8")
+    monkeypatch.setenv("MERMAID", mermaid_root.as_posix())
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_PYTHON", sys.executable)
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_SCRIPT", decoder.as_posix())
+
+    result = main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["processed_floats"][0]["float_id"] == "0100"
+    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    assert rows[0]["message"] == "decoded from env script"
+
+
+def test_explicit_cli_decoder_args_override_env(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "0100_sample.BIN").write_bytes(b"raw-bin")
+    env_decoder = _write_decoder(tmp_path / "decoder_env.py", "decoded from env")
+    cli_decoder = _write_decoder(tmp_path / "decoder_cli.py", "decoded from cli")
+    mermaid_root = tmp_path / "mermaid"
+    database_root = mermaid_root / "database"
+    database_root.mkdir(parents=True)
+    (database_root / "Databases.json").write_text("[]\n", encoding="utf-8")
+    monkeypatch.setenv("MERMAID", mermaid_root.as_posix())
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_PYTHON", "/does/not/exist/python")
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_SCRIPT", env_decoder.as_posix())
+
+    result = main(
+        [
+            "normalize",
+            "-i",
+            str(input_root),
+            "-o",
+            str(output_dir),
+            "--decoder-python",
+            sys.executable,
+            "--decoder-script",
+            str(cli_decoder),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["processed_floats"][0]["float_id"] == "0100"
+    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    assert rows[0]["message"] == "decoded from cli"
+
+
+def test_bin_free_runs_do_not_require_decoder_env_or_args(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    (input_root / "0100_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_PYTHON", raising=False)
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_SCRIPT", raising=False)
+
+    result = main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+
+    assert result == 0
+    assert payload["mode"] == "stateful"
+    assert (output_dir / "467.174-T-0100" / "log_operational_records.jsonl").exists()
+
+
+def test_bin_runs_require_decoder_python_when_unresolved(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "0100_sample.BIN").write_bytes(b"raw-bin")
+    decoder = _write_decoder(tmp_path / "decoder.py", "decoded")
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_PYTHON", raising=False)
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_SCRIPT", decoder.as_posix())
+
+    with pytest.raises(SystemExit, match="Provide --decoder-python or set MERMAID_RECORDS_DECODER_PYTHON"):
+        main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+
+def test_bin_runs_require_decoder_script_when_unresolved(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    output_dir = tmp_path / "output"
+    input_root.mkdir()
+    (input_root / "0100_sample.BIN").write_bytes(b"raw-bin")
+    monkeypatch.setenv("MERMAID_RECORDS_DECODER_PYTHON", sys.executable)
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_SCRIPT", raising=False)
+
+    with pytest.raises(SystemExit, match="Provide --decoder-script or set MERMAID_RECORDS_DECODER_SCRIPT"):
+        main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+
+def _write_decoder(path: Path, message: str) -> Path:
+    path.write_text(
+        f"""
+from pathlib import Path
+
+def database_update(_arg):
+    print("Update Databases")
+
+def concatenate_files(path):
+    return [path]
+
+def concatenate_rbr_files(path):
+    return [path]
+
+def decrypt_all(path):
+    workdir = Path(path)
+    log = workdir / "0100_sample.LOG"
+    log.write_text("1700000000:[MAIN  ,0007]{message}\\n", encoding="utf-8")
+    return [path]
+""",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _jsonl_lines(path: Path) -> list[dict[str, object]]:
+    with path.open("r", encoding="utf-8") as handle:
+        return [json.loads(line) for line in handle if line.strip()]

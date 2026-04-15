@@ -27,7 +27,7 @@ python -m pip install -e '.[dev]'
 After activation, the remainder of the README uses plain `python`, e.g.,
 
 ```sh
-mermaid-records normalize -i ~/mermaid/server_everyone  --decoder-python  ~/miniconda3/envs/pymaid3.10/bin/python --decoder-script $AUTOMAID/scripts/preprocess.py -o ~/mermaid/records
+mermaid-records normalize -i /path/to/server --output-dir /path/to/output-dir
 ```
 
 If the virtual environment is not activated, you can invoke the installed CLI directly as:
@@ -59,7 +59,7 @@ mermaid-records normalize --input-file /path/to/file1.LOG,/path/to/file2.MER /pa
 Run the normalization pipeline with `BIN` decode enabled:
 
 ```sh
-MERMAID=/path/to/mermaid mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
+mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
 Preview the normalization plan without writing outputs, manifests, state files, or preflight status:
@@ -73,6 +73,54 @@ Print the dry-run plan as JSON:
 ```sh
 mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --dry-run --json
 ```
+
+### CLI Resolution Order
+
+The CLI keeps input selection explicit:
+
+- `--input-root` selects stateful mode
+- `--input-file` selects stateless mode
+
+The CLI does not infer input paths from environment variables.
+
+Output directory resolution order:
+
+- `--output-dir` wins when provided
+- otherwise, if `MERMAID` is set, the default output root is `$MERMAID/records`
+- otherwise, the CLI errors and tells you to provide `--output-dir` or set `MERMAID`
+
+Decoder Python resolution order:
+
+- `--decoder-python` wins when provided
+- otherwise `MERMAID_RECORDS_DECODER_PYTHON` is used when set
+- otherwise the CLI errors only if the selected run actually contains `BIN` inputs
+
+Decoder script resolution order:
+
+- `--decoder-script` wins when provided
+- otherwise `MERMAID_RECORDS_DECODER_SCRIPT` is used when set
+- otherwise the CLI errors only if the selected run actually contains `BIN` inputs
+
+Preflight mode defaults to:
+
+- `strict`
+
+Configured-machine example:
+
+```sh
+export MERMAID=/path/to/mermaid
+export MERMAID_RECORDS_DECODER_PYTHON=/path/to/decoder-env/bin/python
+export MERMAID_RECORDS_DECODER_SCRIPT=/path/to/automaid/scripts/preprocess.py
+mermaid-records normalize -i /path/to/server
+```
+
+On a configured machine like this, the CLI uses:
+
+- output dir: `$MERMAID/records`
+- decoder python: `$MERMAID_RECORDS_DECODER_PYTHON`
+- decoder script: `$MERMAID_RECORDS_DECODER_SCRIPT`
+
+Explicit CLI arguments always override environment variables.
 
 The installed public CLI surface is intentionally small:
 
@@ -123,7 +171,7 @@ Invariant details:
 
 `BIN -> LOG` decode uses external automaid/preprocess code through a subprocess wrapper in `mermaid_records.bin2log`.
 
-The package does not auto-detect a conda environment name. Callers must supply:
+The package does not auto-detect a conda environment name. Callers must supply decoder paths either explicitly on the CLI or through environment variables:
 
 - the path to the Python executable for the automaid decoder environment
 - the path to `preprocess.py`
@@ -133,6 +181,13 @@ In practice this looks like:
 ```sh
 --decoder-python /path/to/conda/env/bin/python
 --decoder-script /path/to/automaid/scripts/preprocess.py
+```
+
+or:
+
+```sh
+export MERMAID_RECORDS_DECODER_PYTHON=/path/to/conda/env/bin/python
+export MERMAID_RECORDS_DECODER_SCRIPT=/path/to/automaid/scripts/preprocess.py
 ```
 
 If automaid expects environment variables such as `MERMAID`, set them before running the decode-enabled scripts.

@@ -10,10 +10,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
 from .bin2log import Bin2LogConfig
+from .discovery import iter_bin_files
 from .normalize_pipeline import run_normalization_pipeline
 
 
@@ -49,7 +51,6 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output-dir",
         type=Path,
-        required=True,
         help="Directory where normalized JSONL outputs will be written.",
     )
     normalize.add_argument(
@@ -97,21 +98,41 @@ def main(argv: list[str] | None = None) -> int:
 def _handle_normalize(args: argparse.Namespace) -> int:
     """Handle the normalize subcommand."""
 
+    output_dir = _resolve_output_dir(args.output_dir)
+    input_files = _parse_input_files(args.input_file)
+    decoder_required = _decoder_required(input_root=args.input_root, input_files=input_files)
     config = None
-    if args.decoder_python is not None or args.decoder_script is not None:
-        if args.decoder_python is None or args.decoder_script is None:
-            raise SystemExit("--decoder-python and --decoder-script must be provided together")
+    decoder_python = _resolve_decoder_python(args.decoder_python)
+    decoder_script = _resolve_decoder_script(args.decoder_script)
+    if decoder_required:
+        if decoder_python is None:
+            raise SystemExit(
+                "BIN inputs require a decoder Python. Provide --decoder-python or set "
+                "MERMAID_RECORDS_DECODER_PYTHON."
+            )
+        if decoder_script is None:
+            raise SystemExit(
+                "BIN inputs require a decoder script. Provide --decoder-script or set "
+                "MERMAID_RECORDS_DECODER_SCRIPT."
+            )
+    if decoder_python is not None or decoder_script is not None:
+        if decoder_python is None or decoder_script is None:
+            raise SystemExit(
+                "--decoder-python and --decoder-script must be provided together, either "
+                "explicitly or via MERMAID_RECORDS_DECODER_PYTHON and "
+                "MERMAID_RECORDS_DECODER_SCRIPT."
+            )
         config = Bin2LogConfig(
-            python_executable=args.decoder_python,
-            decoder_script=args.decoder_script,
+            python_executable=decoder_python,
+            decoder_script=decoder_script,
             preflight_mode=args.preflight_mode,
         )
 
     summary = run_normalization_pipeline(
         args.input_root,
-        output_dir=args.output_dir,
+        output_dir=output_dir,
         config=config,
-        input_files=_parse_input_files(args.input_file),
+        input_files=input_files,
         dry_run=args.dry_run,
         progress=_cli_progress,
     )
@@ -137,6 +158,42 @@ def _parse_input_files(values: list[list[str]] | None) -> list[Path] | None:
                 if token:
                     paths.append(Path(token))
     return paths
+
+
+def _resolve_output_dir(output_dir: Path | None) -> Path:
+    if output_dir is not None:
+        return output_dir
+    mermaid_root = os.environ.get("MERMAID")
+    if mermaid_root:
+        return Path(mermaid_root) / "records"
+    raise SystemExit(
+        "Output directory is unresolved: --output-dir was not given and MERMAID is not set. "
+        "Provide --output-dir or set MERMAID."
+    )
+
+
+def _resolve_decoder_python(decoder_python: Path | None) -> Path | None:
+    if decoder_python is not None:
+        return decoder_python
+    configured = os.environ.get("MERMAID_RECORDS_DECODER_PYTHON")
+    return Path(configured) if configured else None
+
+
+def _resolve_decoder_script(decoder_script: Path | None) -> Path | None:
+    if decoder_script is not None:
+        return decoder_script
+    configured = os.environ.get("MERMAID_RECORDS_DECODER_SCRIPT")
+    return Path(configured) if configured else None
+
+
+def _decoder_required(
+    *,
+    input_root: Path | None,
+    input_files: list[Path] | None,
+) -> bool:
+    if input_root is not None:
+        return any(True for _ in iter_bin_files(input_root))
+    return any(path.suffix.upper() == ".BIN" for path in input_files or [])
 
 
 def _format_dry_run(payload: dict[str, object]) -> str:
