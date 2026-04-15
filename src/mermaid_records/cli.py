@@ -13,10 +13,11 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 
 from .bin2log import Bin2LogConfig
 from .discovery import iter_bin_files
-from .normalize_pipeline import run_normalization_pipeline
+from .normalize_pipeline import DryRunSummary, NormalizationPipelineSummary, run_normalization_pipeline
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -81,6 +82,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print dry-run output as structured JSON instead of a human-readable plan.",
     )
+    normalize.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Print an expanded end-of-run summary.",
+    )
     normalize.set_defaults(handler=_handle_normalize)
 
     return parser
@@ -98,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
 def _handle_normalize(args: argparse.Namespace) -> int:
     """Handle the normalize subcommand."""
 
+    started = time.perf_counter()
     output_dir = _resolve_output_dir(args.output_dir)
     input_files = _parse_input_files(args.input_file)
     decoder_required = _decoder_required(input_root=args.input_root, input_files=input_files)
@@ -136,11 +144,12 @@ def _handle_normalize(args: argparse.Namespace) -> int:
         dry_run=args.dry_run,
         progress=_cli_progress,
     )
+    elapsed_s = time.perf_counter() - started
     payload = summary.to_dict()
-    if args.dry_run and not args.json:
-        print(_format_dry_run(payload))
-    else:
+    if args.dry_run and args.json:
         print(json.dumps(payload, sort_keys=True))
+    else:
+        print(_format_run_summary(summary, elapsed_s=elapsed_s, verbose=args.verbose))
     return 0
 
 
@@ -220,6 +229,88 @@ def _format_dry_run(payload: dict[str, object]) -> str:
                 lines.append("    decoder-invalidated:")
                 for row in family["decoder_invalidated"]:
                     lines.append(f"      - {_format_diff_row(row)}")
+    return "\n".join(lines)
+
+
+def _format_run_summary(
+    summary: NormalizationPipelineSummary | DryRunSummary,
+    *,
+    elapsed_s: float,
+    verbose: bool,
+) -> str:
+    metrics = summary.metrics
+    lines = [
+        "DRY RUN SUMMARY" if isinstance(summary, DryRunSummary) else "NORMALIZATION SUMMARY",
+        f"  mode: {summary.mode}",
+        f"  raw files processed: {metrics.raw_files_processed}",
+        (
+            "  raw files: "
+            f"new={metrics.raw_files_new} changed={metrics.raw_files_changed} "
+            f"removed={metrics.raw_files_removed}"
+        ),
+        (
+            "  floats: "
+            f"append={metrics.floats_append} rewrite={metrics.floats_rewrite} "
+            f"noop={metrics.floats_noop}"
+        ),
+    ]
+
+    if isinstance(summary, DryRunSummary):
+        lines.append(
+            "  output totals: "
+            "log records written=not evaluated log records removed=not evaluated "
+            "mer records written=not evaluated mer records removed=not evaluated"
+        )
+        lines.append(
+            "  issues: "
+            "malformed log lines=not evaluated skipped log files=not evaluated "
+            "malformed mer blocks=not evaluated skipped mer files=not evaluated"
+        )
+    else:
+        lines.append(
+            "  output totals: "
+            f"log records written={metrics.log_records_written} "
+            f"log records removed={metrics.log_records_removed} "
+            f"mer records written={metrics.mer_records_written} "
+            f"mer records removed={metrics.mer_records_removed}"
+        )
+        lines.append(
+            "  issues: "
+            f"malformed log lines={metrics.malformed_log_lines} "
+            f"skipped log files={metrics.skipped_log_files} "
+            f"malformed mer blocks={metrics.malformed_mer_blocks} "
+            f"skipped mer files={metrics.skipped_mer_files}"
+        )
+
+    lines.append(
+        "  decode: "
+        f"bin files decoded={metrics.bin_files_decoded} "
+        f"preflight mode={metrics.preflight_mode or 'n/a'}"
+    )
+    lines.append(f"  runtime: total wall-clock time={elapsed_s:.2f}s")
+
+    if verbose:
+        lines.extend(
+            [
+                "  family actions:",
+                (
+                    "    log: "
+                    f"append={metrics.log_floats_append} rewrite={metrics.log_floats_rewrite} "
+                    f"noop={metrics.log_floats_noop}"
+                ),
+                (
+                    "    mer: "
+                    f"append={metrics.mer_floats_append} rewrite={metrics.mer_floats_rewrite} "
+                    f"noop={metrics.mer_floats_noop}"
+                ),
+                f"  output root: {summary.output_dir}",
+            ]
+        )
+        if summary.input_root is not None:
+            lines.append(f"  input root: {summary.input_root}")
+        if summary.input_files:
+            lines.append(f"  explicit input files: {len(summary.input_files)}")
+
     return "\n".join(lines)
 
 

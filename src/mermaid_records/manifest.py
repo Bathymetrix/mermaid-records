@@ -126,6 +126,19 @@ def latest_source_state(float_output_dir: Path) -> dict[str, object] | None:
     return json.loads(source_state_path.read_text(encoding="utf-8"))
 
 
+def latest_outputs_manifest(float_output_dir: Path) -> dict[str, object] | None:
+    """Load the latest persisted outputs manifest for one float, if present."""
+
+    latest_path = float_output_dir / "manifests" / "latest.json"
+    if not latest_path.exists():
+        return None
+    latest = json.loads(latest_path.read_text(encoding="utf-8"))
+    outputs_manifest_path = float_output_dir / latest["outputs_manifest"]
+    if not outputs_manifest_path.exists():
+        return None
+    return json.loads(outputs_manifest_path.read_text(encoding="utf-8"))
+
+
 def output_dir_contains_manifests(output_dir: Path) -> bool:
     """Return whether the output tree already contains manifests."""
 

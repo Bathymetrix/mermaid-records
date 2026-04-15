@@ -16,8 +16,10 @@ from .bin2log import Bin2LogConfig, decode_workspace_logs, prepare_decode_worksp
 from .discovery import iter_bin_files, iter_log_files, iter_mer_files
 from .manifest import (
     begin_float_run,
+    build_outputs_manifest,
     build_source_state,
     finalize_float_run,
+    latest_outputs_manifest,
     latest_source_state,
     output_dir_contains_manifests,
     record_pruned_sources,
@@ -69,6 +71,7 @@ class NormalizationPipelineSummary:
     input_files: list[str]
     output_dir: str
     processed_floats: list[FloatRunSummary]
+    metrics: RunMetrics
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable summary payload."""
@@ -85,11 +88,41 @@ class DryRunSummary:
     input_files: list[str]
     output_dir: str
     floats: list[dict[str, object]]
+    metrics: RunMetrics
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable summary payload."""
 
         return asdict(self)
+
+
+@dataclass(slots=True)
+class RunMetrics:
+    """Aggregate counts for CLI end-of-run summaries."""
+
+    raw_files_processed: int = 0
+    raw_files_new: int = 0
+    raw_files_changed: int = 0
+    raw_files_removed: int = 0
+    floats_append: int = 0
+    floats_rewrite: int = 0
+    floats_noop: int = 0
+    log_floats_append: int = 0
+    log_floats_rewrite: int = 0
+    log_floats_noop: int = 0
+    mer_floats_append: int = 0
+    mer_floats_rewrite: int = 0
+    mer_floats_noop: int = 0
+    log_records_written: int = 0
+    log_records_removed: int = 0
+    mer_records_written: int = 0
+    mer_records_removed: int = 0
+    malformed_log_lines: int = 0
+    skipped_log_files: int = 0
+    malformed_mer_blocks: int = 0
+    skipped_mer_files: int = 0
+    bin_files_decoded: int = 0
+    preflight_mode: str | None = None
 
 
 def run_normalization_pipeline(
@@ -143,6 +176,7 @@ def _run_stateful(
     all_group_keys = sorted(set(grouped_sources) | set(previous_outputs))
     normalization_version = _normalization_version()
     planned_floats: list[PlannedFloatRun] = []
+    metrics = RunMetrics(preflight_mode=config.preflight_mode if config is not None else None)
 
     for group_key in all_group_keys:
         current_sources = grouped_sources.get(group_key, [])
@@ -213,8 +247,14 @@ def _run_stateful(
                 input_file_diffs=input_file_diffs,
             )
         )
+        _accumulate_diff_metrics(metrics, input_file_diffs)
+        _accumulate_action_metrics(metrics, summary)
 
     if dry_run:
+        metrics.bin_files_decoded = sum(
+            len(_rewrite_paths(plan.summary.log_action, plan.current_sources, plan.log_diff, "bin"))
+            for plan in planned_floats
+        )
         _emit_progress(progress, "Dry-run planning complete")
         return DryRunSummary(
             mode="stateful",
@@ -222,6 +262,7 @@ def _run_stateful(
             input_files=[],
             output_dir=output_dir.as_posix(),
             floats=[_dry_run_float_payload(plan) for plan in planned_floats],
+            metrics=metrics,
         )
 
     processed_floats: list[FloatRunSummary] = []
@@ -229,6 +270,7 @@ def _run_stateful(
         current_sources = plan.current_sources
         summary = plan.summary
         _emit_progress(progress, f"Processing float {summary.float_id}")
+        previous_outputs = latest_outputs_manifest(plan.float_output_dir)
 
         record_pruned_sources(
             float_output_dir=plan.float_output_dir,
@@ -249,14 +291,17 @@ def _run_stateful(
         skipped_log_files: list[dict[str, object]] = []
         malformed_mer_blocks: list[dict[str, object]] = []
         skipped_mer_files: list[dict[str, object]] = []
+        log_paths = _rewrite_paths(summary.log_action, current_sources, plan.log_diff, "log")
+        bin_paths = _rewrite_paths(summary.log_action, current_sources, plan.log_diff, "bin")
+        mer_paths = _rewrite_paths(summary.mer_action, current_sources, plan.mer_diff, "mer")
 
         error: BaseException | None = None
         try:
             _execute_log_family(
                 float_output_dir=plan.float_output_dir,
                 action=summary.log_action,
-                log_paths=_rewrite_paths(summary.log_action, current_sources, plan.log_diff, "log"),
-                bin_paths=_rewrite_paths(summary.log_action, current_sources, plan.log_diff, "bin"),
+                log_paths=log_paths,
+                bin_paths=bin_paths,
                 config=config,
                 float_id=summary.float_id,
                 progress=progress,
@@ -267,7 +312,7 @@ def _run_stateful(
             _execute_mer_family(
                 float_output_dir=plan.float_output_dir,
                 action=summary.mer_action,
-                mer_paths=_rewrite_paths(summary.mer_action, current_sources, plan.mer_diff, "mer"),
+                mer_paths=mer_paths,
                 float_id=summary.float_id,
                 progress=progress,
                 run_id=run_id,
@@ -290,6 +335,21 @@ def _run_stateful(
                 skipped_mer_files=skipped_mer_files,
             )
 
+        _accumulate_issue_metrics(
+            metrics,
+            malformed_log_lines=malformed_log_lines,
+            skipped_log_files=skipped_log_files,
+            malformed_mer_blocks=malformed_mer_blocks,
+            skipped_mer_files=skipped_mer_files,
+        )
+        metrics.bin_files_decoded += len(bin_paths) if summary.log_action != "noop" else 0
+        _accumulate_output_metrics(
+            metrics,
+            previous_outputs=previous_outputs,
+            current_outputs=build_outputs_manifest(plan.float_output_dir),
+            log_action=summary.log_action,
+            mer_action=summary.mer_action,
+        )
         processed_floats.append(summary)
 
     return NormalizationPipelineSummary(
@@ -298,6 +358,7 @@ def _run_stateful(
         input_files=[],
         output_dir=output_dir.as_posix(),
         processed_floats=processed_floats,
+        metrics=metrics,
     )
 
 
@@ -321,6 +382,7 @@ def _run_stateless(
     normalization_version = _normalization_version()
     processed_floats: list[FloatRunSummary] = []
     dry_run_floats: list[dict[str, object]] = []
+    metrics = RunMetrics(preflight_mode=config.preflight_mode if config is not None else None)
 
     for group_key, current_sources in sorted(grouped_sources.items()):
         if any(path.suffix.upper() == ".BIN" for path in current_sources) and config is None:
@@ -362,7 +424,10 @@ def _run_stateless(
             mer_action="append" if _has_kind(current_sources, "mer") else "noop",
             decoder_state_invalidated=False,
         )
+        _accumulate_diff_metrics(metrics, input_file_diffs)
+        _accumulate_action_metrics(metrics, summary)
         if dry_run:
+            metrics.bin_files_decoded += _count_kind(current_sources, "bin")
             dry_run_floats.append(
                 _dry_run_float_payload(
                     PlannedFloatRun(
@@ -378,27 +443,49 @@ def _run_stateless(
             continue
 
         _emit_progress(progress, f"Processing float {summary.float_id}")
+        malformed_log_lines: list[dict[str, object]] = []
+        skipped_log_files: list[dict[str, object]] = []
+        malformed_mer_blocks: list[dict[str, object]] = []
+        skipped_mer_files: list[dict[str, object]] = []
+        log_paths = _selected_paths(current_sources, {"log"})
+        bin_paths = _selected_paths(current_sources, {"bin"})
+        mer_paths = _selected_paths(current_sources, {"mer"})
         _execute_log_family(
             float_output_dir=float_output_dir,
             action="append",
-            log_paths=_selected_paths(current_sources, {"log"}),
-            bin_paths=_selected_paths(current_sources, {"bin"}),
+            log_paths=log_paths,
+            bin_paths=bin_paths,
             config=config,
             float_id=summary.float_id,
             progress=progress,
-            run_id=None,
-            malformed_log_lines=None,
-            skipped_log_files=None,
+            run_id="stateless",
+            malformed_log_lines=malformed_log_lines,
+            skipped_log_files=skipped_log_files,
         )
         _execute_mer_family(
             float_output_dir=float_output_dir,
             action="append",
-            mer_paths=_selected_paths(current_sources, {"mer"}),
+            mer_paths=mer_paths,
             float_id=summary.float_id,
             progress=progress,
-            run_id=None,
-            malformed_mer_blocks=None,
-            skipped_mer_files=None,
+            run_id="stateless",
+            malformed_mer_blocks=malformed_mer_blocks,
+            skipped_mer_files=skipped_mer_files,
+        )
+        _accumulate_issue_metrics(
+            metrics,
+            malformed_log_lines=malformed_log_lines,
+            skipped_log_files=skipped_log_files,
+            malformed_mer_blocks=malformed_mer_blocks,
+            skipped_mer_files=skipped_mer_files,
+        )
+        metrics.bin_files_decoded += len(bin_paths)
+        _accumulate_output_metrics(
+            metrics,
+            previous_outputs=None,
+            current_outputs=build_outputs_manifest(float_output_dir),
+            log_action=summary.log_action,
+            mer_action=summary.mer_action,
         )
         processed_floats.append(summary)
 
@@ -410,6 +497,7 @@ def _run_stateless(
             input_files=[path.as_posix() for path in sorted(input_files)],
             output_dir=output_dir.as_posix(),
             floats=dry_run_floats,
+            metrics=metrics,
         )
 
     return NormalizationPipelineSummary(
@@ -418,6 +506,7 @@ def _run_stateless(
         input_files=[path.as_posix() for path in sorted(input_files)],
         output_dir=output_dir.as_posix(),
         processed_floats=processed_floats,
+        metrics=metrics,
     )
 
 
@@ -873,6 +962,97 @@ def _rewrite_paths(
     if action == "rewrite":
         return _selected_paths(current_sources, {kind})
     return _paths_from_sources([item for item in diff["added"] if item["source_kind"] == kind])
+
+
+def _accumulate_diff_metrics(metrics: RunMetrics, rows: list[dict[str, object]]) -> None:
+    metrics.raw_files_processed += len(rows)
+    for row in rows:
+        if row["change_kind"] == "new":
+            metrics.raw_files_new += 1
+        elif row["change_kind"] == "changed":
+            metrics.raw_files_changed += 1
+        elif row["change_kind"] == "removed":
+            metrics.raw_files_removed += 1
+
+
+def _accumulate_action_metrics(metrics: RunMetrics, summary: FloatRunSummary) -> None:
+    overall_action = _overall_float_action(summary)
+    if overall_action == "append":
+        metrics.floats_append += 1
+    elif overall_action == "rewrite":
+        metrics.floats_rewrite += 1
+    else:
+        metrics.floats_noop += 1
+
+    if summary.log_action == "append":
+        metrics.log_floats_append += 1
+    elif summary.log_action == "rewrite":
+        metrics.log_floats_rewrite += 1
+    else:
+        metrics.log_floats_noop += 1
+
+    if summary.mer_action == "append":
+        metrics.mer_floats_append += 1
+    elif summary.mer_action == "rewrite":
+        metrics.mer_floats_rewrite += 1
+    else:
+        metrics.mer_floats_noop += 1
+
+
+def _accumulate_issue_metrics(
+    metrics: RunMetrics,
+    *,
+    malformed_log_lines: list[dict[str, object]],
+    skipped_log_files: list[dict[str, object]],
+    malformed_mer_blocks: list[dict[str, object]],
+    skipped_mer_files: list[dict[str, object]],
+) -> None:
+    metrics.malformed_log_lines += len(malformed_log_lines)
+    metrics.skipped_log_files += len(skipped_log_files)
+    metrics.malformed_mer_blocks += len(malformed_mer_blocks)
+    metrics.skipped_mer_files += len(skipped_mer_files)
+
+
+def _accumulate_output_metrics(
+    metrics: RunMetrics,
+    *,
+    previous_outputs: dict[str, object] | None,
+    current_outputs: dict[str, object],
+    log_action: str,
+    mer_action: str,
+) -> None:
+    previous_counts = previous_outputs.get("counts", {}) if previous_outputs is not None else {}
+    current_counts = current_outputs.get("counts", {})
+
+    if log_action == "append":
+        metrics.log_records_written += max(
+            0,
+            _sum_counts(current_counts, "log_") - _sum_counts(previous_counts, "log_"),
+        )
+    elif log_action == "rewrite":
+        metrics.log_records_written += _sum_counts(current_counts, "log_")
+        metrics.log_records_removed += _sum_counts(previous_counts, "log_")
+
+    if mer_action == "append":
+        metrics.mer_records_written += max(
+            0,
+            _sum_counts(current_counts, "mer_") - _sum_counts(previous_counts, "mer_"),
+        )
+    elif mer_action == "rewrite":
+        metrics.mer_records_written += _sum_counts(current_counts, "mer_")
+        metrics.mer_records_removed += _sum_counts(previous_counts, "mer_")
+
+
+def _sum_counts(counts: dict[str, object], prefix: str) -> int:
+    return sum(int(value) for key, value in counts.items() if key.startswith(prefix))
+
+
+def _overall_float_action(summary: FloatRunSummary) -> str:
+    if "rewrite" in {summary.log_action, summary.mer_action}:
+        return "rewrite"
+    if "append" in {summary.log_action, summary.mer_action}:
+        return "append"
+    return "noop"
 
 
 def _dry_run_float_payload(plan: PlannedFloatRun) -> dict[str, object]:
