@@ -454,6 +454,58 @@ def test_stateful_logs_malformed_mer_blocks_and_continues(tmp_path: Path) -> Non
     assert _jsonl_lines(run_dir / "skipped_mer_files.jsonl") == []
 
 
+def test_stateful_logs_incomplete_mer_data_block_and_continues(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    mer_path = input_root / "0100_incomplete_data.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<MISC UPLOAD_MAX=100kB />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 FNAME=bad.000000 SMP_OFFSET=1 TRUE_FS=40.0 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=12 />\n"
+            "\t<DATA>\n\rABCDEF\n"
+            "</EVENT>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-08T01:02:03 FNAME=good.000000 SMP_OFFSET=2 TRUE_FS=40.0 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=3 />\n"
+            "\t<DATA>GOOD</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    malformed_rows = _jsonl_lines(run_dir / "malformed_mer_blocks.jsonl")
+    data_rows = _jsonl_lines(output_root / "467.174-T-0100" / "mer_data_records.jsonl")
+
+    assert len(data_rows) == 1
+    assert data_rows[0]["fname"] == "good.000000"
+    assert malformed_rows == [
+        {
+            "block_index": 0,
+            "block_kind": "event_data",
+            "error": "incomplete DATA block: missing </DATA>",
+            "float_id": "T0100",
+            "raw_block": malformed_rows[0]["raw_block"],
+            "run_id": latest["run_id"],
+            "source_file": mer_path.as_posix(),
+        }
+    ]
+    assert "<DATA>" in malformed_rows[0]["raw_block"]
+
+
 def test_stateful_records_skipped_mer_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()

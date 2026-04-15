@@ -350,6 +350,12 @@ def _build_data_record(
     format_attrs = _parse_attributes(raw_format_line)
     unknown_info_keys = set(info_attrs) - set(_INFO_FIELDS)
     unknown_format_keys = set(format_attrs) - set(_FORMAT_FIELDS)
+    actual_payload_nbytes = len(data_payload) if data_payload is not None else 0
+    expected_payload_nbytes = _expected_payload_nbytes(format_attrs)
+    if expected_payload_nbytes is None:
+        payload_length_matches_expected = None
+    else:
+        payload_length_matches_expected = actual_payload_nbytes == expected_payload_nbytes
 
     record = {
         **_common_mer_record_fields(float_id, path),
@@ -371,11 +377,21 @@ def _build_data_record(
         "stages": format_attrs.get("STAGES"),
         "normalized": format_attrs.get("NORMALIZED"),
         "length": format_attrs.get("LENGTH"),
-        "data_payload_nbytes": len(data_payload) if data_payload is not None else 0,
+        "data_payload_nbytes": actual_payload_nbytes,
+        "expected_payload_nbytes": expected_payload_nbytes,
+        "payload_length_matches_expected": payload_length_matches_expected,
         "raw_info_line": raw_info_line,
         "raw_format_line": raw_format_line,
     }
     return record, unknown_info_keys, unknown_format_keys
+
+
+def _expected_payload_nbytes(format_attrs: dict[str, str]) -> int | None:
+    length = format_attrs.get("LENGTH")
+    bytes_per_sample = format_attrs.get("BYTES_PER_SAMPLE")
+    if length is None or bytes_per_sample is None:
+        return None
+    return int(length) * int(bytes_per_sample)
 
 
 def _environment_raw_values(

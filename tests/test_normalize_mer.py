@@ -129,6 +129,8 @@ def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_data_row
     assert data_records[0]["smp_offset"] == "614054"
     assert data_records[0]["true_fs"] == "40.014107"
     assert data_records[0]["data_payload_nbytes"] == 3
+    assert data_records[0]["expected_payload_nbytes"] == 19328
+    assert data_records[0]["payload_length_matches_expected"] is False
     assert data_records[0]["raw_info_line"] == (
         '<INFO DATE=2024-02-07T22:47:22 FNAME=2024-02-07T22_47_22.000000 '
         'SMP_OFFSET=614054 TRUE_FS=40.014107 />'
@@ -142,6 +144,8 @@ def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_data_row
     assert data_records[1]["detrig"] == "5819"
     assert data_records[1]["length"] == "1024"
     assert data_records[1]["data_payload_nbytes"] == 4
+    assert data_records[1]["expected_payload_nbytes"] == 4096
+    assert data_records[1]["payload_length_matches_expected"] is False
     assert "record_time" not in data_records[1]
     assert "time" not in data_records[1]
     assert all(record["float_id"] == "0100" for record in data_records)
@@ -295,6 +299,72 @@ def test_write_mer_jsonl_prototypes_counts_zero_event_files(tmp_path: Path) -> N
     assert summary.zero_event_files == 1
     assert summary.total_event_blocks == 0
     assert _read_jsonl(output_dir / "mer_data_records.jsonl") == []
+
+
+def test_write_mer_jsonl_prototypes_excludes_data_framing_bytes_from_payload_length(
+    tmp_path: Path,
+) -> None:
+    mer_path = tmp_path / "0100_framed.MER"
+    payload = b"A" * 19328
+    mer_path.write_bytes(
+        (
+            b"<ENVIRONMENT>\n"
+            b"\t<BOARD 452116600-A0 />\n"
+            b"</ENVIRONMENT>\n"
+            b"<PARAMETERS>\n"
+            b"\t<MISC UPLOAD_MAX=100kB />\n"
+            b"</PARAMETERS>\n"
+            b"<EVENT>\n"
+            b"\t<INFO DATE=2024-02-07T22:47:22 FNAME=framed.000000 SMP_OFFSET=614054 TRUE_FS=40.014107 />\n"
+            b"\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            b"STAGES=5 NORMALIZED=YES LENGTH=4832 />\n"
+            b"\t<DATA>\n\r"
+            + payload
+            + b"\n\r\t</DATA>\n"
+            b"</EVENT>\n"
+        )
+    )
+
+    output_dir = tmp_path / "jsonl"
+    write_mer_jsonl_prototypes([mer_path], output_dir)
+    data_records = _read_jsonl(output_dir / "mer_data_records.jsonl")
+
+    assert data_records[0]["data_payload_nbytes"] == 19328
+    assert data_records[0]["expected_payload_nbytes"] == 19328
+    assert data_records[0]["payload_length_matches_expected"] is True
+
+
+def test_write_mer_jsonl_prototypes_reports_payload_length_mismatch(
+    tmp_path: Path,
+) -> None:
+    mer_path = tmp_path / "0100_payload_mismatch.MER"
+    payload = b"B" * 7
+    mer_path.write_bytes(
+        (
+            b"<ENVIRONMENT>\n"
+            b"\t<BOARD 452116600-A0 />\n"
+            b"</ENVIRONMENT>\n"
+            b"<PARAMETERS>\n"
+            b"\t<MISC UPLOAD_MAX=100kB />\n"
+            b"</PARAMETERS>\n"
+            b"<EVENT>\n"
+            b"\t<INFO DATE=2024-02-07T22:47:22 FNAME=mismatch.000000 SMP_OFFSET=1 TRUE_FS=40.0 />\n"
+            b"\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            b"STAGES=5 NORMALIZED=YES LENGTH=2 />\n"
+            b"\t<DATA>\n\r"
+            + payload
+            + b"\n\r\t</DATA>\n"
+            b"</EVENT>\n"
+        )
+    )
+
+    output_dir = tmp_path / "jsonl"
+    write_mer_jsonl_prototypes([mer_path], output_dir)
+    data_records = _read_jsonl(output_dir / "mer_data_records.jsonl")
+
+    assert data_records[0]["data_payload_nbytes"] == 7
+    assert data_records[0]["expected_payload_nbytes"] == 8
+    assert data_records[0]["payload_length_matches_expected"] is False
 
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:

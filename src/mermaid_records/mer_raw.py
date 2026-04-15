@@ -18,8 +18,12 @@ _SECTION_RE = re.compile(
 _EVENT_RE = re.compile(rb"<EVENT>(?P<body>.*?)</EVENT>", re.DOTALL)
 _INFO_RE = re.compile(rb"<INFO (?P<body>[^>]+)/>")
 _FORMAT_RE = re.compile(rb"<FORMAT (?P<body>[^>]+)/>")
-_DATA_RE = re.compile(rb"<DATA>(?P<body>.*?)</DATA>", re.DOTALL)
 _ATTR_RE = re.compile(r'([A-Za-z_]+)=([^\s>]+)')
+
+_DATA_OPEN_TAG = b"<DATA>"
+_DATA_CLOSE_TAG = b"</DATA>"
+_DATA_LEADING_FRAME = b"\n\r"
+_DATA_TRAILING_FRAME = b"\n\r\t"
 
 type MalformedMerBlockCallback = Callable[[int | None, str, str, str], None]
 
@@ -114,7 +118,17 @@ def iter_mer_data_blocks_recoverable(
         raw_block = event_match.group(0).decode("ascii", "ignore")
         info_line = _extract_tag_line(event_body, _INFO_RE)
         format_line = _extract_tag_line(event_body, _FORMAT_RE)
-        payload = _extract_payload(event_body)
+        try:
+            payload = _extract_payload(event_body)
+        except ValueError as exc:
+            _report_malformed_block(
+                on_malformed_block,
+                block_index=block_index,
+                block_kind="event_data",
+                raw_block=raw_block,
+                error=str(exc),
+            )
+            continue
 
         if info_line is None:
             _report_malformed_block(
@@ -415,12 +429,26 @@ def _extract_tag_line(event_body: bytes, pattern: re.Pattern[bytes]) -> str | No
 
 
 def _extract_payload(event_body: bytes) -> bytes | None:
-    """Extract the raw bytes inside a DATA tag."""
+    """Extract the raw DATA payload bytes without delimiter framing."""
 
-    match = _DATA_RE.search(event_body)
-    if match is None:
+    start = event_body.find(_DATA_OPEN_TAG)
+    if start == -1:
         return None
-    return match.group("body")
+    payload_start = start + len(_DATA_OPEN_TAG)
+    if event_body[payload_start : payload_start + len(_DATA_LEADING_FRAME)] == _DATA_LEADING_FRAME:
+        payload_start += len(_DATA_LEADING_FRAME)
+
+    end = event_body.find(_DATA_CLOSE_TAG, payload_start)
+    if end == -1:
+        raise ValueError("incomplete DATA block: missing </DATA>")
+
+    payload_end = end
+    if (
+        payload_end >= len(_DATA_TRAILING_FRAME)
+        and event_body[payload_end - len(_DATA_TRAILING_FRAME) : payload_end] == _DATA_TRAILING_FRAME
+    ):
+        payload_end -= len(_DATA_TRAILING_FRAME)
+    return event_body[payload_start:payload_end]
 
 
 def _parse_attributes(line: str | None) -> dict[str, str]:
