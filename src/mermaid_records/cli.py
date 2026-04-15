@@ -292,17 +292,19 @@ def _format_run_summary(
     if verbose:
         lines.extend(
             [
-                "  family actions:",
+                "    family actions:",
                 (
-                    "    log: "
+                    "      log: "
                     f"append={metrics.log_floats_append} rewrite={metrics.log_floats_rewrite} "
                     f"noop={metrics.log_floats_noop}"
                 ),
                 (
-                    "    mer: "
+                    "      mer: "
                     f"append={metrics.mer_floats_append} rewrite={metrics.mer_floats_rewrite} "
                     f"noop={metrics.mer_floats_noop}"
                 ),
+                "      per-instrument actions:",
+                *_format_per_instrument_outputs(summary),
                 f"  output root: {summary.output_dir}",
             ]
         )
@@ -312,6 +314,33 @@ def _format_run_summary(
             lines.append(f"  explicit input files: {len(summary.input_files)}")
 
     return "\n".join(lines)
+
+
+def _format_per_instrument_outputs(
+    summary: NormalizationPipelineSummary | DryRunSummary,
+) -> list[str]:
+    if isinstance(summary, NormalizationPipelineSummary):
+        return [
+            (
+                f"        {Path(item.output_dir).name}: "
+                f"log_family={item.log_action} mer_family={item.mer_action} | "
+                f"sources bin={item.bin_count} log={item.log_count} mer={item.mer_count}"
+            )
+            for item in summary.processed_floats
+        ]
+
+    return [
+        (
+            f"        {Path(item['output_dir']).name}: "
+            f"log_family={item['families']['log']['action']} "
+            f"mer_family={item['families']['mer']['action']} | "
+            f"sources "
+            f"bin={sum(1 for row in item['families']['log']['file_diffs'] if row['source_kind'] == 'bin')} "
+            f"log={sum(1 for row in item['families']['log']['file_diffs'] if row['source_kind'] == 'log')} "
+            f"mer={sum(1 for row in item['families']['mer']['file_diffs'] if row['source_kind'] == 'mer')}"
+        )
+        for item in summary.floats
+    ]
 
 
 def _format_diff_row(row: dict[str, object]) -> str:

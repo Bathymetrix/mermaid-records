@@ -194,9 +194,10 @@ def test_normalize_cli_verbose_summary_expands_output(tmp_path: Path, capsys) ->
     captured = capsys.readouterr()
 
     assert result == 0
-    assert "family actions:" in captured.out
-    assert "log: append=1 rewrite=0 noop=0" in captured.out
-    assert "mer: append=0 rewrite=0 noop=1" in captured.out
+    assert "    family actions:" in captured.out
+    assert "      log: append=1 rewrite=0 noop=0" in captured.out
+    assert "      mer: append=0 rewrite=0 noop=1" in captured.out
+    assert "      per-instrument actions:" in captured.out
     assert f"output root: {output_dir.as_posix()}" in captured.out
     assert f"input root: {input_root.as_posix()}" in captured.out
 
@@ -225,7 +226,8 @@ def test_normalize_cli_short_verbose_flag_expands_output(tmp_path: Path, capsys)
     captured = capsys.readouterr()
 
     assert result == 0
-    assert "family actions:" in captured.out
+    assert "    family actions:" in captured.out
+    assert "      per-instrument actions:" in captured.out
     assert "output root:" in captured.out
 
 
