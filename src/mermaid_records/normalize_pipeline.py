@@ -245,6 +245,10 @@ def _run_stateful(
         )
         run_id = str(run_context["run_id"])
         input_file_diffs = [{**row, "run_id": run_id} for row in plan.input_file_diffs]
+        malformed_log_lines: list[dict[str, object]] = []
+        skipped_log_files: list[dict[str, object]] = []
+        malformed_mer_blocks: list[dict[str, object]] = []
+        skipped_mer_files: list[dict[str, object]] = []
 
         error: BaseException | None = None
         try:
@@ -256,6 +260,9 @@ def _run_stateful(
                 config=config,
                 float_id=summary.float_id,
                 progress=progress,
+                run_id=run_id,
+                malformed_log_lines=malformed_log_lines,
+                skipped_log_files=skipped_log_files,
             )
             _execute_mer_family(
                 float_output_dir=plan.float_output_dir,
@@ -263,6 +270,9 @@ def _run_stateful(
                 mer_paths=_rewrite_paths(summary.mer_action, current_sources, plan.mer_diff, "mer"),
                 float_id=summary.float_id,
                 progress=progress,
+                run_id=run_id,
+                malformed_mer_blocks=malformed_mer_blocks,
+                skipped_mer_files=skipped_mer_files,
             )
         except BaseException as exc:
             error = exc
@@ -274,6 +284,10 @@ def _run_stateful(
                 preflight_mode=config.preflight_mode if config is not None and _has_kind(current_sources, "bin") else None,
                 error=error,
                 input_file_diffs=_public_diff_rows(input_file_diffs),
+                malformed_log_lines=malformed_log_lines,
+                skipped_log_files=skipped_log_files,
+                malformed_mer_blocks=malformed_mer_blocks,
+                skipped_mer_files=skipped_mer_files,
             )
 
         processed_floats.append(summary)
@@ -372,6 +386,9 @@ def _run_stateless(
             config=config,
             float_id=summary.float_id,
             progress=progress,
+            run_id=None,
+            malformed_log_lines=None,
+            skipped_log_files=None,
         )
         _execute_mer_family(
             float_output_dir=float_output_dir,
@@ -379,6 +396,9 @@ def _run_stateless(
             mer_paths=_selected_paths(current_sources, {"mer"}),
             float_id=summary.float_id,
             progress=progress,
+            run_id=None,
+            malformed_mer_blocks=None,
+            skipped_mer_files=None,
         )
         processed_floats.append(summary)
 
@@ -410,6 +430,9 @@ def _execute_log_family(
     config: Bin2LogConfig | None,
     float_id: str,
     progress: ProgressCallback | None,
+    run_id: str | None,
+    malformed_log_lines: list[dict[str, object]] | None,
+    skipped_log_files: list[dict[str, object]] | None,
 ) -> None:
     destinations = [float_output_dir / filename for filename in LOG_OUTPUT_FILENAMES.values()]
     if action == "noop":
@@ -448,7 +471,14 @@ def _execute_log_family(
                 raise ValueError(
                     f"Error while decoding BIN source(s) {paths_text}: {exc}"
                 ) from exc
-        write_log_jsonl_prototypes(rendered_paths, temp_dir, float_id=float_id)
+        write_log_jsonl_prototypes(
+            rendered_paths,
+            temp_dir,
+            float_id=float_id,
+            run_id=run_id,
+            malformed_log_lines=malformed_log_lines,
+            skipped_log_files=skipped_log_files,
+        )
         if action == "append":
             _append_rendered_outputs(
                 temp_dir=temp_dir,
@@ -470,6 +500,9 @@ def _execute_mer_family(
     mer_paths: list[Path],
     float_id: str,
     progress: ProgressCallback | None,
+    run_id: str | None,
+    malformed_mer_blocks: list[dict[str, object]] | None,
+    skipped_mer_files: list[dict[str, object]] | None,
 ) -> None:
     destinations = [float_output_dir / filename for filename in MER_OUTPUT_FILENAMES.values()]
     if action == "noop":
@@ -484,7 +517,14 @@ def _execute_mer_family(
     float_output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mermaid-mer-family-") as tmpdir:
         temp_dir = Path(tmpdir)
-        write_mer_jsonl_prototypes(mer_paths, temp_dir, float_id=float_id)
+        write_mer_jsonl_prototypes(
+            mer_paths,
+            temp_dir,
+            float_id=float_id,
+            run_id=run_id,
+            malformed_mer_blocks=malformed_mer_blocks,
+            skipped_mer_files=skipped_mer_files,
+        )
         if action == "append":
             _append_rendered_outputs(
                 temp_dir=temp_dir,

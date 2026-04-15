@@ -11,7 +11,7 @@ from pathlib import Path
 import re
 from typing import Iterable
 
-from .mer_raw import parse_mer_file
+from .mer_raw import parse_mer_file, parse_mer_file_recoverable
 from .parse_float_name import maybe_parse_float_name
 
 OUTPUT_FILENAMES = {
@@ -111,6 +111,9 @@ def write_mer_jsonl_prototypes(
     output_dir: Path,
     *,
     float_id: str | None = None,
+    run_id: str | None = None,
+    malformed_mer_blocks: list[dict[str, object]] | None = None,
+    skipped_mer_files: list[dict[str, object]] | None = None,
 ) -> MerJsonlPrototypeSummary:
     """Write conservative MER-derived JSONL prototype streams."""
 
@@ -145,8 +148,33 @@ def write_mer_jsonl_prototypes(
         for path in sorted(Path(path) for path in mer_paths):
             try:
                 total_mer_files += 1
-                metadata, blocks = parse_mer_file(path)
                 path_float_id = float_id or _fallback_float_id(path)
+                def _record_malformed_block(
+                    block_index: int | None,
+                    block_kind: str,
+                    raw_block: str,
+                    error: str,
+                ) -> None:
+                    if malformed_mer_blocks is None or run_id is None:
+                        return
+                    malformed_mer_blocks.append(
+                        {
+                            "run_id": run_id,
+                            "float_id": path_float_id,
+                            "source_file": path.as_posix(),
+                            "block_index": block_index,
+                            "block_kind": block_kind,
+                            "raw_block": raw_block,
+                            "error": error,
+                        }
+                    )
+                if malformed_mer_blocks is not None and run_id is not None:
+                    metadata, blocks = parse_mer_file_recoverable(
+                        path,
+                        on_malformed_block=_record_malformed_block,
+                    )
+                else:
+                    metadata, blocks = parse_mer_file(path)
                 if not blocks:
                     zero_event_files += 1
 
@@ -226,6 +254,19 @@ def write_mer_jsonl_prototypes(
                     if file_unknown_format_keys:
                         details.append("FORMAT keys: " + ", ".join(sorted(file_unknown_format_keys)))
                     raise ValueError("Unhandled MER event fields observed: " + "; ".join(details))
+            except OSError as exc:
+                if skipped_mer_files is None or run_id is None:
+                    raise
+                skipped_mer_files.append(
+                    {
+                        "run_id": run_id,
+                        "float_id": path_float_id,
+                        "source_file": path.as_posix(),
+                        "error": str(exc),
+                        "skipped_at": _iso_now(),
+                    }
+                )
+                continue
             except Exception as exc:
                 raise ValueError(f"Error while normalizing MER file {path}: {exc}") from exc
 
@@ -387,3 +428,9 @@ def _fallback_float_id(path: Path) -> str:
 def _write_jsonl_line(handle, record: dict[str, object]) -> None:
     handle.write(json.dumps(record, sort_keys=True))
     handle.write("\n")
+
+
+def _iso_now() -> str:
+    from datetime import datetime, timezone
+
+    return datetime.now(timezone.utc).isoformat()

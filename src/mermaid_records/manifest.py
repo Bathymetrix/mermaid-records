@@ -54,6 +54,10 @@ def finalize_float_run(
     preflight_mode: str | None,
     error: BaseException | None,
     input_file_diffs: list[dict[str, object]] | None = None,
+    malformed_log_lines: list[dict[str, object]] | None = None,
+    skipped_log_files: list[dict[str, object]] | None = None,
+    malformed_mer_blocks: list[dict[str, object]] | None = None,
+    skipped_mer_files: list[dict[str, object]] | None = None,
 ) -> None:
     """Write per-float manifests for a completed or failed run."""
 
@@ -77,6 +81,10 @@ def finalize_float_run(
     _write_json(run_dir / "outputs.json", outputs_json)
     _write_json(run_dir / "source_state.json", source_state)
     _write_jsonl(run_dir / "input_file_diffs.jsonl", input_file_diffs or [])
+    _write_jsonl(run_dir / "malformed_log_lines.jsonl", malformed_log_lines or [])
+    _write_jsonl(run_dir / "skipped_log_files.jsonl", skipped_log_files or [])
+    _write_jsonl(run_dir / "malformed_mer_blocks.jsonl", malformed_mer_blocks or [])
+    _write_jsonl(run_dir / "skipped_mer_files.jsonl", skipped_mer_files or [])
 
     preflight_root = float_output_dir / "preflight_status.json"
     if preflight_root.exists():

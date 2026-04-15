@@ -9,6 +9,8 @@ import sys
 import pytest
 
 from mermaid_records.bin2log import Bin2LogConfig
+import mermaid_records.normalize_log as normalize_log_module
+import mermaid_records.normalize_mer as normalize_mer_module
 from mermaid_records.normalize_pipeline import run_normalization_pipeline
 
 
@@ -328,6 +330,210 @@ def decrypt_all(path):
         )
 
     assert bin_path.as_posix() in str(excinfo.value)
+
+
+def test_stateful_logs_malformed_log_lines_and_continues(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    log_path = input_root / "0100_malformed.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[MAIN  ,0007]first",
+                "[DIVING,15",
+                "1700000001:[MAIN  ,0007]second",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    malformed_rows = _jsonl_lines(run_dir / "malformed_log_lines.jsonl")
+    operational_rows = _jsonl_lines(output_root / "467.174-T-0100" / "log_operational_records.jsonl")
+
+    assert [row["message"] for row in operational_rows] == ["first", "second"]
+    assert malformed_rows == [
+        {
+            "error": "line does not match expected LOG pattern",
+            "float_id": "T0100",
+            "line_number": 2,
+            "raw_line": "[DIVING,15",
+            "run_id": latest["run_id"],
+            "source_file": log_path.as_posix(),
+        }
+    ]
+    assert _jsonl_lines(run_dir / "skipped_log_files.jsonl") == []
+
+
+def test_stateful_records_skipped_log_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    log_path = input_root / "0100_broken.LOG"
+    _write_log(log_path, "first")
+
+    def _raise_unreadable(path: Path, *, on_malformed_line=None):
+        raise OSError("simulated unreadable log")
+        yield  # pragma: no cover
+
+    monkeypatch.setattr(normalize_log_module, "iter_operational_log_entries", _raise_unreadable)
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    skipped_rows = _jsonl_lines(run_dir / "skipped_log_files.jsonl")
+
+    assert skipped_rows == [
+        {
+            "error": "simulated unreadable log",
+            "float_id": "T0100",
+            "run_id": latest["run_id"],
+            "source_file": log_path.as_posix(),
+            "skipped_at": skipped_rows[0]["skipped_at"],
+        }
+    ]
+    assert _jsonl_lines(run_dir / "malformed_log_lines.jsonl") == []
+
+
+def test_stateful_logs_malformed_mer_blocks_and_continues(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    mer_path = input_root / "0100_malformed.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<BOARD 452116600-A0 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "\t<MISC UPLOAD_MAX=100kB />\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22 FNAME=bad.000000 SMP_OFFSET=1 TRUE_FS=40.0 />\n"
+            "\t<DATA>BAD</DATA>\n"
+            "</EVENT>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-08T01:02:03 FNAME=good.000000 SMP_OFFSET=2 TRUE_FS=40.0 />\n"
+            "\t<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 "
+            "STAGES=5 NORMALIZED=YES LENGTH=12 />\n"
+            "\t<DATA>GOOD</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    malformed_rows = _jsonl_lines(run_dir / "malformed_mer_blocks.jsonl")
+    data_rows = _jsonl_lines(output_root / "467.174-T-0100" / "mer_data_records.jsonl")
+
+    assert len(data_rows) == 1
+    assert data_rows[0]["fname"] == "good.000000"
+    assert malformed_rows == [
+        {
+            "block_index": 0,
+            "block_kind": "event_format",
+            "error": "missing FORMAT tag",
+            "float_id": "T0100",
+            "raw_block": malformed_rows[0]["raw_block"],
+            "run_id": latest["run_id"],
+            "source_file": mer_path.as_posix(),
+        }
+    ]
+    assert "<EVENT>" in malformed_rows[0]["raw_block"]
+    assert _jsonl_lines(run_dir / "skipped_mer_files.jsonl") == []
+
+
+def test_stateful_records_skipped_mer_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    mer_path = input_root / "0100_broken.MER"
+    _write_mer(mer_path)
+
+    def _raise_unreadable(path: Path, *, on_malformed_block=None):
+        raise OSError("simulated unreadable mer")
+
+    monkeypatch.setattr(normalize_mer_module, "parse_mer_file_recoverable", _raise_unreadable)
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    skipped_rows = _jsonl_lines(run_dir / "skipped_mer_files.jsonl")
+
+    assert skipped_rows == [
+        {
+            "error": "simulated unreadable mer",
+            "float_id": "T0100",
+            "run_id": latest["run_id"],
+            "source_file": mer_path.as_posix(),
+            "skipped_at": skipped_rows[0]["skipped_at"],
+        }
+    ]
+    assert _jsonl_lines(run_dir / "malformed_mer_blocks.jsonl") == []
+
+
+def test_stateful_skips_hopelessly_broken_mer_file(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    mer_path = input_root / "0100_hopeless.MER"
+    mer_path.write_bytes(b"this is not a mer file at all")
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+    run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
+    skipped_rows = _jsonl_lines(run_dir / "skipped_mer_files.jsonl")
+
+    assert skipped_rows == [
+        {
+            "error": (
+                "MER structure unreadable: no recoverable ENVIRONMENT, PARAMETERS, "
+                "or EVENT content"
+            ),
+            "float_id": "T0100",
+            "run_id": latest["run_id"],
+            "source_file": mer_path.as_posix(),
+            "skipped_at": skipped_rows[0]["skipped_at"],
+        }
+    ]
+    assert _jsonl_lines(run_dir / "malformed_mer_blocks.jsonl") == []
+
+
+def test_stateless_malformed_log_recovery_writes_no_manifests(tmp_path: Path) -> None:
+    log_path = tmp_path / "0100_malformed.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[MAIN  ,0007]first",
+                "[DIVING,15",
+                "1700000001:[MAIN  ,0007]second",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_root = tmp_path / "output"
+    run_normalization_pipeline(output_dir=output_root, input_files=[log_path])
+
+    assert not (output_root / "0100" / "manifests").exists()
+    operational_rows = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
+    assert [row["message"] for row in operational_rows] == ["first", "second"]
 
 
 def test_first_run_diff_semantics_treat_previous_state_as_empty(tmp_path: Path) -> None:

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
@@ -96,6 +97,9 @@ def write_log_jsonl_prototypes(
     output_dir: Path,
     *,
     float_id: str | None = None,
+    run_id: str | None = None,
+    malformed_log_lines: list[dict[str, object]] | None = None,
+    skipped_log_files: list[dict[str, object]] | None = None,
 ) -> LogJsonlPrototypeSummary:
     """Write conservative LOG-derived JSONL prototype streams."""
 
@@ -137,8 +141,28 @@ def write_log_jsonl_prototypes(
     ):
         for path in sorted_paths:
             path_float_id = float_id or _fallback_float_id(path)
+            def _record_malformed_line(
+                line_number: int,
+                raw_line: str,
+                error: str,
+            ) -> None:
+                if malformed_log_lines is None or run_id is None:
+                    return
+                malformed_log_lines.append(
+                    {
+                        "run_id": run_id,
+                        "float_id": path_float_id,
+                        "source_file": path.as_posix(),
+                        "line_number": line_number,
+                        "raw_line": raw_line,
+                        "error": error,
+                    }
+                )
             try:
-                for entry in iter_operational_log_entries(path):
+                for entry in iter_operational_log_entries(
+                    path,
+                    on_malformed_line=_record_malformed_line,
+                ):
                     if entry.source_kind != "log":
                         continue
 
@@ -229,6 +253,19 @@ def write_log_jsonl_prototypes(
                         unclassified_patterns[
                             (entry.subsystem, entry.code, entry.message)
                         ] += 1
+            except OSError as exc:
+                if skipped_log_files is None or run_id is None:
+                    raise
+                skipped_log_files.append(
+                    {
+                        "run_id": run_id,
+                        "float_id": path_float_id,
+                        "source_file": path.as_posix(),
+                        "error": str(exc),
+                        "skipped_at": _iso_now(),
+                    }
+                )
+                continue
             except Exception as exc:
                 raise ValueError(f"Error while normalizing LOG file {path}: {exc}") from exc
 
@@ -476,3 +513,7 @@ def _log_epoch_time(entry: OperationalLogEntry) -> str:
 def _write_jsonl_line(handle, record: dict[str, object]) -> None:
     handle.write(json.dumps(record, sort_keys=True))
     handle.write("\n")
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
