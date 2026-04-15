@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 
-"""Decode BIN fixtures into LOG fixtures and verify them against tracked LOGs."""
+"""Internal dev utility to decode BIN fixtures and compare them against tracked LOGs."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ def main() -> int:
     """Decode BIN fixtures into LOG files and verify them against tracked LOGs."""
 
     parser = argparse.ArgumentParser(
-        description="Materialize BIN fixtures into LOG files and verify them against tracked LOG fixtures.",
+        description="Internal dev utility: materialize BIN fixtures into LOG files and verify them against tracked LOG fixtures.",
     )
     parser.add_argument(
         "--family-root",

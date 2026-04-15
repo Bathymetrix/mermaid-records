@@ -214,33 +214,13 @@ Unsupported behavior that is intentionally out of scope for this package:
 - `CYCLE` / `CYCLE.h`
 - any workflow that mutates raw source files in place
 
-## Helper Scripts
+## Internal Dev Utilities
 
-These scripts are repo helper entry points rather than installed package subcommands.
+The installed and supported workflow is `mermaid-records normalize`.
 
-### Profile The Full Normalization Pipeline
-
-Profile one fixture root from raw source artifacts through JSONL outputs:
-
-Older-generation canonical fixture root:
-
-```sh
-python scripts/profile_normalization_pipeline.py data/fixtures/452.020-P-06
-```
-
-Newer-generation canonical fixture root with `BIN` decode enabled:
-
-```sh
-MERMAID=/path/to/mermaid python scripts/profile_normalization_pipeline.py data/fixtures/467.174-T-0100 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-This prints one flat JSON object with counts and timings for:
-
-- input discovery
-- `BIN -> LOG` decode
-- `LOG` parsing and normalization
-- `MER` parsing and normalization
-- JSONL writing
+The repo still includes a small number of internal developer utilities for decoder
+adapter work on tracked fixtures. These are not installed package entry points and
+should not be treated as parallel normalization workflows.
 
 ### Profile The Wrapped BIN To LOG Decode Path
 
@@ -260,54 +240,13 @@ MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 20 --decoder-
 
 This prints one JSON summary per run with phase timings for the current wrapped decode batch path.
 
-### Generate LOG JSONL Prototypes
+### Materialize BIN Fixture LOGs
 
-Generate the current LOG-derived JSONL families from the representative LOG subset:
-
-```sh
-python scripts/generate_log_jsonl_prototype.py
-```
-
-Outputs are written under:
+Decode BIN fixtures in a temporary workspace and compare the emitted LOGs against
+tracked LOG fixtures:
 
 ```sh
-data/fixtures/log_examples_representative_06_0100/jsonl_prototype/
+MERMAID=/path/to/mermaid python scripts/materialize_bin_logs.py --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
 
-Current LOG JSONL outputs are:
-
-- `log_operational_records.jsonl`
-- `log_acquisition_records.jsonl`
-- `log_ascent_request_records.jsonl`
-- `log_gps_records.jsonl`
-- `log_transmission_records.jsonl`
-- `log_measurement_records.jsonl`
-- `log_unclassified_records.jsonl`
-
-### Generate MER JSONL Prototypes
-
-Generate the current MER-derived JSONL families from the representative MER subset:
-
-```sh
-python scripts/generate_mer_jsonl_prototype.py
-```
-
-Outputs are written under:
-
-```sh
-data/fixtures/mer_examples_representative_06_0100/jsonl_prototype/
-```
-
-Current MER JSONL outputs are:
-
-- `mer_environment_records.jsonl`
-- `mer_parameter_records.jsonl`
-- `mer_data_records.jsonl`
-
-### Other Dev Scripts
-
-Additional helper scripts currently in the repo:
-
-- `scripts/materialize_bin_logs.py`
-
-These are dev-facing workflow utilities around the current external decoder adapters.
+This is an internal fixture-maintenance utility around the external decoder adapter.

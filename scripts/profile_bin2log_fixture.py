@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 
-"""Profile the existing BIN->LOG batch decode workflow on a fixture subset."""
+"""Internal dev utility to profile the wrapped BIN->LOG decode path on fixtures."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from mermaid_records.bin2log import Bin2LogConfig, Bin2LogError, update_decoder_
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Profile the current BIN->LOG batch decode path on a fixture subset.",
+        description="Internal dev utility: profile the current BIN->LOG batch decode path on a fixture subset.",
     )
     parser.add_argument(
         "count",
