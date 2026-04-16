@@ -95,6 +95,8 @@ class RunSpec:
     env_overrides: dict[str, str | None]
     input_manifest_path: Path | None
     has_bin: bool
+    decoder_mermaid_root: Path | None
+    seed_decoder_database: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -164,6 +166,24 @@ def build_argument_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--mermaid-root",
+        type=Path,
+        default=None,
+        help=(
+            "MERMAID root to expose to the external decoder when BIN inputs are present. "
+            "Defaults to $MERMAID when set."
+        ),
+    )
+    parser.add_argument(
+        "--matrix",
+        choices=("semantic", "exhaustive"),
+        default="semantic",
+        help=(
+            "semantic runs one representative set of meaningful flag combinations; "
+            "exhaustive expands every boolean permutation."
+        ),
+    )
+    parser.add_argument(
         "--include-invalid",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -196,14 +216,17 @@ def main(argv: list[str] | None = None) -> int:
     args = build_argument_parser().parse_args(argv)
     decoder_python = args.decoder_python or _path_from_env("MERMAID_RECORDS_DECODER_PYTHON")
     decoder_script = args.decoder_script or _path_from_env("MERMAID_RECORDS_DECODER_SCRIPT")
+    mermaid_root = args.mermaid_root or _path_from_env("MERMAID")
     report = run_audit(
         input_root=args.input_root.expanduser().resolve(),
         output_root=args.output_root.expanduser().resolve(),
         cli_command=args.cli_command,
         decoder_python=decoder_python,
         decoder_script=decoder_script,
+        mermaid_root=mermaid_root,
         include_invalid=args.include_invalid,
         include_input_file_mode=args.include_input_file_mode,
+        matrix=args.matrix,
         arg_max_buffer=args.arg_max_buffer,
         max_runs=args.max_runs,
     )
@@ -218,8 +241,10 @@ def run_audit(
     cli_command: str,
     decoder_python: Path | None,
     decoder_script: Path | None,
+    mermaid_root: Path | None,
     include_invalid: bool,
     include_input_file_mode: bool,
+    matrix: str,
     arg_max_buffer: int,
     max_runs: int | None,
 ) -> dict[str, object]:
@@ -249,7 +274,9 @@ def run_audit(
         cli_command=cli_command,
         decoder_python=decoder_python,
         decoder_script=decoder_script,
+        mermaid_root=mermaid_root,
         include_invalid=include_invalid,
+        matrix=matrix,
     )
     if max_runs is not None:
         specs = specs[:max_runs]
@@ -276,6 +303,7 @@ def run_audit(
         cli_command=cli_command,
         decoder_python=decoder_python,
         decoder_script=decoder_script,
+        mermaid_root=mermaid_root,
         discovered=discovered,
         results=results,
     )
@@ -390,7 +418,9 @@ def build_run_specs(
     cli_command: str,
     decoder_python: Path | None,
     decoder_script: Path | None,
+    mermaid_root: Path | None,
     include_invalid: bool,
+    matrix: str,
 ) -> list[RunSpec]:
     """Build the exhaustive run matrix."""
 
@@ -408,74 +438,98 @@ def build_run_specs(
         include_invalid=include_invalid,
     )
 
+    flag_presets = build_flag_presets(matrix)
     specs: list[RunSpec] = []
     counter = 0
     for scenario in scenarios:
         for output_mode in output_modes:
             for decoder_choice in decoder_choices:
                 for preflight_mode in ("strict", "cached"):
-                    for dry_run in (False, True):
-                        for force_rewrite in (False, True):
-                            for json_output in (False, True):
-                                for verbose in (False, True):
-                                    counter += 1
-                                    slug = _build_slug(
-                                        scenario=scenario,
-                                        output_mode=output_mode,
-                                        decoder_mode=decoder_choice.name,
-                                        preflight_mode=preflight_mode,
-                                        dry_run=dry_run,
-                                        force_rewrite=force_rewrite,
-                                        json_output=json_output,
-                                        verbose=verbose,
-                                    )
-                                    run_id = f"run-{counter:04d}"
-                                    artifacts_dir = runs_dir / run_id
-                                    command, output_dir, env_overrides = compose_command(
-                                        cli_prefix=cli_prefix,
-                                        scenario=scenario,
-                                        output_mode=output_mode,
-                                        decoder_choice=decoder_choice,
-                                        preflight_mode=preflight_mode,
-                                        dry_run=dry_run,
-                                        force_rewrite=force_rewrite,
-                                        json_output=json_output,
-                                        verbose=verbose,
-                                        artifacts_dir=artifacts_dir,
-                                    )
-                                    expects_success = expected_success(
-                                        has_bin=scenario.has_bin,
-                                        output_mode=output_mode,
-                                        decoder_choice=decoder_choice,
-                                    )
-                                    availability_issue = availability_issue_for(
-                                        has_bin=scenario.has_bin,
-                                        decoder_choice=decoder_choice,
-                                    )
-                                    specs.append(
-                                        RunSpec(
-                                            run_id=run_id,
-                                            slug=slug,
-                                            input_scenario=scenario.name,
-                                            input_mode=scenario.input_mode,
-                                            output_mode=output_mode,
-                                            preflight_mode=preflight_mode,
-                                            dry_run=dry_run,
-                                            force_rewrite=force_rewrite,
-                                            json_output=json_output,
-                                            verbose=verbose,
-                                            decoder_mode=decoder_choice.name,
-                                            expects_success=expects_success,
-                                            availability_issue=availability_issue,
-                                            command=command,
-                                            output_dir=output_dir,
-                                            artifacts_dir=artifacts_dir,
-                                            env_overrides=env_overrides,
-                                            input_manifest_path=scenario.manifest_path,
-                                            has_bin=scenario.has_bin,
-                                        )
-                                    )
+                    for dry_run, force_rewrite, json_output, verbose in flag_presets:
+                        counter += 1
+                        slug = _build_slug(
+                            scenario=scenario,
+                            output_mode=output_mode,
+                            decoder_mode=decoder_choice.name,
+                            preflight_mode=preflight_mode,
+                            dry_run=dry_run,
+                            force_rewrite=force_rewrite,
+                            json_output=json_output,
+                            verbose=verbose,
+                        )
+                        run_id = f"run-{counter:04d}"
+                        artifacts_dir = runs_dir / run_id
+                        command, output_dir, env_overrides, seed_decoder_database = compose_command(
+                            cli_prefix=cli_prefix,
+                            scenario=scenario,
+                            output_mode=output_mode,
+                            decoder_choice=decoder_choice,
+                            preflight_mode=preflight_mode,
+                            dry_run=dry_run,
+                            force_rewrite=force_rewrite,
+                            json_output=json_output,
+                            verbose=verbose,
+                            artifacts_dir=artifacts_dir,
+                            mermaid_root=mermaid_root,
+                        )
+                        expects_success = expected_success(
+                            has_bin=scenario.has_bin,
+                            output_mode=output_mode,
+                            decoder_choice=decoder_choice,
+                            mermaid_root=mermaid_root,
+                        )
+                        availability_issue = availability_issue_for(
+                            has_bin=scenario.has_bin,
+                            decoder_choice=decoder_choice,
+                            mermaid_root=mermaid_root,
+                        )
+                        specs.append(
+                            RunSpec(
+                                run_id=run_id,
+                                slug=slug,
+                                input_scenario=scenario.name,
+                                input_mode=scenario.input_mode,
+                                output_mode=output_mode,
+                                preflight_mode=preflight_mode,
+                                dry_run=dry_run,
+                                force_rewrite=force_rewrite,
+                                json_output=json_output,
+                                verbose=verbose,
+                                decoder_mode=decoder_choice.name,
+                                expects_success=expects_success,
+                                availability_issue=availability_issue,
+                                command=command,
+                                output_dir=output_dir,
+                                artifacts_dir=artifacts_dir,
+                                env_overrides=env_overrides,
+                                input_manifest_path=scenario.manifest_path,
+                                has_bin=scenario.has_bin,
+                                decoder_mermaid_root=mermaid_root,
+                                seed_decoder_database=seed_decoder_database,
+                            )
+                        )
     return specs
+
+
+def build_flag_presets(matrix: str) -> list[tuple[bool, bool, bool, bool]]:
+    """Return either the full boolean matrix or a semantic subset."""
+
+    if matrix == "exhaustive":
+        return [
+            (dry_run, force_rewrite, json_output, verbose)
+            for dry_run in (False, True)
+            for force_rewrite in (False, True)
+            for json_output in (False, True)
+            for verbose in (False, True)
+        ]
+    return [
+        (False, False, False, False),
+        (False, False, False, True),
+        (False, True, False, False),
+        (True, False, False, False),
+        (True, False, True, False),
+        (True, True, True, True),
+    ]
 
 
 def build_decoder_choices(
@@ -581,7 +635,8 @@ def compose_command(
     json_output: bool,
     verbose: bool,
     artifacts_dir: Path,
-) -> tuple[tuple[str, ...], Path | None, dict[str, str | None]]:
+    mermaid_root: Path | None,
+) -> tuple[tuple[str, ...], Path | None, dict[str, str | None], bool]:
     """Assemble one subprocess invocation and its environment overrides."""
 
     output_dir: Path | None = None
@@ -590,6 +645,7 @@ def compose_command(
         "MERMAID_RECORDS_DECODER_PYTHON": None,
         "MERMAID_RECORDS_DECODER_SCRIPT": None,
     }
+    seed_decoder_database = False
     command = list(cli_prefix)
     command.append("normalize")
 
@@ -602,10 +658,14 @@ def compose_command(
     if output_mode == "cli_arg":
         output_dir = artifacts_dir / "records"
         command.extend(["-o", output_dir.as_posix()])
+        if scenario.has_bin and mermaid_root is not None:
+            env_overrides["MERMAID"] = mermaid_root.as_posix()
     elif output_mode == "mermaid_env":
         mermaid_root = artifacts_dir / "mermaid_env"
         env_overrides["MERMAID"] = mermaid_root.as_posix()
         output_dir = mermaid_root / "records"
+        if scenario.has_bin:
+            seed_decoder_database = True
 
     if decoder_choice.cli_python is not None:
         command.extend(["--decoder-python", decoder_choice.cli_python.as_posix()])
@@ -625,7 +685,7 @@ def compose_command(
         command.append("--json")
     if verbose:
         command.append("--verbose")
-    return tuple(command), output_dir, env_overrides
+    return tuple(command), output_dir, env_overrides, seed_decoder_database
 
 
 def expected_success(
@@ -633,6 +693,7 @@ def expected_success(
     has_bin: bool,
     output_mode: str,
     decoder_choice: DecoderConfigChoice,
+    mermaid_root: Path | None,
 ) -> bool:
     """Predict whether the CLI should succeed for one spec."""
 
@@ -647,6 +708,8 @@ def expected_success(
         "cli_script_only",
     }:
         return False
+    if has_bin and mermaid_root is None:
+        return False
     if has_bin and decoder_choice.name == "none":
         return False
     return True
@@ -656,10 +719,13 @@ def availability_issue_for(
     *,
     has_bin: bool,
     decoder_choice: DecoderConfigChoice,
+    mermaid_root: Path | None,
 ) -> str | None:
     """Explain why a planned run cannot meaningfully exercise its intended path."""
 
     if decoder_choice.available:
+        if has_bin and mermaid_root is None:
+            return "BIN combinations need a MERMAID root so the external decoder can locate its database."
         return None
     if has_bin and decoder_choice.name in {"env_both", "cli_both", "cli_over_env"}:
         return (
@@ -694,6 +760,9 @@ def execute_run_spec(spec: RunSpec) -> RunResult:
             exception=None,
             summary=spec.availability_issue,
         )
+
+    if spec.seed_decoder_database:
+        _seed_decoder_database(spec)
 
     env = os.environ.copy()
     for key in ("MERMAID", "MERMAID_RECORDS_DECODER_PYTHON", "MERMAID_RECORDS_DECODER_SCRIPT"):
@@ -821,6 +890,7 @@ def summarize_results(
     cli_command: str,
     decoder_python: Path | None,
     decoder_script: Path | None,
+    mermaid_root: Path | None,
     discovered: DiscoveredInputs,
     results: list[dict[str, object]],
 ) -> dict[str, object]:
@@ -848,6 +918,7 @@ def summarize_results(
         "cli_command": cli_command,
         "decoder_python": decoder_python.as_posix() if decoder_python else None,
         "decoder_script": decoder_script.as_posix() if decoder_script else None,
+        "mermaid_root": mermaid_root.as_posix() if mermaid_root else None,
         "discovered_counts": discovered.counts(),
         "total_result_rows": len(results),
         "status_counts": dict(status_counts),
@@ -1020,6 +1091,10 @@ def _result_payload(spec: RunSpec, result: RunResult) -> dict[str, object]:
         "expects_success": spec.expects_success,
         "availability_issue": spec.availability_issue,
         "has_bin": spec.has_bin,
+        "decoder_mermaid_root": (
+            spec.decoder_mermaid_root.as_posix() if spec.decoder_mermaid_root else None
+        ),
+        "seed_decoder_database": spec.seed_decoder_database,
         "command": list(spec.command),
         "output_dir": spec.output_dir.as_posix() if spec.output_dir else None,
         "artifacts_dir": spec.artifacts_dir.as_posix(),
@@ -1074,3 +1149,21 @@ def _path_from_env(name: str) -> Path | None:
 
     value = os.environ.get(name)
     return Path(value).expanduser().resolve() if value else None
+
+
+def _seed_decoder_database(spec: RunSpec) -> None:
+    """Mirror the configured decoder database into an isolated MERMAID root."""
+
+    if spec.decoder_mermaid_root is None:
+        raise RuntimeError("decoder_mermaid_root is required when seed_decoder_database is enabled")
+
+    source_database = spec.decoder_mermaid_root / "database"
+    if not source_database.exists():
+        raise RuntimeError(f"Decoder MERMAID database directory does not exist: {source_database}")
+
+    target_root = Path(spec.env_overrides["MERMAID"])
+    target_database = target_root / "database"
+    target_root.mkdir(parents=True, exist_ok=True)
+    if target_database.exists():
+        return
+    target_database.symlink_to(source_database, target_is_directory=True)

@@ -241,6 +241,9 @@ should not be treated as parallel normalization workflows.
 Use the matrix harness when you want to exercise `normalize` across output
 resolution, decoder resolution, preflight mode, `--dry-run`, `--force-rewrite`,
 `--json`, and `--verbose`, while continuing past failures and logging every run.
+The default `--matrix semantic` mode keeps the run set representative instead of
+expanding every boolean permutation; use `--matrix exhaustive` only when you
+explicitly want the full cartesian product.
 
 The script writes:
 
@@ -278,6 +281,11 @@ python scripts/audit_normalize_cli_matrix.py \
   --decoder-python /path/to/decoder-env/bin/python \
   --decoder-script /path/to/automaid/scripts/preprocess.py
 ```
+
+If the external decoder also expects `MERMAID`, pass it explicitly or rely on
+your shell environment. The harness uses that real `MERMAID` root for decoder
+state, and when testing `MERMAID`-based output resolution it creates an isolated
+temporary root with a linked `database/` directory so outputs stay sandboxed.
 
 ### Profile The Wrapped BIN To LOG Decode Path
 

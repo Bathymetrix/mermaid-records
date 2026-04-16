@@ -256,6 +256,52 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
     assert diff_rows[0]["source_file"] == "0100_first.BIN"
 
 
+def test_decoder_state_tolerates_database_file_removed_after_listing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "0100_first.BIN").write_bytes(b"raw-bin")
+
+    mermaid_root = tmp_path / "mermaid_root"
+    database_root = mermaid_root / "database"
+    database_root.mkdir(parents=True)
+    (database_root / "Databases.json").write_text("[]\n", encoding="utf-8")
+    missing_json = database_root / "DatabaseV1_0.json"
+    missing_json.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setenv("MERMAID", str(mermaid_root))
+
+    decoder = _write_decoder(tmp_path / "decoder.py", "decoded")
+    output_root = tmp_path / "output"
+
+    import mermaid_records.manifest as manifest_module
+
+    original_database_files = manifest_module._database_files
+
+    def _database_files_then_remove(database_root: Path | None) -> list[Path]:
+        paths = original_database_files(database_root)
+        if missing_json.exists():
+            missing_json.unlink()
+        return paths
+
+    monkeypatch.setattr(manifest_module, "_database_files", _database_files_then_remove)
+
+    summary = run_normalization_pipeline(
+        input_root,
+        output_dir=output_root,
+        config=Bin2LogConfig(
+            python_executable=Path(sys.executable),
+            decoder_script=decoder,
+        ),
+    )
+
+    assert summary.metrics.bin_files_decoded == 1
+    latest = _read_json(output_root / "0100" / "manifests" / "latest.json")
+    source_state = _read_json(output_root / "0100" / latest["source_state_manifest"])
+    assert source_state["decoder_state"]["database_bundle_hash"] is not None
+
+
 def test_stateless_mode_isolated_and_rejects_existing_manifests(tmp_path: Path) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()

@@ -256,9 +256,10 @@ def _database_files(database_root: Path | None) -> list[Path]:
 
 
 def _bundle_hash(paths: list[Path]) -> str | None:
-    if not paths:
+    existing_paths = [path for path in paths if path.exists() and path.is_file()]
+    if not existing_paths:
         return None
-    manifest_lines = [f"{path.name}\t{_hash_file(path)}" for path in paths]
+    manifest_lines = [f"{path.name}\t{_hash_file(path)}" for path in existing_paths]
     return hashlib.sha256("\n".join(manifest_lines).encode("utf-8")).hexdigest()
 
 
