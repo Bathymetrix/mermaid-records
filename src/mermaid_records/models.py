@@ -14,7 +14,11 @@ type OperationalSourceKind = Literal["log"]
 
 @dataclass(slots=True)
 class OperationalLogEntry:
-    """One parsed operational log line from a LOG file."""
+    """One parsed operational LOG line of the form timestamp:[TAG]message.
+
+    Represents a successfully parsed tagged LOG entry. Does not include
+    continuation lines, console output, or other non-tagged LOG content.
+    """
 
     time: datetime
     subsystem: str
@@ -27,7 +31,10 @@ class OperationalLogEntry:
 
 @dataclass(slots=True)
 class MerFileMetadata:
-    """File-level metadata extracted conservatively from a .MER file."""
+    """File-level metadata extracted conservatively from <ENVIRONMENT> through </PARAMETERS> in a .MER file.
+
+    Includes raw lines and minimally parsed fields without interpretation.
+    """
 
     board: str | None
     software_version: str | None
@@ -48,7 +55,12 @@ class MerFileMetadata:
 
 @dataclass(slots=True)
 class MerDataBlock:
-    """One transmitted data block from a .MER file."""
+    """Metadata and payload for one <EVENT> block in a .MER file.
+
+    Covers parsed fields from <INFO> and <FORMAT>, and the raw binary payload
+    from <DATA> (excluding framing delimiters). No interpretation of the
+    payload is performed.
+    """
 
     date: datetime | None
     pressure_mbar: float | None
