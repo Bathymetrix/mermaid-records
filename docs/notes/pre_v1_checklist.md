@@ -70,6 +70,7 @@ The goal is correctness, stability, and release clarity, not feature expansion.
 - [x] Confirm no unnecessary modules remain in the package
 - [x] Confirm no stale tests remain that preserve superseded behavior
 - [x] Confirm no stale helper scripts remain that imply out-of-scope workflows
+- [ ] Revisit `data/fixtures` ownership before `v1.0.0`: keep active raw fixture sets, but decide whether stale generated `jsonl_prototype/` artifacts and out-of-scope fixture subsets such as `s61/` should be regenerated, relocated, or removed
 - [x] Confirm the package scope remains tightly limited to normalization only
 
 ## Must-Not-Forget
