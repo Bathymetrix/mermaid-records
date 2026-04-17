@@ -7,8 +7,8 @@ from pathlib import Path
 import sys
 
 import pytest
-import mermaid_records.audit_normalize_cli as audit_normalize_cli
-from mermaid_records.audit_normalize_cli import (
+import mermaid_records._audit_normalize_cli as audit_normalize_cli
+from mermaid_records._audit_normalize_cli import (
     INPUT_FILE_MODE,
     INPUT_ROOT_MODE,
     build_flag_presets,

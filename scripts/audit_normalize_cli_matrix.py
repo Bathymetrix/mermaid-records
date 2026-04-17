@@ -14,7 +14,7 @@ SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from mermaid_records.audit_normalize_cli import main
+from mermaid_records._audit_normalize_cli import main
 
 
 if __name__ == "__main__":
