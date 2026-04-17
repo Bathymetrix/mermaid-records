@@ -1,334 +1,165 @@
 # mermaid-records
 
-`mermaid-records` is a Python package for the normalization pipeline from raw MERMAID source artifacts to low-level JSONL record families. It is a canonical normalization layer, not an analysis layer.
+`mermaid-records` normalizes raw MERMAID `BIN`, `LOG`, and `MER` artifacts into structured JSONL record families without introducing interpretation.
 
-Release-facing contract details, including persisted schema inventories, live in
-`docs/notes/normalization_release_contract.md`.
+It is a normalization layer, not an interpretation or analysis layer. The package restructures source artifacts conservatively, preserves source information where practical, and leaves higher-level derivation, interval inference, coordinate conversion, and scientific interpretation to downstream tooling.
 
-Current source inputs:
+## Scope
 
-- `BIN`
-- `LOG`
-- `MER`
+`mermaid-records` is intended for scientists and operators who work with MERMAID float data and need a stable, machine-readable baseline from raw artifacts.
 
-Explicitly not supported in `v1.0.0`:
+Version 1 focuses on truthful normalization:
 
-- `S41`
-- `S61`
-- `RBR`
-- other profile or auxiliary formats
+- normalize raw `BIN`, `LOG`, and `MER` inputs into canonical JSONL record families
+- preserve source information conservatively
+- avoid silent data loss during parsing and normalization
+- keep interpretation to a minimum
+- make malformed or non-normalizable content visible rather than silently dropping it
 
-Support for additional file types may be added in future releases. For `v1.0.0`,
-the normalization pipeline is intentionally limited to `BIN`/`LOG`/`MER` to
-ensure correctness and stability.
+## Non-goals
+
+This package intentionally does **not**:
+
+- convert raw latitude/longitude strings into decimal degrees
+- derive acquisition, recording, or transmission intervals beyond explicit normalized evidence
+- infer higher-level mission or scientific meaning
+- perform waveform analysis
+- replace manufacturer decoding logic
+
+Small explicit normalizations may still occur where required for stable structured output. See `docs/limitations.md` for the allowed transformations called out explicitly in the v1 contract.
+
+## Decoder boundary
+
+`LOG` and `MER` normalization are first-class package behavior.
+
+`BIN` inputs require an external preprocess/decode step to produce `LOG` artifacts. In v1, that decoder remains external and is invoked across a subprocess boundary rather than reimplemented inside this package. This is deliberate: `mermaid-records` owns normalization, not vendor decoder logic.
 
 ## Installation
 
-Use Python 3.12 or newer.
-
-Create a fresh local virtual environment from the repo root:
-
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -e '.[dev]'
+```bash
+python -m pip install .
 ```
 
-After activation, the remainder of the README uses plain `python`, e.g.,
+For development:
 
-```sh
-mermaid-records normalize -i /path/to/server --output-dir /path/to/output-dir
+```bash
+python -m pip install -e .[dev]
 ```
 
-If the virtual environment is not activated, you can invoke the installed CLI directly as:
+## CLI
 
-```sh
-./.venv/bin/mermaid-records --help
+The installed entrypoint is:
+
+```bash
+mermaid-records normalize --input-root <INPUT_ROOT> --output-dir <OUTPUT_DIR>
 ```
 
-## Package CLI
+Depending on the workflow, normalization can also be targeted with `--input-file`. The CLI has both stateful and stateless behavior. See `docs/cli.md` for the authoritative interface and mode details.
 
-Show the installed CLI help:
+## Output model
 
-```sh
-mermaid-records --help
+Normalization writes per-instrument JSONL record families under the selected output directory.
+
+Typical families include:
+
+```text
+<output-dir>/
+  <instrument>/
+    log_acquisition_records.jsonl
+    log_ascent_request_records.jsonl
+    log_battery_records.jsonl
+    log_gps_records.jsonl
+    log_operational_records.jsonl
+    log_parameter_records.jsonl
+    log_pressure_temperature_records.jsonl
+    log_sbe_records.jsonl
+    log_testmode_records.jsonl
+    log_transmission_records.jsonl
+    log_unclassified_records.jsonl
+    mer_environment_records.jsonl
+    mer_event_records.jsonl
+    mer_parameter_records.jsonl
+    manifests/          # stateful mode only
+    state/              # stateful mode only
 ```
 
-Run the normalization pipeline in stateful mode:
+Not every float emits every record family, and not every family populates every optional field. Presence, absence, and sparsity reflect the underlying source artifacts and float generation, not necessarily a normalization defect.
 
-```sh
-mermaid-records normalize --input-root /path/to/input-root --output-dir /path/to/output-dir
+The three representative float classes used during v1 documentation review were:
+
+- CTD MERMAID (MOBY)
+- ACOUSTIC MERMAID
+- PSD MERMAID (Stanford)
+
+No single float should be expected to exercise every family or every non-null field.
+
+## Representative normalized records
+
+### LOG acquisition
+
+```json
+{"instrument_id":"T0100","source_file":"0100_6492BBF7.LOG","source_container":"log","record_time":"2023-06-21T16:55:34","log_epoch_time":"1687366534","subsystem":"MRMAID","code":"0002","message":"acq started","acquisition_state":"started","acquisition_evidence_kind":"transition","raw_line":"1687366534:[MRMAID,0002]acq started"}
 ```
 
-Run the normalization pipeline in stateless file-list mode (comma and/or space separated):
+### LOG GPS
 
-```sh
-mermaid-records normalize --input-file /path/to/file1.LOG,/path/to/file2.MER /path/to/file3.LOG -o /path/to/output-dir
+```json
+{"instrument_id":"P0006","source_file":"06_67D03E13.LOG","source_container":"log","record_time":"2025-03-11T13:44:29","log_epoch_time":"1741700669","subsystem":"SURF","code":"394","message":"S13deg22.967mn, W173deg28.554mn","gps_record_kind":"fix_position","raw_values":{"latitude":"S13deg22.967mn","longitude":"W173deg28.554mn"},"raw_line":"1741700669:[SURF ,394]S13deg22.967mn, W173deg28.554mn"}
 ```
 
-Run the normalization pipeline with `BIN` decode enabled:
+### LOG parameter episode
 
-```sh
-mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
+```json
+{"instrument_id":"P0006","source_file":"06_67C95E46.LOG","episode_index":0,"start_record_time":"2025-03-06T08:39:06","end_record_time":"2025-03-06T08:39:06","raw_lines":["1741250346: bypass 10000ms 10000ms (10000ms 200000ms stored)","1741250346: valve 60000ms 12750 (60000ms 12750 stored)","1741250346: pump 60000ms 30% 10750 80% (60000ms 30% 10750 80% stored)","...","1741250346: stage[0] 0mbar (+/-5000mbar) 86400s (<86400s)"]}
 ```
 
-Preview the normalization plan without writing outputs, manifests, state files, or preflight status:
+### LOG transmission
 
-```sh
-mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --dry-run
+```json
+{"instrument_id":"R0007","source_file":"0007_5FD6F697.LOG","source_container":"log","record_time":"2020-12-14T06:39:04","log_epoch_time":"1607927944","subsystem":"UPLOAD","code":"0231","message":"\"0007/5FD707A6.MER\" uploaded at 126bytes/s","referenced_artifact":"0007_5FD707A6.MER","rate_bytes_per_s":126,"raw_line":"1607927944:[UPLOAD,0231]\"0007/5FD707A6.MER\" uploaded at 126bytes/s","transmission_kind":"upload_artifact"}
 ```
 
-Force a full rewrite of targeted outputs instead of using incremental append/noop decisions:
+### MER environment
 
-```sh
-mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --force-rewrite
+```json
+{"instrument_id":"T0100","source_file":"0100_68B47F96.MER","source_container":"mer","environment_kind":"gpsinfo","gpsinfo_date":"2025-08-21T17:00:37","raw_values":{"date":"2025-08-21T17:00:37","lat":"+3218.9010","lon":"+13524.7830"},"line":"\t<GPSINFO DATE=2025-08-21T17:00:37 LAT=+3218.9010 LON=+13524.7830 />"}
 ```
 
-Print the dry-run plan as JSON:
+### MER event
 
-```sh
-mermaid-records normalize -i /path/to/input-root -o /path/to/output-dir --dry-run --json
+```json
+{"instrument_id":"P0006","source_file":"06_6799729E.MER","source_container":"mer","block_index":0,"event_index":0,"event_info_date":"2025-01-28T11:26:29.948059","pressure":"763.00","temperature":"-11.0000","criterion":"0.0478937","snr":"5.498","trig":"2000","detrig":"5733","endianness":"LITTLE","bytes_per_sample":"4","sampling_rate":"20.000000","stages":"5","normalized":"YES","length":"4736","raw_info_line":"<INFO DATE=2025-01-28T11:26:29.948059 PRESSURE=763.00 TEMPERATURE=-11.0000 CRITERION=0.0478937 SNR=5.498 TRIG=2000 DETRIG=5733 />","raw_format_line":"<FORMAT ENDIANNESS=LITTLE BYTES_PER_SAMPLE=4 SAMPLING_RATE=20.000000 STAGES=5 NORMALIZED=YES LENGTH=4736 />","encoded_payload":"<base64 omitted>"}
 ```
 
-### CLI Resolution Order
+### MER parameter
 
-The CLI keeps input selection explicit:
-
-- `--input-root` selects stateful mode
-- `--input-file` selects stateless mode
-
-The CLI does not infer input paths from environment variables.
-
-Output directory resolution order:
-
-- `--output-dir` wins when provided
-- otherwise, if `MERMAID` is set, the default output root is `$MERMAID/records`
-- otherwise, the CLI errors and tells you to provide `--output-dir` or set `MERMAID`
-
-Decoder Python resolution order:
-
-- `--decoder-python` wins when provided
-- otherwise `MERMAID_RECORDS_DECODER_PYTHON` is used when set
-- otherwise the CLI errors only if the selected run actually contains `BIN` inputs
-
-Decoder script resolution order:
-
-- `--decoder-script` wins when provided
-- otherwise `MERMAID_RECORDS_DECODER_SCRIPT` is used when set
-- otherwise the CLI errors only if the selected run actually contains `BIN` inputs
-
-Preflight mode defaults to:
-
-- `strict`
-
-Configured-machine example:
-
-```sh
-export MERMAID=/path/to/mermaid
-export MERMAID_RECORDS_DECODER_PYTHON=/path/to/decoder-env/bin/python
-export MERMAID_RECORDS_DECODER_SCRIPT=/path/to/automaid/scripts/preprocess.py
-mermaid-records normalize -i /path/to/server
+```json
+{"instrument_id":"R0007","source_file":"0007_69C46326.MER","source_container":"mer","parameter_kind":"stanford_process","stanford_process_duration_h":168,"stanford_process_period_h":3,"stanford_process_window_len":1024,"stanford_process_window_type":"Hanning","stanford_process_overlap_percent":10,"stanford_process_db_offset":0.0,"raw_values":{"duration_h":"168","process_period_h":"3","window_len":"1024","window_type":"Hanning","overlap_percent":"10","db_offset":"0"},"line":"\t<STANFORD_PROCESS DURATION_h=168 PROCESS_PERIOD_h=3 WINDOW_LEN=1024 WINDOW_TYPE=Hanning OVERLAP_PERCENT=10 dB_OFFSET=0 />"}
 ```
 
-On a configured machine like this, the CLI uses:
+## Source preservation
 
-- output dir: `$MERMAID/records`
-- decoder python: `$MERMAID_RECORDS_DECODER_PYTHON`
-- decoder script: `$MERMAID_RECORDS_DECODER_SCRIPT`
+`mermaid-records` preserves source information in three main ways:
 
-Explicit CLI arguments always override environment variables.
+- directly in normalized records, for example `raw_line`, `raw_lines`, or `line`
+- as structured components, for example `raw_info_line`, `raw_format_line`, and encoded payload fields in MER event records
+- in stateful audit/manifests when that mode is enabled
 
-The installed public CLI surface is intentionally small:
+This package does **not** guarantee that every JSONL record contains a full verbatim copy of the original source block.
 
-- `mermaid-records normalize`
+In particular, some normalized records, notably MER event records, do not preserve the original `<EVENT>...</EVENT>` block verbatim. Instead, they preserve structured components sufficient for downstream interpretation, but not byte-for-byte reconstruction of the full original block.
 
-The `normalize` command supports exactly two execution modes:
+## Documentation map
 
-- stateful mode
-  - triggered by `--input-root`
-  - writes manifests
-  - enables incremental rerun detection and pruning
-  - errors on `BIN` input unless decoder paths are supplied
-- stateless mode
-  - triggered by `--input-file`
-  - ignores manifests and writes none
-  - performs no pruning
-  - errors if the target output tree already contains any `manifests/`
+- `docs/cli.md` — CLI interface, execution modes, and rewrite behavior
+- `docs/ethos.md` — design philosophy and scope discipline
+- `docs/limitations.md` — explicit limitations, preservation caveats, and allowed transformations
+- `docs/notes/normalization_release_contract.md` — detailed behavioral contract and reference semantics
 
-The `normalize` command writes:
+## Design constraint
 
-- one subdirectory per instrument under the output root
-- in stateful corpus mode, full serial-number subdirectory names derived from `<serial>.vit` files in `--input-root`, for example `467.174-T-0100/`
-- per-instrument LOG JSONL outputs:
-  - `log_operational_records.jsonl`
-  - `log_acquisition_records.jsonl`
-  - `log_ascent_request_records.jsonl`
-  - `log_gps_records.jsonl`
-  - `log_parameter_records.jsonl`
-    - grouped startup/dive-parameter episodes preserved from LOG continuation lines
-  - `log_testmode_records.jsonl`
-    - grouped test-mode sessions preserved from LOGs
-  - `log_sbe_records.jsonl`
-    - grouped SBE/profil operational episodes preserved from LOGs
-  - `log_transmission_records.jsonl`
-  - `log_pressure_temperature_records.jsonl`
-  - `log_battery_records.jsonl`
-  - `log_unclassified_records.jsonl`
-- per-instrument MER JSONL outputs:
-  - `mer_environment_records.jsonl`
-  - `mer_parameter_records.jsonl`
-  - `mer_event_records.jsonl`
-- per-instrument `manifests/` in stateful mode
-- per-run `manifests/runs/<run_id>/input_file_diffs.jsonl` in stateful mode
-- per-instrument `state/` for pruning records in stateful mode
-- per-instrument `preflight_status.json` when BIN decode preflight runs and a durable output directory is in use
+> The scope of this package should not be allowed to creep.
 
-Invariant details:
+New formats and edge cases may extend normalization coverage, but features that introduce interpretation, derived semantics, or higher-level analysis should not be added here.
 
-- JSONL outputs are ordered by deterministic source processing order, not time order
-- JSONL field ordering is explicit and stable: provenance/identity first, then time, then family metadata, then payload/accounting, then raw fallback fields
-- existing JSONL lines are never mutated in place; the safe update paths are append and full rewrite
-- `--force-rewrite` overrides incremental planning and forces targeted instrument families to rewrite
-- dry-run reuses the same planning and diff logic as a real run but performs zero filesystem writes
-- canonical `instrument_id` is resolved from `src/mermaid_records/parse_instrument_name.py` when a full serial is available, for example `452.020-P-08 -> P0008` and `467.174-T-0100 -> T0100`
-- LOG routing happens in layers:
-  - grouped structural routes such as `parameter`, `testmode`, and `sbe` are resolved first
-  - ordinary parsed operational lines always emit one row to `log_operational_records.jsonl`
-  - then each ordinary operational line may match zero or one derived family
-  - multi-match across derived operational families is a normalization error and fails loudly
-
-## Decoder Requirements
-
-`BIN -> LOG` decode uses external automaid/preprocess code through a subprocess wrapper in `mermaid_records.bin2log`.
-
-The package does not auto-detect a conda environment name. Callers must supply decoder paths either explicitly on the CLI or through environment variables:
-
-- the path to the Python executable for the automaid decoder environment
-- the path to `preprocess.py`
-
-In practice this looks like:
-
-```sh
---decoder-python /path/to/conda/env/bin/python
---decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-or:
-
-```sh
-export MERMAID_RECORDS_DECODER_PYTHON=/path/to/conda/env/bin/python
-export MERMAID_RECORDS_DECODER_SCRIPT=/path/to/automaid/scripts/preprocess.py
-```
-
-If automaid expects environment variables such as `MERMAID`, set them before running the decode-enabled scripts.
-
-BIN decode preflight supports exactly two modes:
-
-- `strict`
-  - default
-  - requires successful live `database_update(...)`
-- `cached`
-  - still attempts `database_update(...)`
-  - if refresh fails, emits a warning and continues using cached local decoder state
-
-When BIN decode preflight runs with a durable output directory, the wrapper also writes
-`preflight_status.json` there so non-interactive runs can audit whether refresh succeeded,
-failed closed, or continued in cached-degraded mode.
-
-Unsupported behavior that is intentionally out of scope for this package:
-
-- analysis or timeline interpretation
-- unit or coordinate conversions
-- inferred acquisition windows from assertion lines or sample metadata
-- DET / REQ logic
-- `CYCLE` / `CYCLE.h`
-- any workflow that mutates raw source files in place
-
-## Internal Dev Utilities
-
-The installed and supported workflow is `mermaid-records normalize`.
-
-The repo still includes a small number of internal developer utilities for decoder
-adapter work on tracked fixtures. These are not installed package entry points and
-should not be treated as parallel normalization workflows.
-
-### Audit Normalize CLI Combinations
-
-Use the matrix harness when you want to exercise `normalize` across output
-resolution, decoder resolution, preflight mode, `--dry-run`, `--force-rewrite`,
-`--json`, and `--verbose`, while continuing past failures and logging every run.
-The default `--matrix semantic` mode keeps the run set representative instead of
-expanding every boolean permutation; use `--matrix exhaustive` only when you
-explicitly want the full cartesian product.
-
-The script writes:
-
-- one JSONL row per planned run to `audit_normalize_cli/reports/results.jsonl`
-- per-run `stdout.txt`, `stderr.txt`, `command.txt`, and `spec.json`
-- aggregate `summary.json` and `summary.md`
-- `inputs/all_raw_files.txt` so the exact stateless file list is captured
-
-Repo-local example:
-
-```sh
-python scripts/audit_normalize_cli_matrix.py \
-  --input-root ~/mermaid/server_everyone \
-  --output-root ~/Desktop/records_test \
-  --cli-command "mermaid-records"
-```
-
-If your machine exposes a wrapper command named `mermaid`, point the harness at it:
-
-```sh
-python scripts/audit_normalize_cli_matrix.py \
-  --input-root ~/mermaid/server_everyone \
-  --output-root ~/Desktop/records_test \
-  --cli-command "mermaid"
-```
-
-For BIN-containing corpora, provide valid decoder paths if you want the successful
-BIN combinations to run instead of being logged as skipped/unavailable:
-
-```sh
-python scripts/audit_normalize_cli_matrix.py \
-  --input-root ~/mermaid/server_everyone \
-  --output-root ~/Desktop/records_test \
-  --cli-command "mermaid-records" \
-  --decoder-python /path/to/decoder-env/bin/python \
-  --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-If the external decoder also expects `MERMAID`, pass it explicitly or rely on
-your shell environment. The harness uses that real `MERMAID` root for decoder
-state, and when testing `MERMAID`-based output resolution it creates an isolated
-temporary root with a linked `database/` directory so outputs stay sandboxed.
-
-### Profile The Wrapped BIN To LOG Decode Path
-
-Profile the current batch decode workflow on the newer-generation fixture family:
-
-```sh
-MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 1 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-```sh
-MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 5 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-```sh
-MERMAID=/path/to/mermaid python scripts/profile_bin2log_fixture.py 20 --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-This prints one JSON summary per run with phase timings for the current wrapped decode batch path.
-
-### Materialize BIN Fixture LOGs
-
-Decode BIN fixtures in a temporary workspace and compare the emitted LOGs against
-tracked LOG fixtures:
-
-```sh
-MERMAID=/path/to/mermaid python scripts/materialize_bin_logs.py --decoder-python /path/to/decoder-env/bin/python --decoder-script /path/to/automaid/scripts/preprocess.py
-```
-
-This is an internal fixture-maintenance utility around the external decoder adapter.
+© 2026 Bathymetrix, LLC

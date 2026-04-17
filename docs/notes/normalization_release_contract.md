@@ -150,6 +150,10 @@ Per instrument:
         outputs.json
         source_state.json
         input_file_diffs.jsonl
+        malformed_log_lines.jsonl
+        skipped_log_files.jsonl
+        malformed_mer_blocks.jsonl
+        skipped_mer_files.jsonl
         preflight_status.json
   state/
     pruned_records.jsonl
@@ -158,12 +162,14 @@ Per instrument:
 Notes:
 
 - JSONL field ordering is frozen semantically: provenance/identity, then time, then family metadata, then payload/accounting, then raw fallback fields.
+- `manifests/` and `state/` are stateful-mode artifacts; stateless mode writes neither.
 - `preflight_status.json` at instrument root is present only when BIN preflight ran with a durable output directory.
 - `latest.json` points to the most recent run for that instrument.
 - `run.json` stores run metadata and status.
 - `outputs.json` stores output inventory and row counts.
 - `source_state.json` stores raw source identity and decoder-state identity.
 - `input_file_diffs.jsonl` stores one row per raw source file with file-level diff fields only.
+- `malformed_log_lines.jsonl`, `skipped_log_files.jsonl`, `malformed_mer_blocks.jsonl`, and `skipped_mer_files.jsonl` store per-run recovery/reporting artifacts for stateful runs.
 - `state/pruned_records.jsonl` stores removed-source observations from stateful reruns.
 
 ## JSONL Filenames
@@ -273,6 +279,11 @@ MER families:
 - `transmission_kind`
 - `referenced_artifact` (`/` normalized to `_` when the LOG text is parsed as a LOG/MER filename reference)
 - `rate_bytes_per_s`
+- `byte_count`
+- `byte_offset`
+- `artifact_size_bytes`
+- `uploaded_file_count`
+- `disconnect_duration_s`
 
 `log_pressure_temperature_records.jsonl`
 
@@ -319,7 +330,11 @@ Shared MER provenance fields:
 
 - shared MER provenance fields
 - `block_index`
+- `event_index`
+- `event_info_date`
+- `event_rounds`
 - `date`
+- `rounds`
 - `pressure`
 - `temperature`
 - `criterion`
@@ -335,7 +350,11 @@ Shared MER provenance fields:
 - `stages`
 - `normalized`
 - `length`
+- `encoded_payload`
+- `encoded_payload_byte_count`
 - `data_payload_nbytes`
+- `expected_payload_nbytes`
+- `payload_length_matches_expected`
 - `raw_info_line`
 - `raw_format_line`
 
@@ -398,6 +417,22 @@ Shared MER provenance fields:
   - `run_id`
 
 This file is strictly file-level. It does not store append/rewrite/noop decisions and does not contain standalone non-file invalidation rows.
+
+`manifests/runs/<run_id>/malformed_log_lines.jsonl`
+
+- one row per recoverably malformed LOG line recorded during a stateful run
+
+`manifests/runs/<run_id>/skipped_log_files.jsonl`
+
+- one row per skipped LOG file recorded during a stateful run
+
+`manifests/runs/<run_id>/malformed_mer_blocks.jsonl`
+
+- one row per recoverably malformed MER block or metadata line recorded during a stateful run
+
+`manifests/runs/<run_id>/skipped_mer_files.jsonl`
+
+- one row per skipped MER file recorded during a stateful run
 
 `preflight_status.json`
 
