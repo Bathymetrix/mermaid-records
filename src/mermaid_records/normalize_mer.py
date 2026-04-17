@@ -73,6 +73,32 @@ _FORMAT_FIELDS = [
 ]
 
 
+def _classify_mer_tag_kind(
+    tag_name: str,
+    *,
+    stage_name: str,
+) -> str:
+    if stage_name == "environment":
+        primary_map = _ENVIRONMENT_KIND_MAP
+        forbidden_map = _PARAMETER_KIND_MAP
+    elif stage_name == "parameter":
+        primary_map = _PARAMETER_KIND_MAP
+        forbidden_map = _ENVIRONMENT_KIND_MAP
+    else:
+        raise ValueError(f"Unsupported MER stage: {stage_name}")
+
+    in_primary = tag_name in primary_map
+    in_forbidden = tag_name in forbidden_map
+    if in_primary and in_forbidden:
+        raise ValueError(
+            "MER derived-family multi-match: "
+            f"tag {tag_name!r} is registered in both {stage_name} and the opposite stage"
+        )
+    if in_primary:
+        return primary_map[tag_name]
+    return "unknown"
+
+
 @dataclass(slots=True)
 class MerJsonlPrototypeSummary:
     """Summary of generated MER-derived JSONL prototype streams."""
@@ -301,7 +327,7 @@ def _build_environment_record(
 ) -> tuple[dict[str, object], str]:
     stripped_line = line.strip()
     tag_name = _tag_name(stripped_line)
-    environment_kind = _ENVIRONMENT_KIND_MAP.get(tag_name, "unknown")
+    environment_kind = _classify_mer_tag_kind(tag_name, stage_name="environment")
     attrs = _parse_attributes(stripped_line)
     raw_values = _environment_raw_values(tag_name, stripped_line, attrs)
     return (
@@ -341,7 +367,7 @@ def _build_parameter_record(
 ) -> tuple[dict[str, object], str]:
     stripped_line = line.strip()
     tag_name = _tag_name(stripped_line)
-    parameter_kind = _PARAMETER_KIND_MAP.get(tag_name, "unknown")
+    parameter_kind = _classify_mer_tag_kind(tag_name, stage_name="parameter")
     attrs = _parse_attributes(stripped_line)
     raw_values = {key.lower(): value for key, value in attrs.items()} or None
     return (

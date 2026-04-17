@@ -6,6 +6,9 @@ import base64
 import json
 from pathlib import Path
 
+import pytest
+
+import mermaid_records.normalize_mer as normalize_mer_module
 from mermaid_records.normalize_mer import write_mer_jsonl_prototypes
 
 
@@ -245,6 +248,27 @@ def test_write_mer_jsonl_prototypes_supports_rounds_info_field(tmp_path: Path) -
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["rounds"] == "17"
+
+
+def test_mer_environment_and_parameter_stage_tag_spaces_are_exclusive() -> None:
+    for tag in normalize_mer_module._ENVIRONMENT_KIND_MAP:
+        assert tag not in normalize_mer_module._PARAMETER_KIND_MAP
+        assert (
+            normalize_mer_module._classify_mer_tag_kind(tag, stage_name="environment")
+            == normalize_mer_module._ENVIRONMENT_KIND_MAP[tag]
+        )
+    for tag in normalize_mer_module._PARAMETER_KIND_MAP:
+        assert tag not in normalize_mer_module._ENVIRONMENT_KIND_MAP
+        assert (
+            normalize_mer_module._classify_mer_tag_kind(tag, stage_name="parameter")
+            == normalize_mer_module._PARAMETER_KIND_MAP[tag]
+        )
+
+
+def test_mer_tag_stage_multi_match_fails_loudly(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(normalize_mer_module._PARAMETER_KIND_MAP, "BOARD", "bad_overlap")
+    with pytest.raises(ValueError, match="MER derived-family multi-match"):
+        normalize_mer_module._classify_mer_tag_kind("BOARD", stage_name="environment")
 
 
 def test_write_mer_jsonl_prototypes_supports_stanford_process_parameter(tmp_path: Path) -> None:

@@ -179,6 +179,12 @@ class _ParsedTaggedLogLine:
     message: str
 
 
+@dataclass(slots=True)
+class _DerivedFamilyMatch:
+    family: str
+    record: dict[str, object] | None
+
+
 def _common_log_record_fields(
     entry: OperationalLogEntry,
     *,
@@ -285,30 +291,25 @@ def write_log_jsonl_prototypes(
                     if isinstance(item, OperationalLogEntry):
                         total_records += 1
                         entry = item
-                        acquisition_record = _classify_acquisition(entry, instrument_id=path_instrument_id)
-                        ascent_request_record = _classify_ascent_request(entry, instrument_id=path_instrument_id)
-                        gps_record = _classify_gps(entry, instrument_id=path_instrument_id)
-                        transmission_record = _classify_transmission(entry, instrument_id=path_instrument_id)
-                        pressure_temperature_record = _classify_pressure_temperature(
+                        derived_match = _single_operational_family_match(
                             entry,
                             instrument_id=path_instrument_id,
                         )
-                        battery_record = _classify_battery(
-                            entry,
-                            instrument_id=path_instrument_id,
-                        )
-                        routed_measurement_kind = _classify_operational_measurement_fallback(entry)
                         severity = _severity(entry.message)
                         message_kind = _message_kind(
                             entry,
-                            has_acquisition=acquisition_record is not None,
-                            has_ascent_request=ascent_request_record is not None,
-                            has_gps=gps_record is not None,
-                            has_transmission=transmission_record is not None,
+                            has_acquisition=derived_match is not None and derived_match.family == "acquisition",
+                            has_ascent_request=(
+                                derived_match is not None and derived_match.family == "ascent_request"
+                            ),
+                            has_gps=derived_match is not None and derived_match.family == "gps",
+                            has_transmission=(
+                                derived_match is not None and derived_match.family == "transmission"
+                            ),
                             has_measurement=(
-                                pressure_temperature_record is not None
-                                or battery_record is not None
-                                or routed_measurement_kind is not None
+                                derived_match is not None
+                                and derived_match.family
+                                in {"pressure_temperature", "battery", "operational_measurement"}
                             ),
                         )
                         common_fields = _common_log_record_fields(entry, instrument_id=path_instrument_id)
@@ -323,11 +324,12 @@ def write_log_jsonl_prototypes(
                         _write_jsonl_line(operational_handle, operational_record)
                         operational_count += 1
 
-                        classified = False
-                        if acquisition_record is not None:
+                        classified = derived_match is not None
+                        if derived_match is not None and derived_match.family == "acquisition":
+                            acquisition_record = derived_match.record
+                            assert acquisition_record is not None
                             _write_jsonl_line(acquisition_handle, acquisition_record)
                             acquisition_count += 1
-                            classified = True
                             acquisition_state_counter[
                                 acquisition_record["acquisition_state"]
                             ] += 1
@@ -340,10 +342,11 @@ def write_log_jsonl_prototypes(
                             )
                             acquisition_examples.setdefault(example_key, acquisition_record)
 
-                        if ascent_request_record is not None:
+                        if derived_match is not None and derived_match.family == "ascent_request":
+                            ascent_request_record = derived_match.record
+                            assert ascent_request_record is not None
                             _write_jsonl_line(ascent_request_handle, ascent_request_record)
                             ascent_request_count += 1
-                            classified = True
                             ascent_request_state_counter[
                                 ascent_request_record["ascent_request_state"]
                             ] += 1
@@ -352,37 +355,40 @@ def write_log_jsonl_prototypes(
                                 ascent_request_record,
                             )
 
-                        if gps_record is not None:
+                        if derived_match is not None and derived_match.family == "gps":
+                            gps_record = derived_match.record
+                            assert gps_record is not None
                             _write_jsonl_line(gps_handle, gps_record)
                             gps_count += 1
-                            classified = True
                             gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
                             gps_examples.setdefault(gps_record["gps_record_kind"], gps_record)
 
-                        if transmission_record is not None:
+                        if derived_match is not None and derived_match.family == "transmission":
+                            transmission_record = derived_match.record
+                            assert transmission_record is not None
                             _write_jsonl_line(transmission_handle, transmission_record)
                             transmission_count += 1
-                            classified = True
                             if len(transmission_examples) < 3:
                                 transmission_examples.append(transmission_record)
 
-                        if pressure_temperature_record is not None:
+                        if derived_match is not None and derived_match.family == "pressure_temperature":
+                            pressure_temperature_record = derived_match.record
+                            assert pressure_temperature_record is not None
                             _write_jsonl_line(pressure_temperature_handle, pressure_temperature_record)
                             pressure_temperature_count += 1
-                            classified = True
                             if len(pressure_temperature_examples) < 3:
                                 pressure_temperature_examples.append(pressure_temperature_record)
 
-                        if battery_record is not None:
+                        if derived_match is not None and derived_match.family == "battery":
+                            battery_record = derived_match.record
+                            assert battery_record is not None
                             _write_jsonl_line(battery_handle, battery_record)
                             battery_count += 1
-                            classified = True
                             if len(battery_examples) < 3:
                                 battery_examples.append(battery_record)
 
-                        if routed_measurement_kind is not None:
+                        if derived_match is not None and derived_match.family == "operational_measurement":
                             routed_measurement_to_operational_count += 1
-                            classified = True
 
                         if not classified:
                             unclassified_record = {
@@ -823,6 +829,56 @@ def _severity(message: str) -> str | None:
     if "<WARN>" in message or "<WRN>" in message:
         return "warn"
     return None
+
+
+def _collect_operational_family_matches(
+    entry: OperationalLogEntry,
+    *,
+    instrument_id: str,
+) -> list[_DerivedFamilyMatch]:
+    matches: list[_DerivedFamilyMatch] = []
+    for family, record in (
+        ("acquisition", _classify_acquisition(entry, instrument_id=instrument_id)),
+        ("ascent_request", _classify_ascent_request(entry, instrument_id=instrument_id)),
+        ("gps", _classify_gps(entry, instrument_id=instrument_id)),
+        ("transmission", _classify_transmission(entry, instrument_id=instrument_id)),
+        (
+            "pressure_temperature",
+            _classify_pressure_temperature(entry, instrument_id=instrument_id),
+        ),
+        ("battery", _classify_battery(entry, instrument_id=instrument_id)),
+    ):
+        if record is not None:
+            matches.append(_DerivedFamilyMatch(family=family, record=record))
+
+    routed_measurement_kind = _classify_operational_measurement_fallback(entry)
+    if routed_measurement_kind is not None:
+        matches.append(
+            _DerivedFamilyMatch(
+                family="operational_measurement",
+                record={
+                    "measurement_kind": routed_measurement_kind,
+                    "message": entry.message,
+                },
+            )
+        )
+    return matches
+
+
+def _single_operational_family_match(
+    entry: OperationalLogEntry,
+    *,
+    instrument_id: str,
+) -> _DerivedFamilyMatch | None:
+    matches = _collect_operational_family_matches(entry, instrument_id=instrument_id)
+    if len(matches) <= 1:
+        return matches[0] if matches else None
+
+    families = ", ".join(match.family for match in matches)
+    raise ValueError(
+        "Operational derived-family multi-match: "
+        f"{families} for line {entry.raw_line!r}"
+    )
 
 
 def _classify_acquisition(

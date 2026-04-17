@@ -5,6 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
+import mermaid_records.normalize_log as normalize_log_module
 from mermaid_records.normalize_log import write_log_jsonl_prototypes
 
 FIXTURES_ROOT = (
@@ -225,6 +228,67 @@ def test_write_log_jsonl_prototypes_preserves_old_measurement_population_account
         "battery 14685mV,   12688uA"
     ]
     assert [record["message_kind"] for record in operational_records] == ["measurement"] * 8
+
+
+def test_write_log_jsonl_prototypes_fails_loudly_on_derived_family_multi_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    log_path = tmp_path / "0100_ambiguous.LOG"
+    log_path.write_text(
+        '1700000000:[UPLOAD,0231]"0100/AAAA0001.MER" uploaded at 83bytes/s\n',
+        encoding="utf-8",
+    )
+
+    original_classifier = normalize_log_module._classify_battery
+
+    def _ambiguous_battery(entry, *, instrument_id: str):
+        record = original_classifier(entry, instrument_id=instrument_id)
+        if record is not None:
+            return record
+        return {
+            **normalize_log_module._common_log_record_fields(entry, instrument_id=instrument_id),
+            "voltage_mv": 14685,
+            "current_ua": 12688,
+            "raw_line": entry.raw_line,
+        }
+
+    monkeypatch.setattr(normalize_log_module, "_classify_battery", _ambiguous_battery)
+
+    with pytest.raises(
+        ValueError,
+        match="Operational derived-family multi-match: transmission, battery",
+    ):
+        write_log_jsonl_prototypes([log_path], tmp_path / "jsonl")
+
+
+def test_write_log_jsonl_prototypes_keeps_grouped_sbe_routing_outside_operational_exclusivity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    log_path = tmp_path / "0100_sbe.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[SBE61 ,0396]P +20122,T +19514,S +34584",
+                "1700000001:[PROFIL,0299]    speed_control=10mbar/s",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    def _fail_if_called(*args, **kwargs):
+        raise AssertionError("Operational exclusivity collector should not run for grouped SBE episodes")
+
+    monkeypatch.setattr(normalize_log_module, "_single_operational_family_match", _fail_if_called)
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_prototypes([log_path], output_dir)
+
+    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
+    assert summary.sbe_records == 1
+    assert len(sbe_records) == 1
 
 
 def test_write_log_jsonl_prototypes_emits_acquisition_records(
