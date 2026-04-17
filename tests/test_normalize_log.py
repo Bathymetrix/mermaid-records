@@ -572,6 +572,96 @@ def test_write_log_jsonl_prototypes_groups_contiguous_sbe61_measurements_from_01
     assert all("[SBE61 ,0396]" not in row["raw_line"] for row in malformed_log_lines)
 
 
+def test_write_log_jsonl_prototypes_broadens_transmission_classification_conservatively(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0700_transmission.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[UPLOAD,0248]Upload data files...",
+                '1700000001:[UPLOAD,0231]"0070/60B742A0.MER" uploaded at 137bytes/s',
+                "1700000002:[MRMAID,0604]1373 bytes in 0026/5D3CDEA0.MER",
+                "1700000003:[ZTX   ,486]peer ask to resume 07/5B6A9B02.LOG from byte 1024",
+                "1700000004:[ZTX   ,472]<ERR>peer ask to resume 0048/607503A2.MER (118847bytes) from byte 4294967294",
+                '1700000005:[UPLOAD,9999]<ERR>upload "0026","0026/5DC0FCFC.MER"',
+                "1700000006:[SURF  ,0069]transfer interrupted , retry",
+                "1700000007:[MAIN  ,0013]2 file(s) uploaded",
+                "1700000008:[SURF  ,0014]disconnected after 288s",
+                "1700000009:[SURF  ,0025]Iridium...",
+                "1700000010:[SURF  ,0226]Go dive (Minimum surface delay expired and no more file to upload)",
+                "1700000011:[SURF  ,0056]<WARN>peer mute",
+                "1700000012:[SURF  ,0071]<WARN>timeout",
+                "1700000013:[SURF  ,0023]failed to connect #1, code -8, net 1, qual 5, dial 1",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_prototypes([log_path], output_dir)
+
+    transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
+
+    assert summary.transmission_records == 9
+    assert [record["transmission_kind"] for record in transmission_records] == [
+        "upload_batch",
+        "upload_artifact",
+        "upload_progress_artifact",
+        "upload_resume",
+        "upload_resume",
+        "upload_error_artifact",
+        "upload_retry",
+        "upload_session_summary",
+        "upload_disconnect",
+    ]
+    assert transmission_records[0]["transmission_kind"] == "upload_batch"
+    assert transmission_records[0]["referenced_artifact"] is None
+    assert transmission_records[0]["byte_count"] is None
+
+    assert transmission_records[1]["transmission_kind"] == "upload_artifact"
+    assert transmission_records[1]["referenced_artifact"] == "0070_60B742A0.MER"
+    assert transmission_records[1]["rate_bytes_per_s"] == 137
+
+    assert transmission_records[2]["transmission_kind"] == "upload_progress_artifact"
+    assert transmission_records[2]["referenced_artifact"] == "0026_5D3CDEA0.MER"
+    assert transmission_records[2]["byte_count"] == 1373
+    assert transmission_records[2]["rate_bytes_per_s"] is None
+
+    assert transmission_records[3]["transmission_kind"] == "upload_resume"
+    assert transmission_records[3]["referenced_artifact"] == "07_5B6A9B02.LOG"
+    assert transmission_records[3]["byte_offset"] == 1024
+    assert transmission_records[3]["artifact_size_bytes"] is None
+
+    assert transmission_records[4]["transmission_kind"] == "upload_resume"
+    assert transmission_records[4]["referenced_artifact"] == "0048_607503A2.MER"
+    assert transmission_records[4]["byte_offset"] == 4294967294
+    assert transmission_records[4]["artifact_size_bytes"] == 118847
+    assert transmission_records[4]["message"].startswith("<ERR>peer ask to resume")
+
+    assert transmission_records[5]["transmission_kind"] == "upload_error_artifact"
+    assert transmission_records[5]["referenced_artifact"] == "0026_5DC0FCFC.MER"
+
+    assert transmission_records[6]["transmission_kind"] == "upload_retry"
+    assert transmission_records[6]["referenced_artifact"] is None
+
+    assert transmission_records[7]["transmission_kind"] == "upload_session_summary"
+    assert transmission_records[7]["uploaded_file_count"] == 2
+
+    assert transmission_records[8]["transmission_kind"] == "upload_disconnect"
+    assert transmission_records[8]["disconnect_duration_s"] == 288
+
+    assert {record["message"] for record in unclassified_records} >= {
+        "Iridium...",
+        "Go dive (Minimum surface delay expired and no more file to upload)",
+        "<WARN>peer mute",
+        "<WARN>timeout",
+        "failed to connect #1, code -8, net 1, qual 5, dial 1",
+    }
+
+
 def _read_jsonl(path: Path) -> list[dict[str, object]]:
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]

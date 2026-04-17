@@ -56,7 +56,38 @@ _PARAMETER_PREFIX_RE = re.compile(
     re.IGNORECASE,
 )
 
-_UPLOADED_ARTIFACT_RE = re.compile(r'"(?P<artifact>[^"]+)" uploaded at (?P<rate>\d+)bytes/s')
+_ARTIFACT_PATH_PATTERN = r"(?P<artifact>\d{2,4}/[A-Za-z0-9]+\.(?:MER|LOG|BIN))"
+_UPLOADED_ARTIFACT_RE = re.compile(
+    rf'"{_ARTIFACT_PATH_PATTERN}" uploaded at (?P<rate>\d+)bytes/s',
+    re.IGNORECASE,
+)
+_UPLOAD_PROGRESS_ARTIFACT_RE = re.compile(
+    rf"(?P<byte_count>\d+) bytes in {_ARTIFACT_PATH_PATTERN}",
+    re.IGNORECASE,
+)
+_UPLOAD_RESUME_RE = re.compile(
+    rf"peer ask to resume {_ARTIFACT_PATH_PATTERN}"
+    rf"(?: \((?P<artifact_size_bytes>\d+)bytes\))?"
+    rf" from byte (?P<byte_offset>\d+)",
+    re.IGNORECASE,
+)
+_UPLOAD_ERROR_ARTIFACT_RE = re.compile(
+    rf"<ERR>\s*upload\b.*?{_ARTIFACT_PATH_PATTERN}",
+    re.IGNORECASE,
+)
+_UPLOAD_RETRY_RE = re.compile(
+    r"transfer interrupted\s*,?\s*retry(?: now)?",
+    re.IGNORECASE,
+)
+_UPLOAD_SESSION_SUMMARY_RE = re.compile(
+    r"(?P<uploaded_file_count>\d+) file(?:\(s\)|s)? uploaded",
+    re.IGNORECASE,
+)
+_UPLOAD_DISCONNECT_RE = re.compile(
+    r"disconnected after (?P<disconnect_duration_s>\d+)s",
+    re.IGNORECASE,
+)
+_UPLOAD_BATCH_RE = re.compile(r"^Upload data files\.\.\.$", re.IGNORECASE)
 _P_T_S_RE = re.compile(r"\bP\s*[+-]?\d+,\s*T\s*[+-]?\d+,\s*S\s*[+-]?\d+\b")
 _PRESS_TEMP_RE = re.compile(r"\bP\s*[+-]?\d+mbar,\s*T\s*[+-]?\d+mdegC\b")
 _BATTERY_RE = re.compile(r"\bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b", re.IGNORECASE)
@@ -810,27 +841,104 @@ def _classify_transmission(
     *,
     instrument_id: str,
 ) -> dict[str, object] | None:
-    message = entry.message
-    if "Upload data files" in message:
-        return {
-            **_common_log_record_fields(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_batch",
-            "referenced_artifact": None,
-            "rate_bytes_per_s": None,
-            "raw_line": entry.raw_line,
-        }
+    message = entry.message.strip()
 
     uploaded_match = _UPLOADED_ARTIFACT_RE.search(message)
-    if uploaded_match is None:
-        return None
+    if uploaded_match is not None:
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_artifact",
+            "referenced_artifact": _normalize_parsed_artifact_reference(
+                uploaded_match.group("artifact")
+            ),
+            "rate_bytes_per_s": int(uploaded_match.group("rate")),
+        }
 
+    resume_match = _UPLOAD_RESUME_RE.search(message)
+    if resume_match is not None:
+        artifact_size_bytes = resume_match.group("artifact_size_bytes")
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_resume",
+            "referenced_artifact": _normalize_parsed_artifact_reference(
+                resume_match.group("artifact")
+            ),
+            "byte_offset": int(resume_match.group("byte_offset")),
+            "artifact_size_bytes": (
+                int(artifact_size_bytes) if artifact_size_bytes is not None else None
+            ),
+        }
+
+    progress_match = _UPLOAD_PROGRESS_ARTIFACT_RE.search(message)
+    if progress_match is not None:
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_progress_artifact",
+            "referenced_artifact": _normalize_parsed_artifact_reference(
+                progress_match.group("artifact")
+            ),
+            "byte_count": int(progress_match.group("byte_count")),
+        }
+
+    error_match = _UPLOAD_ERROR_ARTIFACT_RE.search(message)
+    if error_match is not None:
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_error_artifact",
+            "referenced_artifact": _normalize_parsed_artifact_reference(
+                error_match.group("artifact")
+            ),
+        }
+
+    if _UPLOAD_RETRY_RE.search(message):
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_retry",
+        }
+
+    session_summary_match = _UPLOAD_SESSION_SUMMARY_RE.search(message)
+    if session_summary_match is not None:
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_session_summary",
+            "uploaded_file_count": int(
+                session_summary_match.group("uploaded_file_count")
+            ),
+        }
+
+    disconnect_match = _UPLOAD_DISCONNECT_RE.search(message)
+    if disconnect_match is not None:
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_disconnect",
+            "disconnect_duration_s": int(
+                disconnect_match.group("disconnect_duration_s")
+            ),
+        }
+
+    if _UPLOAD_BATCH_RE.search(message):
+        return {
+            **_base_transmission_record(entry, instrument_id=instrument_id),
+            "transmission_kind": "upload_batch",
+        }
+
+    return None
+
+
+def _base_transmission_record(
+    entry: OperationalLogEntry,
+    *,
+    instrument_id: str,
+) -> dict[str, object]:
     return {
         **_common_log_record_fields(entry, instrument_id=instrument_id),
-        "transmission_kind": "upload_artifact",
-        "referenced_artifact": _normalize_parsed_artifact_reference(
-            uploaded_match.group("artifact")
-        ),
-        "rate_bytes_per_s": int(uploaded_match.group("rate")),
+        "referenced_artifact": None,
+        "rate_bytes_per_s": None,
+        "byte_count": None,
+        "byte_offset": None,
+        "artifact_size_bytes": None,
+        "uploaded_file_count": None,
+        "disconnect_duration_s": None,
         "raw_line": entry.raw_line,
     }
 
