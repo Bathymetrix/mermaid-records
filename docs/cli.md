@@ -26,18 +26,34 @@ or, for targeted runs:
 mermaid-records normalize --input-file <INPUT_FILE> --output-dir <OUTPUT_DIR>
 ```
 
-Depending on the runtime environment, output resolution may also use established environment configuration, but the documented interface should be treated as the flag-based form above.
+Supported normalize flags currently are:
+
+- `--input-root`
+- `--input-file`
+- `--output-dir`
+- `--decoder-python`
+- `--decoder-script`
+- `--preflight-mode {strict,cached}`
+- `--dry-run`
+- `--force-rewrite`
+- `--json`
+- `--verbose` / `-v`
+
+`--output-dir` is optional only when the `MERMAID` environment variable is set, in which case the CLI resolves the output directory to `$MERMAID/records`.
+
+`--json` only changes CLI output when `--dry-run` is also set. Without `--dry-run`, the current implementation still prints the normal human-readable summary.
 
 ## Execution modes
 
 The CLI has two important behavioral modes:
 
-- **stateful mode** — writes normalization bookkeeping and manifests
-- **stateless mode** — performs normalization without manifest persistence
+- **stateful mode** — selected by `--input-root`; writes normalization bookkeeping and manifests
+- **stateless mode** — selected by `--input-file`; performs normalization without manifest persistence
 
 This distinction matters for:
 
 - whether `manifests/` and `state/` exist
+- whether `preflight_status.json` can exist
 - whether malformed/non-normalizable content is persisted in manifest artifacts
 - how rewrite/bookkeeping behavior should be interpreted
 
@@ -62,16 +78,23 @@ Typical per-instrument outputs include LOG and MER JSONL families such as:
 - `mer_event_records.jsonl`
 - `mer_parameter_records.jsonl`
 
-Stateful runs may also create:
+Stateful runs materialize:
 
 - `manifests/`
 - `state/`
+
+Additionally:
+
+- `preflight_status.json` is written at instrument root only when BIN decode preflight runs with a durable output directory
+- stateless runs do not write `manifests/`, `state/`, or `preflight_status.json`
 
 ## Force rewrite
 
 `--force-rewrite` is a targeted regeneration mechanism.
 
 For the targeted instrument output directories, it removes package-owned generated artifacts before regeneration so that stale outputs from older layouts do not persist. It should be understood as instrument-scoped cleanup and rebuild, not global deletion of all outputs under the entire output root.
+
+In stateless mode, `--force-rewrite` still rewrites only the targeted instrument outputs; it does not enable manifests or other stateful bookkeeping.
 
 ## Operational guidance
 

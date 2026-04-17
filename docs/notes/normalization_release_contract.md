@@ -100,7 +100,7 @@ BIN decode preflight has exactly two requested modes:
   - live `database_update(...)` refresh is still attempted
   - refresh failure may continue in degraded cached mode
 
-When a durable output directory is used, `preflight_status.json` records:
+When BIN decode preflight runs with a durable output directory, `preflight_status.json` records:
 
 - requested mode
 - effective mode
@@ -141,7 +141,7 @@ Per instrument:
   mer_environment_records.jsonl
   mer_parameter_records.jsonl
   mer_event_records.jsonl
-  preflight_status.json
+  preflight_status.json  # only when BIN decode preflight ran
   manifests/
     latest.json
     runs/

@@ -58,7 +58,21 @@ The installed entrypoint is:
 mermaid-records normalize --input-root <INPUT_ROOT> --output-dir <OUTPUT_DIR>
 ```
 
-Depending on the workflow, normalization can also be targeted with `--input-file`. The CLI has both stateful and stateless behavior. See `docs/cli.md` for the authoritative interface and mode details.
+Supported normalize flags currently include:
+
+- `--input-root` for stateful mode
+- `--input-file` for stateless mode
+- `--output-dir`
+- `--decoder-python` and `--decoder-script` for BIN-backed runs
+- `--preflight-mode {strict,cached}`
+- `--dry-run`
+- `--force-rewrite`
+- `--json` for structured dry-run output
+- `--verbose` / `-v`
+
+`--output-dir` may also resolve from `$MERMAID/records` when `--output-dir` is omitted and `MERMAID` is set.
+
+The CLI has both stateful mode and stateless mode. See `docs/cli.md` for the authoritative interface and mode details.
 
 ## Output model
 
@@ -85,15 +99,15 @@ Typical families include:
     mer_parameter_records.jsonl
     manifests/          # stateful mode only
     state/              # stateful mode only
+    preflight_status.json  # only when BIN decode preflight ran
 ```
 
 Not every float emits every record family, and not every family populates every optional field. Presence, absence, and sparsity reflect the underlying source artifacts and float generation, not necessarily a normalization defect.
 
-The three representative float classes used during v1 documentation review were:
+The tracked fixture families currently used for release-facing examples and tests are:
 
-- CTD MERMAID (MOBY)
-- ACOUSTIC MERMAID
-- PSD MERMAID (Stanford)
+- `452.020-P-06`
+- `467.174-T-0100`
 
 No single float should be expected to exercise every family or every non-null field.
 
@@ -120,7 +134,7 @@ No single float should be expected to exercise every family or every non-null fi
 ### LOG transmission
 
 ```json
-{"instrument_id":"R0007","source_file":"0007_5FD6F697.LOG","source_container":"log","record_time":"2020-12-14T06:39:04","log_epoch_time":"1607927944","subsystem":"UPLOAD","code":"0231","message":"\"0007/5FD707A6.MER\" uploaded at 126bytes/s","referenced_artifact":"0007_5FD707A6.MER","rate_bytes_per_s":126,"raw_line":"1607927944:[UPLOAD,0231]\"0007/5FD707A6.MER\" uploaded at 126bytes/s","transmission_kind":"upload_artifact"}
+{"instrument_id":"T0100","source_file":"0100_66E74070.LOG","source_container":"log","record_time":"2024-09-15T16:22:53","log_epoch_time":"1726434973","subsystem":"UPLOAD","code":"0231","message":"\"0100/66E73F16.MER\" uploaded at 80bytes/s","referenced_artifact":"0100_66E73F16.MER","rate_bytes_per_s":80,"raw_line":"1726434973:[UPLOAD,0231]\"0100/66E73F16.MER\" uploaded at 80bytes/s","transmission_kind":"upload_artifact"}
 ```
 
 ### MER environment
@@ -138,7 +152,7 @@ No single float should be expected to exercise every family or every non-null fi
 ### MER parameter
 
 ```json
-{"instrument_id":"R0007","source_file":"0007_69C46326.MER","source_container":"mer","parameter_kind":"stanford_process","stanford_process_duration_h":168,"stanford_process_period_h":3,"stanford_process_window_len":1024,"stanford_process_window_type":"Hanning","stanford_process_overlap_percent":10,"stanford_process_db_offset":0.0,"raw_values":{"duration_h":"168","process_period_h":"3","window_len":"1024","window_type":"Hanning","overlap_percent":"10","db_offset":"0"},"line":"\t<STANFORD_PROCESS DURATION_h=168 PROCESS_PERIOD_h=3 WINDOW_LEN=1024 WINDOW_TYPE=Hanning OVERLAP_PERCENT=10 dB_OFFSET=0 />"}
+{"instrument_id":"T0100","source_file":"0100_6492BBAB.MER","source_container":"mer","parameter_kind":"misc","raw_values":{"upload_max":"100kB"},"line":"\t<MISC UPLOAD_MAX=100kB />"}
 ```
 
 ## Source preservation
@@ -148,6 +162,7 @@ No single float should be expected to exercise every family or every non-null fi
 - directly in normalized records, for example `raw_line`, `raw_lines`, or `line`
 - as structured components, for example `raw_info_line`, `raw_format_line`, and encoded payload fields in MER event records
 - in stateful audit/manifests when that mode is enabled
+- in `preflight_status.json` when BIN decode preflight runs with a durable output directory
 
 This package does **not** guarantee that every JSONL record contains a full verbatim copy of the original source block.
 
