@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 from typing import Iterable
 
-from .mer_raw import parse_mer_file, parse_mer_file_recoverable
+from .parse_mer import parse_mer_file, parse_mer_file_recoverable
 from .parse_instrument_name import maybe_parse_instrument_name
 
 OUTPUT_FILENAMES = {

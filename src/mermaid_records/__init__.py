@@ -17,7 +17,7 @@ from .bin2log import (
     iter_decoded_log_lines,
     update_decoder_database,
 )
-from .operational_raw import iter_operational_log_entries
+from .parse_log import iter_operational_log_entries
 from .parse_instrument_name import InstrumentName, parse_instrument_name
 from .discovery import (
     iter_bin_files,
@@ -31,7 +31,7 @@ from .models import (
     MerFileMetadata,
     OperationalLogEntry,
 )
-from .mer_raw import iter_mer_event_blocks, parse_mer_file
+from .parse_mer import iter_mer_event_blocks, parse_mer_file
 from .normalize_log import LogJsonlPrototypeSummary, write_log_jsonl_prototypes
 from .normalize_mer import MerJsonlPrototypeSummary, write_mer_jsonl_prototypes
 from .normalize_pipeline import (
