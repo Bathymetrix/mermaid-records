@@ -215,12 +215,6 @@ def iter_mer_event_blocks_recoverable(
         )
 
 
-def iter_mer_records(path: Path) -> Iterator[MerEventBlock]:
-    """Yield parsed MER event blocks."""
-
-    yield from iter_mer_event_blocks(path)
-
-
 def _parse_metadata(path: Path, data: bytes) -> MerFileMetadata:
     """Parse file-level metadata from ENVIRONMENT and PARAMETERS sections."""
 
