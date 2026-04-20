@@ -34,6 +34,14 @@ def test_readme_documents_release_cli_contract() -> None:
     assert "preflight_status.json" in readme
 
 
+def test_readme_lists_release_facing_fixture_families() -> None:
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "- `452.020-P-06`" in readme
+    assert "- `465.152-R-0001`" in readme
+    assert "- `467.174-T-0100`" in readme
+
+
 def test_root_license_file_is_present() -> None:
     license_text = (REPO_ROOT / "LICENSE").read_text(encoding="utf-8")
 

@@ -11,6 +11,8 @@ from mermaid_records.discovery import (
     iter_raw_inputs,
 )
 
+PSD_FIXTURE_ROOT = Path("data/fixtures/465.152-R-0001")
+
 
 def test_iter_bin_files_recurses(tmp_path: Path) -> None:
     _build_tree(tmp_path)
@@ -92,6 +94,18 @@ def test_iter_raw_inputs_requires_existing_directory(tmp_path: Path) -> None:
 
     with pytest.raises(NotADirectoryError):
         list(iter_raw_inputs(not_a_directory))
+
+
+def test_iter_raw_inputs_discovers_real_psd_fixture_subset() -> None:
+    paths = list(iter_raw_inputs(PSD_FIXTURE_ROOT, sort=True))
+
+    assert [path.relative_to(PSD_FIXTURE_ROOT).as_posix() for path in paths] == [
+        "bin/0001_6255B10B.BIN",
+        "bin/0001_625CB0DC.BIN",
+        "mer/0001_6255B101.MER",
+        "mer/0001_625CB0C0.MER",
+    ]
+    assert [path.relative_to(PSD_FIXTURE_ROOT).as_posix() for path in iter_log_files(PSD_FIXTURE_ROOT)] == []
 
 
 def _build_tree(root: Path) -> None:

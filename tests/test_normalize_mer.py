@@ -11,6 +11,10 @@ import pytest
 import mermaid_records.normalize_mer as normalize_mer_module
 from mermaid_records.normalize_mer import write_mer_jsonl_prototypes
 
+PSD_MER_FIXTURE_ROOT = (
+    Path(__file__).resolve().parents[1] / "data" / "fixtures" / "465.152-R-0001" / "mer"
+)
+
 
 def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_event_rows(
     tmp_path: Path,
@@ -596,6 +600,111 @@ def test_write_mer_jsonl_prototypes_accepts_metadata_only_stanford_mer(
     assert summary.zero_event_files == 1
     assert summary.total_event_blocks == 0
     assert _read_jsonl(output_dir / "mer_event_records.jsonl") == []
+
+
+def test_write_mer_jsonl_prototypes_exercises_real_psd_fixture_subset(
+    tmp_path: Path,
+) -> None:
+    output_dir = tmp_path / "jsonl"
+    malformed_mer_blocks: list[dict[str, object]] = []
+
+    summary = write_mer_jsonl_prototypes(
+        [
+            PSD_MER_FIXTURE_ROOT / "0001_6255B101.MER",
+            PSD_MER_FIXTURE_ROOT / "0001_625CB0C0.MER",
+        ],
+        output_dir,
+        run_id="run-real-psd",
+        malformed_mer_blocks=malformed_mer_blocks,
+    )
+
+    environment_records = _read_jsonl(output_dir / "mer_environment_records.jsonl")
+    parameter_records = _read_jsonl(output_dir / "mer_parameter_records.jsonl")
+    event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
+
+    assert malformed_mer_blocks == []
+    assert summary.environment_records == 27
+    assert summary.parameter_records == 6
+    assert summary.event_records == 10
+    assert summary.total_mer_files == 2
+    assert summary.zero_event_files == 1
+    assert summary.total_event_blocks == 10
+    assert summary.environment_kind_counts == {
+        "board": 2,
+        "clock": 5,
+        "dive": 2,
+        "drift": 5,
+        "gpsinfo": 5,
+        "pool": 2,
+        "sample": 2,
+        "software": 2,
+        "true_sample_freq": 2,
+    }
+    assert summary.parameter_kind_counts == {
+        "adc": 2,
+        "misc": 2,
+        "stanford_process": 2,
+    }
+
+    assert {record["source_file"] for record in environment_records} == {
+        "0001_6255B101.MER",
+        "0001_625CB0C0.MER",
+    }
+    assert {record["source_file"] for record in parameter_records} == {
+        "0001_6255B101.MER",
+        "0001_625CB0C0.MER",
+    }
+    assert {record["source_file"] for record in event_records} == {"0001_625CB0C0.MER"}
+    assert [record["event_index"] for record in event_records] == list(range(10))
+    assert [record["event_rounds"] for record in event_records[:3]] == [
+        "237",
+        "468",
+        "468",
+    ]
+    assert event_records[-1]["event_rounds"] == "468"
+    assert event_records[0]["event_info_date"] == "2022-04-12T10:02:58.273497"
+    assert event_records[-1]["event_info_date"] == "2022-04-11T07:03:03.177795"
+    assert [record["raw_format_line"] for record in event_records] == [None] * 10
+    assert {record["encoded_payload_byte_count"] for record in event_records} == {512}
+    assert {record["data_payload_nbytes"] for record in event_records} == {512}
+    assert {record["expected_payload_nbytes"] for record in event_records} == {None}
+    assert {record["payload_length_matches_expected"] for record in event_records} == {None}
+
+    stanford_process_records = [
+        record
+        for record in parameter_records
+        if record["parameter_kind"] == "stanford_process"
+    ]
+    assert len(stanford_process_records) == 2
+    assert {record["stanford_process_duration_h"] for record in stanford_process_records} == {168}
+    assert {record["stanford_process_period_h"] for record in stanford_process_records} == {3}
+    assert {record["stanford_process_window_len"] for record in stanford_process_records} == {1024}
+    assert {record["stanford_process_window_type"] for record in stanford_process_records} == {
+        "Hanning"
+    }
+    assert {record["stanford_process_overlap_percent"] for record in stanford_process_records} == {
+        10
+    }
+    assert {record["stanford_process_db_offset"] for record in stanford_process_records} == {
+        0.0
+    }
+
+    metadata_only_pool_record = next(
+        record
+        for record in environment_records
+        if record["source_file"] == "0001_6255B101.MER"
+        and record["environment_kind"] == "pool"
+    )
+    eventful_pool_record = next(
+        record
+        for record in environment_records
+        if record["source_file"] == "0001_625CB0C0.MER"
+        and record["environment_kind"] == "pool"
+    )
+    assert metadata_only_pool_record["pool_declared_event_count"] == 0
+    assert metadata_only_pool_record["pool_declared_size_bytes"] == 0
+    assert eventful_pool_record["pool_declared_event_count"] == 10
+    assert eventful_pool_record["pool_declared_size_bytes"] == 6060
 
 
 def test_write_mer_jsonl_prototypes_excludes_stanford_data_framing_bytes_without_format(

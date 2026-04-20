@@ -115,6 +115,7 @@ Not every float emits every record family, and not every family populates every 
 The tracked fixture families currently used for release-facing examples and tests are:
 
 - `452.020-P-06`
+- `465.152-R-0001`
 - `467.174-T-0100`
 
 No single float should be expected to exercise every family or every non-null field.

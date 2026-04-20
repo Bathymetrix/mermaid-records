@@ -197,6 +197,9 @@ Tracked fixtures currently include:
 - `data/fixtures/452.020-P-06/log/*.LOG`
 - `data/fixtures/452.020-P-06/mer/*.MER`
 - `data/fixtures/452.020-P-06/README.md`
+- `data/fixtures/465.152-R-0001/bin/*.BIN`
+- `data/fixtures/465.152-R-0001/mer/*.MER`
+- `data/fixtures/465.152-R-0001/README.md`
 - `data/fixtures/467.174-T-0100/bin/*.BIN`
 - `data/fixtures/467.174-T-0100/log/*.LOG`
 - `data/fixtures/467.174-T-0100/mer/*.MER`
@@ -204,6 +207,8 @@ Tracked fixtures currently include:
 - `data/fixtures/467.174-T-0100/README.md`
 
 The representative JSONL prototype fixture sets under `data/fixtures/log_examples_representative_06_0100/` and `data/fixtures/mer_examples_representative_06_0100/` remain in scope for inspection.
+
+The compact PSD Stanford-style fixture family under `data/fixtures/465.152-R-0001/` intentionally tracks paired raw `BIN` + `MER` artifacts only. Do not invent or require a decoded `log/` branch for that family unless the user explicitly asks for decoder-backed PSD fixtures.
 
 ## Workflow Rules
 
