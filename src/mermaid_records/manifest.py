@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import secrets
 import subprocess
 from typing import TYPE_CHECKING
 
@@ -27,7 +28,7 @@ def begin_instrument_run(
     """Create manifest context for one instrument-level stateful run."""
 
     started_at = _iso_now()
-    run_id = f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+    run_id = _manifest_run_id()
     manifests_root = instrument_output_dir / "manifests"
     run_dir = manifests_root / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -321,6 +322,11 @@ def _hash_file(path: Path) -> str:
 
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _manifest_run_id() -> str:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return f"{timestamp}-{secrets.token_hex(3)}"
 
 
 def _has_materialized_outputs(instrument_output_dir: Path) -> bool:

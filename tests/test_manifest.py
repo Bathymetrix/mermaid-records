@@ -123,6 +123,29 @@ def test_stateful_second_run_with_no_raw_source_changes_is_noop(tmp_path: Path) 
     assert {row["change_kind"] for row in diff_rows} == {"unchanged"}
 
 
+def test_stateful_immediate_reruns_create_distinct_manifest_run_directories(tmp_path: Path) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    _write_log(input_root / "0100_first.LOG", "first")
+    output_root = tmp_path / "output"
+
+    run_normalization_pipeline(input_root, output_dir=output_root)
+    first_latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+
+    run_normalization_pipeline(input_root, output_dir=output_root)
+    second_latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
+
+    runs_root = output_root / "467.174-T-0100" / "manifests" / "runs"
+    run_dirs = sorted(path.name for path in runs_root.iterdir() if path.is_dir())
+
+    assert first_latest["run_id"] != second_latest["run_id"]
+    assert len(run_dirs) == 2
+    assert run_dirs == sorted([first_latest["run_id"], second_latest["run_id"]])
+    assert all(len(run_id.rsplit("-", 1)[-1]) == 6 for run_id in run_dirs)
+    assert all(run_id.count("-") == 1 for run_id in run_dirs)
+
+
 def test_stateful_force_rewrite_rewrites_unchanged_outputs(tmp_path: Path) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()
