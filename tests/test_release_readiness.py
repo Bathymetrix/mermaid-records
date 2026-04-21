@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 import contextlib
+import importlib
 import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tomllib
 from zipfile import ZipFile
 
 from packaging.version import Version
 import pytest
-import setuptools.build_meta
 
 from mermaid_records import __version__
 from mermaid_records.bin2log import Bin2LogConfig
@@ -190,11 +191,40 @@ def _build_release_wheel(tmp_path: Path) -> Path:
     shutil.copy2(REPO_ROOT / "LICENSE", source_root / "LICENSE")
     shutil.copytree(REPO_ROOT / "src", source_root / "src")
     dist_dir.mkdir()
-    with contextlib.chdir(source_root):
-        wheel_name = setuptools.build_meta.build_wheel(str(dist_dir))
-    wheel_path = dist_dir / wheel_name
-    assert wheel_path.exists()
-    return wheel_path
+    build_meta = _load_setuptools_build_meta()
+    if build_meta is not None:
+        with contextlib.chdir(source_root):
+            wheel_name = build_meta.build_wheel(str(dist_dir))
+        wheel_path = dist_dir / wheel_name
+        assert wheel_path.exists()
+        return wheel_path
+
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            str(source_root),
+            "--no-deps",
+            "--wheel-dir",
+            str(dist_dir),
+        ],
+        check=True,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    wheels = sorted(dist_dir.glob("*.whl"))
+    assert len(wheels) == 1
+    return wheels[0]
+
+
+def _load_setuptools_build_meta() -> object | None:
+    try:
+        return importlib.import_module("setuptools.build_meta")
+    except ModuleNotFoundError:
+        return None
 
 
 def _wheel_metadata(path: Path) -> dict[str, str]:
