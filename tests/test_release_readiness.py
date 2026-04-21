@@ -2,11 +2,23 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+import subprocess
+import sys
 import tomllib
+from zipfile import ZipFile
 
+from packaging.version import Version
+
+from mermaid_records import __version__
+from mermaid_records.bin2log import Bin2LogConfig
+from mermaid_records.normalize_pipeline import run_normalization_pipeline
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_RELEASE_VERSION = "1.0.0-alpha"
+EXPECTED_ARTIFACT_VERSION = str(Version(EXPECTED_RELEASE_VERSION))
+EXPECTED_MIN_PYTHON = "3.12"
 
 
 def test_pyproject_uses_dynamic_version_and_release_description() -> None:
@@ -20,11 +32,15 @@ def test_pyproject_uses_dynamic_version_and_release_description() -> None:
     assert pyproject["project"]["description"] == (
         "Canonical normalization of raw MERMAID BIN, LOG, and MER data into JSONL record families."
     )
+    assert pyproject["project"]["requires-python"] == f">={EXPECTED_MIN_PYTHON}"
+    assert "Programming Language :: Python :: 3.12" in pyproject["project"]["classifiers"]
 
 
-def test_readme_documents_release_cli_contract() -> None:
+def test_readme_documents_release_cli_contract_and_python_support() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
 
+    assert f"python-{EXPECTED_MIN_PYTHON}%2B" in readme
+    assert "python-3.14%2B" not in readme
     assert "mermaid-records normalize" in readme
     assert "--input-root" in readme
     assert "--input-file" in readme
@@ -36,6 +52,18 @@ def test_readme_documents_release_cli_contract() -> None:
     assert "preflight_status.json" in readme
     assert "the field is absent rather than `null`" in readme
     assert "does not silently duplicate JSONL rows" in readme
+
+
+def test_release_version_and_built_wheel_metadata_stay_in_sync(tmp_path: Path) -> None:
+    assert __version__ == EXPECTED_RELEASE_VERSION
+
+    wheel_path = _build_release_wheel(tmp_path)
+    metadata = _wheel_metadata(wheel_path)
+
+    assert wheel_path.name.startswith(f"mermaid_records-{EXPECTED_ARTIFACT_VERSION}-")
+    assert metadata["Name"] == "mermaid-records"
+    assert metadata["Version"] == EXPECTED_ARTIFACT_VERSION
+    assert metadata["Requires-Python"] == f">={EXPECTED_MIN_PYTHON}"
 
 
 def test_cli_docs_capture_current_mode_and_flag_contract() -> None:
@@ -82,6 +110,7 @@ def test_root_license_file_is_present() -> None:
 def test_package_root_exposes_only_conservative_metadata_surface() -> None:
     import mermaid_records
 
+    assert mermaid_records.__version__ == EXPECTED_RELEASE_VERSION
     assert mermaid_records.__all__ == [
         "__version__",
         "__author__",
@@ -91,3 +120,119 @@ def test_package_root_exposes_only_conservative_metadata_surface() -> None:
     assert hasattr(mermaid_records, "__version__")
     assert not hasattr(mermaid_records, "write_log_jsonl_prototypes")
     assert not hasattr(mermaid_records, "write_mer_jsonl_prototypes")
+
+
+def test_release_pipeline_does_not_carry_bin_preflight_status_into_non_bin_rerun(
+    tmp_path: Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+    bin_path = input_root / "0100_first.BIN"
+    bin_path.write_bytes(b"raw-bin")
+
+    decoder = _write_decoder(tmp_path / "decoder.py", "decoded")
+    output_root = tmp_path / "output"
+
+    run_normalization_pipeline(
+        input_root,
+        output_dir=output_root,
+        config=Bin2LogConfig(
+            python_executable=Path(sys.executable),
+            decoder_script=decoder,
+        ),
+    )
+
+    instrument_dir = output_root / "467.174-T-0100"
+    first_latest = _read_json(instrument_dir / "manifests" / "latest.json")
+
+    assert first_latest["preflight_status"] == (
+        f"manifests/runs/{first_latest['run_id']}/preflight_status.json"
+    )
+    assert (instrument_dir / "preflight_status.json").exists()
+    assert (instrument_dir / first_latest["preflight_status"]).exists()
+
+    bin_path.unlink()
+    _write_log(input_root / "0100_second.LOG", "second")
+
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    second_latest = _read_json(instrument_dir / "manifests" / "latest.json")
+    second_run_dir = instrument_dir / "manifests" / "runs" / second_latest["run_id"]
+
+    assert not (instrument_dir / "preflight_status.json").exists()
+    assert "preflight_status" not in second_latest
+    assert not (second_run_dir / "preflight_status.json").exists()
+
+
+def _build_release_wheel(tmp_path: Path) -> Path:
+    dist_dir = tmp_path / "dist"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            ".",
+            "--no-deps",
+            "--no-build-isolation",
+            "--wheel-dir",
+            str(dist_dir),
+        ],
+        check=True,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    wheels = sorted(dist_dir.glob("*.whl"))
+    assert len(wheels) == 1
+    return wheels[0]
+
+
+def _wheel_metadata(path: Path) -> dict[str, str]:
+    with ZipFile(path) as archive:
+        metadata_name = next(
+            name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
+        )
+        metadata_text = archive.read(metadata_name).decode("utf-8")
+
+    metadata: dict[str, str] = {}
+    for line in metadata_text.splitlines():
+        if ": " not in line:
+            continue
+        key, value = line.split(": ", 1)
+        metadata[key] = value
+    return metadata
+
+
+def _write_log(path: Path, message: str) -> None:
+    path.write_text(f"1700000000:[MAIN  ,0007]{message}\n", encoding="utf-8")
+
+
+def _write_decoder(path: Path, message: str) -> Path:
+    path.write_text(
+        f"""
+from pathlib import Path
+
+def database_update(_arg):
+    print("Update Databases")
+
+def concatenate_files(path):
+    return [path]
+
+def concatenate_rbr_files(path):
+    return [path]
+
+def decrypt_all(path):
+    workdir = Path(path)
+    log = workdir / "0100_first.LOG"
+    log.write_text("1700000000:[MAIN  ,0007]{message}\\n", encoding="utf-8")
+    return [path]
+""",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _read_json(path: Path) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
