@@ -133,7 +133,7 @@ def _common_mer_record_fields(instrument_id: str, path: Path) -> dict[str, objec
     }
 
 
-def write_mer_jsonl_prototypes(
+def write_mer_jsonl_families(
     mer_paths: Iterable[Path],
     output_dir: Path,
     *,
@@ -320,6 +320,10 @@ def write_mer_jsonl_prototypes(
 
 
 # Backward-compatible alias for pre-v1 module consumers.
+write_mer_jsonl_prototypes = write_mer_jsonl_families
+
+
+# Backward-compatible summary alias for pre-v1 module consumers.
 MerJsonlPrototypeSummary = MerJsonlSummary
 
 

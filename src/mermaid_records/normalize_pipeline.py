@@ -25,9 +25,9 @@ from .manifest import (
     record_pruned_sources,
 )
 from .normalize_log import OUTPUT_FILENAMES as LOG_OUTPUT_FILENAMES
-from .normalize_log import write_log_jsonl_prototypes
+from .normalize_log import write_log_jsonl_families
 from .normalize_mer import OUTPUT_FILENAMES as MER_OUTPUT_FILENAMES
-from .normalize_mer import write_mer_jsonl_prototypes
+from .normalize_mer import write_mer_jsonl_families
 from .parse_instrument_name import (
     InstrumentName,
     instrument_name_from_vit_path,
@@ -605,7 +605,7 @@ def _execute_log_family(
                 raise ValueError(
                     f"Error while decoding BIN source(s) {paths_text}: {exc}"
                 ) from exc
-        write_log_jsonl_prototypes(
+        write_log_jsonl_families(
             rendered_paths,
             temp_dir,
             instrument_id=instrument_id,
@@ -651,7 +651,7 @@ def _execute_mer_family(
     instrument_output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mermaid-mer-family-") as tmpdir:
         temp_dir = Path(tmpdir)
-        write_mer_jsonl_prototypes(
+        write_mer_jsonl_families(
             mer_paths,
             temp_dir,
             instrument_id=instrument_id,

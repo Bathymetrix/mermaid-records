@@ -204,7 +204,7 @@ def _common_log_record_fields(
     }
 
 
-def write_log_jsonl_prototypes(
+def write_log_jsonl_families(
     log_paths: Iterable[Path],
     output_dir: Path,
     *,
@@ -487,6 +487,7 @@ def write_log_jsonl_prototypes(
 
 
 # Backward-compatible alias for pre-v1 module consumers.
+write_log_jsonl_prototypes = write_log_jsonl_families
 LogJsonlPrototypeSummary = LogJsonlSummary
 
 

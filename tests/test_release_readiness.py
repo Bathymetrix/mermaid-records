@@ -130,6 +130,8 @@ def test_package_root_exposes_only_conservative_metadata_surface() -> None:
         "__copyright__",
     ]
     assert hasattr(mermaid_records, "__version__")
+    assert not hasattr(mermaid_records, "write_log_jsonl_families")
+    assert not hasattr(mermaid_records, "write_mer_jsonl_families")
     assert not hasattr(mermaid_records, "write_log_jsonl_prototypes")
     assert not hasattr(mermaid_records, "write_mer_jsonl_prototypes")
 

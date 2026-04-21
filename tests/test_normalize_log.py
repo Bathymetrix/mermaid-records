@@ -8,14 +8,14 @@ from pathlib import Path
 import pytest
 
 import mermaid_records.normalize_log as normalize_log_module
-from mermaid_records.normalize_log import write_log_jsonl_prototypes
+from mermaid_records.normalize_log import write_log_jsonl_families
 
 FIXTURES_ROOT = (
     Path(__file__).resolve().parents[1] / "data" / "fixtures" / "467.174-T-0100" / "log"
 )
 
 
-def test_write_log_jsonl_prototypes_preserves_unclassified_records(
+def test_write_log_jsonl_families_preserves_unclassified_records(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_sample.LOG"
@@ -35,7 +35,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
 
     assert summary.total_records == 6
     assert summary.operational_records == 6
@@ -127,7 +127,7 @@ def test_write_log_jsonl_prototypes_preserves_unclassified_records(
     assert all(record["instrument_id"] == "0100" for record in operational_records)
 
 
-def test_write_log_jsonl_prototypes_accepts_canonical_instrument_id_override(
+def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_sample.LOG"
@@ -137,13 +137,13 @@ def test_write_log_jsonl_prototypes_accepts_canonical_instrument_id_override(
     )
 
     output_dir = tmp_path / "jsonl"
-    write_log_jsonl_prototypes([log_path], output_dir, instrument_id="T0100")
+    write_log_jsonl_families([log_path], output_dir, instrument_id="T0100")
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
 
     assert operational_records[0]["instrument_id"] == "T0100"
 
 
-def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
+def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "06_sample.LOG"
@@ -159,7 +159,7 @@ def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
     pressure_temperature_records = _read_jsonl(
         output_dir / "log_pressure_temperature_records.jsonl"
     )
@@ -181,7 +181,7 @@ def test_write_log_jsonl_prototypes_classifies_legacy_pump_and_outflow_lines(
     assert unclassified_records == []
 
 
-def test_write_log_jsonl_prototypes_preserves_old_measurement_population_accounting(
+def test_write_log_jsonl_families_preserves_old_measurement_population_accounting(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "06_routing.LOG"
@@ -203,7 +203,7 @@ def test_write_log_jsonl_prototypes_preserves_old_measurement_population_account
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
     pressure_temperature_records = _read_jsonl(
         output_dir / "log_pressure_temperature_records.jsonl"
     )
@@ -230,7 +230,7 @@ def test_write_log_jsonl_prototypes_preserves_old_measurement_population_account
     assert [record["message_kind"] for record in operational_records] == ["measurement"] * 8
 
 
-def test_write_log_jsonl_prototypes_fails_loudly_on_derived_family_multi_match(
+def test_write_log_jsonl_families_fails_loudly_on_derived_family_multi_match(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -259,10 +259,10 @@ def test_write_log_jsonl_prototypes_fails_loudly_on_derived_family_multi_match(
         ValueError,
         match="Operational derived-family multi-match: transmission, battery",
     ):
-        write_log_jsonl_prototypes([log_path], tmp_path / "jsonl")
+        write_log_jsonl_families([log_path], tmp_path / "jsonl")
 
 
-def test_write_log_jsonl_prototypes_keeps_grouped_sbe_routing_outside_operational_exclusivity(
+def test_write_log_jsonl_families_keeps_grouped_sbe_routing_outside_operational_exclusivity(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -284,14 +284,14 @@ def test_write_log_jsonl_prototypes_keeps_grouped_sbe_routing_outside_operationa
     monkeypatch.setattr(normalize_log_module, "_single_operational_family_match", _fail_if_called)
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
 
     sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
     assert summary.sbe_records == 1
     assert len(sbe_records) == 1
 
 
-def test_write_log_jsonl_prototypes_emits_acquisition_records(
+def test_write_log_jsonl_families_emits_acquisition_records(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_acq.LOG"
@@ -310,7 +310,7 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
     gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
@@ -355,7 +355,7 @@ def test_write_log_jsonl_prototypes_emits_acquisition_records(
     assert unclassified_records == []
 
 
-def test_write_log_jsonl_prototypes_emits_ascent_request_records(
+def test_write_log_jsonl_families_emits_ascent_request_records(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_ascent.LOG"
@@ -372,7 +372,7 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     ascent_request_records = _read_jsonl(
         output_dir / "log_ascent_request_records.jsonl"
@@ -405,7 +405,7 @@ def test_write_log_jsonl_prototypes_emits_ascent_request_records(
     assert unclassified_records == []
 
 
-def test_write_log_jsonl_prototypes_groups_parameter_block_into_one_episode(
+def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_params.LOG"
@@ -426,7 +426,7 @@ def test_write_log_jsonl_prototypes_groups_parameter_block_into_one_episode(
 
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-1",
@@ -459,7 +459,7 @@ def test_write_log_jsonl_prototypes_groups_parameter_block_into_one_episode(
     }
 
 
-def test_write_log_jsonl_prototypes_stops_parameter_episode_at_explicit_boundaries(
+def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_parameter_boundaries.LOG"
@@ -485,7 +485,7 @@ def test_write_log_jsonl_prototypes_stops_parameter_episode_at_explicit_boundari
 
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-2",
@@ -535,7 +535,7 @@ def test_write_log_jsonl_prototypes_stops_parameter_episode_at_explicit_boundari
     ]
 
 
-def test_write_log_jsonl_prototypes_emits_gps_records(
+def test_write_log_jsonl_families_emits_gps_records(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0100_gps.LOG"
@@ -555,7 +555,7 @@ def test_write_log_jsonl_prototypes_emits_gps_records(
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
@@ -595,14 +595,14 @@ def test_write_log_jsonl_prototypes_emits_gps_records(
     ]
 
 
-def test_write_log_jsonl_prototypes_groups_testmode_fixture_session_from_0100_examples(
+def test_write_log_jsonl_families_groups_testmode_fixture_session_from_0100_examples(
     tmp_path: Path,
 ) -> None:
     log_path = FIXTURES_ROOT / "0100_64511916.LOG"
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
 
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-testmode",
@@ -630,14 +630,14 @@ def test_write_log_jsonl_prototypes_groups_testmode_fixture_session_from_0100_ex
     assert sbe_records[0]["raw_lines"][0].startswith("1683036452:[SBE   ,0391]Mode changed")
 
 
-def test_write_log_jsonl_prototypes_groups_sbe_and_profil_fixture_blocks_from_0100_examples(
+def test_write_log_jsonl_families_groups_sbe_and_profil_fixture_blocks_from_0100_examples(
     tmp_path: Path,
 ) -> None:
     log_path = FIXTURES_ROOT / "0100_6491453E.LOG"
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
 
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-sbe",
@@ -664,14 +664,14 @@ def test_write_log_jsonl_prototypes_groups_sbe_and_profil_fixture_blocks_from_01
     assert all("manual_profil=1" not in row["raw_line"] for row in malformed_log_lines)
 
 
-def test_write_log_jsonl_prototypes_groups_contiguous_sbe61_measurements_from_0100_examples(
+def test_write_log_jsonl_families_groups_contiguous_sbe61_measurements_from_0100_examples(
     tmp_path: Path,
 ) -> None:
     log_path = FIXTURES_ROOT / "0100_649FF25E.LOG"
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
 
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-sbe61",
@@ -694,7 +694,7 @@ def test_write_log_jsonl_prototypes_groups_contiguous_sbe61_measurements_from_01
     assert all("[SBE61 ,0396]" not in row["raw_line"] for row in malformed_log_lines)
 
 
-def test_write_log_jsonl_prototypes_broadens_transmission_classification_conservatively(
+def test_write_log_jsonl_families_broadens_transmission_classification_conservatively(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0700_transmission.LOG"
@@ -722,7 +722,7 @@ def test_write_log_jsonl_prototypes_broadens_transmission_classification_conserv
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
 
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
@@ -784,7 +784,7 @@ def test_write_log_jsonl_prototypes_broadens_transmission_classification_conserv
     }
 
 
-def test_write_log_jsonl_prototypes_classifies_wrapped_tagged_transmission_lines(
+def test_write_log_jsonl_families_classifies_wrapped_tagged_transmission_lines(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0700_wrapped.LOG"
@@ -800,7 +800,7 @@ def test_write_log_jsonl_prototypes_classifies_wrapped_tagged_transmission_lines
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_log_jsonl_prototypes([log_path], output_dir)
+    summary = write_log_jsonl_families([log_path], output_dir)
 
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
@@ -822,7 +822,7 @@ def test_write_log_jsonl_prototypes_classifies_wrapped_tagged_transmission_lines
     assert unclassified_records == []
 
 
-def test_write_log_jsonl_prototypes_routes_wrapped_nonfamily_lines_to_unclassified(
+def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0700_wrapped_unclassified.LOG"
@@ -840,7 +840,7 @@ def test_write_log_jsonl_prototypes_routes_wrapped_nonfamily_lines_to_unclassifi
 
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-wrapped-unclassified",
@@ -867,7 +867,7 @@ def test_write_log_jsonl_prototypes_routes_wrapped_nonfamily_lines_to_unclassifi
     assert all(record["unclassified_reason"] == "no_family_match" for record in unclassified_records)
 
 
-def test_write_log_jsonl_prototypes_keeps_true_unparsable_junk_malformed(
+def test_write_log_jsonl_families_keeps_true_unparsable_junk_malformed(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0700_bad.LOG"
@@ -884,7 +884,7 @@ def test_write_log_jsonl_prototypes_keeps_true_unparsable_junk_malformed(
 
     output_dir = tmp_path / "jsonl"
     malformed_log_lines: list[dict[str, object]] = []
-    summary = write_log_jsonl_prototypes(
+    summary = write_log_jsonl_families(
         [log_path],
         output_dir,
         run_id="run-malformed",

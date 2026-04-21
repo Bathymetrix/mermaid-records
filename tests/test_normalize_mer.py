@@ -9,14 +9,14 @@ from pathlib import Path
 import pytest
 
 import mermaid_records.normalize_mer as normalize_mer_module
-from mermaid_records.normalize_mer import write_mer_jsonl_prototypes
+from mermaid_records.normalize_mer import write_mer_jsonl_families
 
 PSD_MER_FIXTURE_ROOT = (
     Path(__file__).resolve().parents[1] / "data" / "fixtures" / "465.152-R-0001" / "mer"
 )
 
 
-def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_event_rows(
+def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0100_sample.MER"
@@ -62,7 +62,7 @@ def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_event_ro
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_mer_jsonl_prototypes([mer_path], output_dir)
+    summary = write_mer_jsonl_families([mer_path], output_dir)
 
     environment_records = _read_jsonl(output_dir / "mer_environment_records.jsonl")
     parameter_records = _read_jsonl(output_dir / "mer_parameter_records.jsonl")
@@ -200,7 +200,7 @@ def test_write_mer_jsonl_prototypes_preserves_environment_parameter_and_event_ro
     assert all(record["source_file"] == mer_path.name for record in event_records)
 
 
-def test_write_mer_jsonl_prototypes_accepts_canonical_instrument_id_override(tmp_path: Path) -> None:
+def test_write_mer_jsonl_families_accepts_canonical_instrument_id_override(tmp_path: Path) -> None:
     mer_path = tmp_path / "0100_sample.MER"
     mer_path.write_bytes(
         (
@@ -221,13 +221,13 @@ def test_write_mer_jsonl_prototypes_accepts_canonical_instrument_id_override(tmp
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_prototypes([mer_path], output_dir, instrument_id="T0100")
+    write_mer_jsonl_families([mer_path], output_dir, instrument_id="T0100")
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["instrument_id"] == "T0100"
 
 
-def test_write_mer_jsonl_prototypes_supports_rounds_info_field(tmp_path: Path) -> None:
+def test_write_mer_jsonl_families_supports_rounds_info_field(tmp_path: Path) -> None:
     mer_path = tmp_path / "0100_rounds.MER"
     mer_path.write_bytes(
         (
@@ -248,7 +248,7 @@ def test_write_mer_jsonl_prototypes_supports_rounds_info_field(tmp_path: Path) -
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_prototypes([mer_path], output_dir)
+    write_mer_jsonl_families([mer_path], output_dir)
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["rounds"] == "17"
@@ -275,7 +275,7 @@ def test_mer_tag_stage_multi_match_fails_loudly(monkeypatch: pytest.MonkeyPatch)
         normalize_mer_module._classify_mer_tag_kind("BOARD", stage_name="environment")
 
 
-def test_write_mer_jsonl_prototypes_supports_stanford_process_parameter(tmp_path: Path) -> None:
+def test_write_mer_jsonl_families_supports_stanford_process_parameter(tmp_path: Path) -> None:
     mer_path = tmp_path / "0100_stanford.MER"
     mer_path.write_bytes(
         (
@@ -297,7 +297,7 @@ def test_write_mer_jsonl_prototypes_supports_stanford_process_parameter(tmp_path
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_mer_jsonl_prototypes([mer_path], output_dir)
+    summary = write_mer_jsonl_families([mer_path], output_dir)
     parameter_records = _read_jsonl(output_dir / "mer_parameter_records.jsonl")
 
     assert summary.parameter_kind_counts == {"stanford_process": 1}
@@ -316,7 +316,7 @@ def test_write_mer_jsonl_prototypes_supports_stanford_process_parameter(tmp_path
     )
 
 
-def test_write_mer_jsonl_prototypes_reports_source_file_on_unhandled_field(tmp_path: Path) -> None:
+def test_write_mer_jsonl_families_reports_source_file_on_unhandled_field(tmp_path: Path) -> None:
     mer_path = tmp_path / "0100_bad.MER"
     mer_path.write_bytes(
         (
@@ -339,7 +339,7 @@ def test_write_mer_jsonl_prototypes_reports_source_file_on_unhandled_field(tmp_p
     output_dir = tmp_path / "jsonl"
 
     try:
-        write_mer_jsonl_prototypes([mer_path], output_dir)
+        write_mer_jsonl_families([mer_path], output_dir)
     except ValueError as exc:
         message = str(exc)
     else:
@@ -349,7 +349,7 @@ def test_write_mer_jsonl_prototypes_reports_source_file_on_unhandled_field(tmp_p
     assert "BADKEY" in message
 
 
-def test_write_mer_jsonl_prototypes_counts_zero_event_files(tmp_path: Path) -> None:
+def test_write_mer_jsonl_families_counts_zero_event_files(tmp_path: Path) -> None:
     empty_mer = tmp_path / "0001_empty.MER"
     empty_mer.write_bytes(
         (
@@ -363,7 +363,7 @@ def test_write_mer_jsonl_prototypes_counts_zero_event_files(tmp_path: Path) -> N
     )
 
     output_dir = tmp_path / "jsonl"
-    summary = write_mer_jsonl_prototypes([empty_mer], output_dir)
+    summary = write_mer_jsonl_families([empty_mer], output_dir)
 
     assert summary.total_mer_files == 1
     assert summary.zero_event_files == 1
@@ -371,7 +371,7 @@ def test_write_mer_jsonl_prototypes_counts_zero_event_files(tmp_path: Path) -> N
     assert _read_jsonl(output_dir / "mer_event_records.jsonl") == []
 
 
-def test_write_mer_jsonl_prototypes_excludes_data_framing_bytes_from_payload_length(
+def test_write_mer_jsonl_families_excludes_data_framing_bytes_from_payload_length(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0100_framed.MER"
@@ -396,7 +396,7 @@ def test_write_mer_jsonl_prototypes_excludes_data_framing_bytes_from_payload_len
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_prototypes([mer_path], output_dir)
+    write_mer_jsonl_families([mer_path], output_dir)
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["data_payload_nbytes"] == 19328
@@ -405,7 +405,7 @@ def test_write_mer_jsonl_prototypes_excludes_data_framing_bytes_from_payload_len
     assert event_records[0]["payload_length_matches_expected"] is True
 
 
-def test_write_mer_jsonl_prototypes_reports_payload_length_mismatch(
+def test_write_mer_jsonl_families_reports_payload_length_mismatch(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0100_payload_mismatch.MER"
@@ -430,7 +430,7 @@ def test_write_mer_jsonl_prototypes_reports_payload_length_mismatch(
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_prototypes([mer_path], output_dir)
+    write_mer_jsonl_families([mer_path], output_dir)
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["data_payload_nbytes"] == 7
@@ -439,7 +439,7 @@ def test_write_mer_jsonl_prototypes_reports_payload_length_mismatch(
     assert event_records[0]["payload_length_matches_expected"] is False
 
 
-def test_write_mer_jsonl_prototypes_supports_stanford_events_without_format(
+def test_write_mer_jsonl_families_supports_stanford_events_without_format(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0002_stanford_psd.MER"
@@ -481,7 +481,7 @@ def test_write_mer_jsonl_prototypes_supports_stanford_events_without_format(
 
     output_dir = tmp_path / "jsonl"
     malformed_mer_blocks: list[dict[str, object]] = []
-    summary = write_mer_jsonl_prototypes(
+    summary = write_mer_jsonl_families(
         [mer_path],
         output_dir,
         run_id="run-stanford",
@@ -566,7 +566,7 @@ def test_write_mer_jsonl_prototypes_supports_stanford_events_without_format(
     assert misc_record["upload_max"] == "120kB"
 
 
-def test_write_mer_jsonl_prototypes_accepts_metadata_only_stanford_mer(
+def test_write_mer_jsonl_families_accepts_metadata_only_stanford_mer(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0007_metadata_only.MER"
@@ -588,7 +588,7 @@ def test_write_mer_jsonl_prototypes_accepts_metadata_only_stanford_mer(
 
     output_dir = tmp_path / "jsonl"
     malformed_mer_blocks: list[dict[str, object]] = []
-    summary = write_mer_jsonl_prototypes(
+    summary = write_mer_jsonl_families(
         [mer_path],
         output_dir,
         run_id="run-stanford-empty",
@@ -602,13 +602,13 @@ def test_write_mer_jsonl_prototypes_accepts_metadata_only_stanford_mer(
     assert _read_jsonl(output_dir / "mer_event_records.jsonl") == []
 
 
-def test_write_mer_jsonl_prototypes_exercises_real_psd_fixture_subset(
+def test_write_mer_jsonl_families_exercises_real_psd_fixture_subset(
     tmp_path: Path,
 ) -> None:
     output_dir = tmp_path / "jsonl"
     malformed_mer_blocks: list[dict[str, object]] = []
 
-    summary = write_mer_jsonl_prototypes(
+    summary = write_mer_jsonl_families(
         [
             PSD_MER_FIXTURE_ROOT / "0001_6255B101.MER",
             PSD_MER_FIXTURE_ROOT / "0001_625CB0C0.MER",
@@ -707,7 +707,7 @@ def test_write_mer_jsonl_prototypes_exercises_real_psd_fixture_subset(
     assert eventful_pool_record["pool_declared_size_bytes"] == 6060
 
 
-def test_write_mer_jsonl_prototypes_excludes_stanford_data_framing_bytes_without_format(
+def test_write_mer_jsonl_families_excludes_stanford_data_framing_bytes_without_format(
     tmp_path: Path,
 ) -> None:
     mer_path = tmp_path / "0002_framed_stanford.MER"
@@ -729,7 +729,7 @@ def test_write_mer_jsonl_prototypes_excludes_stanford_data_framing_bytes_without
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_prototypes([mer_path], output_dir)
+    write_mer_jsonl_families([mer_path], output_dir)
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["encoded_payload"] == base64.b64encode(payload).decode("ascii")

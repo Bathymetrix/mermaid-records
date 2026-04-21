@@ -2,6 +2,9 @@
 
 ## Persistent Rules
 
+- “prototype” terminology in normalization code/docs refers to earlier development-phase design work; for v1, normalization families and rules are treated as stable.
+- Code-level naming should therefore prefer “families” for active normalization entrypoints, while historical references may remain when context matters.
+
 - Never mix parsing and interpretation.
 - Keep record interfaces stable.
 - Always preserve unknown MER record types.
