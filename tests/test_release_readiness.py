@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 from pathlib import Path
-import subprocess
+import shutil
 import sys
 import tomllib
 from zipfile import ZipFile
 
 from packaging.version import Version
 import pytest
+import setuptools.build_meta
 
 from mermaid_records import __version__
 from mermaid_records.bin2log import Bin2LogConfig
@@ -180,27 +182,19 @@ def test_release_pipeline_does_not_carry_bin_preflight_status_into_non_bin_rerun
 
 
 def _build_release_wheel(tmp_path: Path) -> Path:
+    source_root = tmp_path / "source"
     dist_dir = tmp_path / "dist"
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "wheel",
-            ".",
-            "--no-deps",
-            "--no-build-isolation",
-            "--wheel-dir",
-            str(dist_dir),
-        ],
-        check=True,
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    wheels = sorted(dist_dir.glob("*.whl"))
-    assert len(wheels) == 1
-    return wheels[0]
+    source_root.mkdir()
+    shutil.copy2(REPO_ROOT / "pyproject.toml", source_root / "pyproject.toml")
+    shutil.copy2(REPO_ROOT / "README.md", source_root / "README.md")
+    shutil.copy2(REPO_ROOT / "LICENSE", source_root / "LICENSE")
+    shutil.copytree(REPO_ROOT / "src", source_root / "src")
+    dist_dir.mkdir()
+    with contextlib.chdir(source_root):
+        wheel_name = setuptools.build_meta.build_wheel(str(dist_dir))
+    wheel_path = dist_dir / wheel_name
+    assert wheel_path.exists()
+    return wheel_path
 
 
 def _wheel_metadata(path: Path) -> dict[str, str]:
