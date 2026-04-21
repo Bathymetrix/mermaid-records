@@ -191,6 +191,7 @@ For event blocks:
 - `LOG` is the native per-dive operational source.
 - A single `.MER` may include DET data from the current dive plus REG/REQ data from previous dives. Do not infer dive membership from `MerEventBlock.date` during parsing.
 - The normalize CLI matrix audit helper lives in `src/mermaid_records/_audit_normalize_cli.py` with the repo script wrapper at `scripts/audit_normalize_cli_matrix.py`.
+- The normalized-output randomized audit helper lives in `src/mermaid_records/_audit_normalized_outputs.py` with the repo script wrapper at `scripts/audit_normalized_outputs.py`.
 - The normalize CLI matrix audit defaults to a semantic flag matrix; exhaustive boolean expansion is opt-in.
 
 ## Current Fixtures
