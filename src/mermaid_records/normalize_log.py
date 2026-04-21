@@ -486,11 +486,6 @@ def write_log_jsonl_families(
     )
 
 
-# Backward-compatible alias for pre-v1 module consumers.
-write_log_jsonl_prototypes = write_log_jsonl_families
-LogJsonlPrototypeSummary = LogJsonlSummary
-
-
 def _iter_log_source_units(
     path: Path,
     *,

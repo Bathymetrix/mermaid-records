@@ -132,8 +132,8 @@ def test_package_root_exposes_only_conservative_metadata_surface() -> None:
     assert hasattr(mermaid_records, "__version__")
     assert not hasattr(mermaid_records, "write_log_jsonl_families")
     assert not hasattr(mermaid_records, "write_mer_jsonl_families")
-    assert not hasattr(mermaid_records, "write_log_jsonl_prototypes")
-    assert not hasattr(mermaid_records, "write_mer_jsonl_prototypes")
+    assert not hasattr(mermaid_records, "write_log_jsonl_families")
+    assert not hasattr(mermaid_records, "write_mer_jsonl_families")
 
 
 def test_release_pipeline_does_not_carry_bin_preflight_status_into_non_bin_rerun(
