@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -10,14 +11,17 @@ import tomllib
 from zipfile import ZipFile
 
 from packaging.version import Version
+import pytest
 
 from mermaid_records import __version__
 from mermaid_records.bin2log import Bin2LogConfig
 from mermaid_records.normalize_pipeline import run_normalization_pipeline
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_RELEASE_VERSION = "1.0.0-alpha"
-EXPECTED_ARTIFACT_VERSION = str(Version(EXPECTED_RELEASE_VERSION))
+SOURCE_VERSION = Version(__version__)
+NORMALIZED_SOURCE_VERSION = str(SOURCE_VERSION)
+FINAL_RELEASE_ENV_VAR = "MERMAID_RECORDS_REQUIRE_FINAL_RELEASE"
+EXPECTED_FINAL_RELEASE_VERSION = Version("1.0.0")
 EXPECTED_MIN_PYTHON = "3.12"
 
 
@@ -55,15 +59,23 @@ def test_readme_documents_release_cli_contract_and_python_support() -> None:
 
 
 def test_release_version_and_built_wheel_metadata_stay_in_sync(tmp_path: Path) -> None:
-    assert __version__ == EXPECTED_RELEASE_VERSION
-
     wheel_path = _build_release_wheel(tmp_path)
     metadata = _wheel_metadata(wheel_path)
 
-    assert wheel_path.name.startswith(f"mermaid_records-{EXPECTED_ARTIFACT_VERSION}-")
+    assert wheel_path.name.startswith(f"mermaid_records-{NORMALIZED_SOURCE_VERSION}-")
     assert metadata["Name"] == "mermaid-records"
-    assert metadata["Version"] == EXPECTED_ARTIFACT_VERSION
+    assert Version(metadata["Version"]) == SOURCE_VERSION
     assert metadata["Requires-Python"] == f">={EXPECTED_MIN_PYTHON}"
+
+
+def test_final_release_version_gate() -> None:
+    if os.environ.get(FINAL_RELEASE_ENV_VAR) != "1":
+        pytest.skip(
+            f"set {FINAL_RELEASE_ENV_VAR}=1 to require the final 1.0.0 release version"
+        )
+
+    assert SOURCE_VERSION == EXPECTED_FINAL_RELEASE_VERSION
+    assert not SOURCE_VERSION.is_prerelease
 
 
 def test_cli_docs_capture_current_mode_and_flag_contract() -> None:
@@ -110,7 +122,7 @@ def test_root_license_file_is_present() -> None:
 def test_package_root_exposes_only_conservative_metadata_surface() -> None:
     import mermaid_records
 
-    assert mermaid_records.__version__ == EXPECTED_RELEASE_VERSION
+    assert mermaid_records.__version__ == __version__
     assert mermaid_records.__all__ == [
         "__version__",
         "__author__",
