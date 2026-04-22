@@ -39,16 +39,15 @@ mermaid-records normalize \
   --output-dir /tmp/mermaid-records-example
 ```
 
-The normalize CLI supports:
+Quick usage flags:
 
-- `--input-root` for `stateful mode`
-- `--input-file` for `stateless mode`
-- `--dry-run`
-- `--json` for structured dry-run output only; it requires `--dry-run`
-- `--verbose` / `-v`
-- `--preflight-mode {strict,cached}` for BIN-backed runs
+- Input selection: `--input-root` for `stateful` mode, or `--input-file` for explicit `stateless` runs
+- Output: `--output-dir`; if omitted, the CLI uses `$MERMAID/records` when `MERMAID` is set
+- BIN decoder and preflight: `--decoder-python` and `--decoder-script` (used together), plus `--preflight-mode {strict,cached}`
+- Planning and reporting: `--dry-run`, `--json` (dry-run only), and `--verbose` / `-v`
+- Rewrite control: `--force-rewrite` to force targeted family rewrites instead of append/noop incremental decisions
 
-`--output-dir` may be omitted only when `MERMAID` is set. In that case, the CLI resolves the output root to `$MERMAID/records`.
+See [docs/cli.md](docs/cli.md) for the full CLI reference.
 
 ## Execution modes
 
