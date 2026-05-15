@@ -12,6 +12,7 @@
 - Add or update tests with any real logic change.
 - Prefer small, coherent commits and always tell the user when the current state is a good time to commit.
 - Any time suggesting a commit, also suggest a matching commit message.
+- Do not suggest `type: message` commit subjects by default; prefer clear, simple, project-specific commit messages.
 - Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
@@ -21,6 +22,7 @@
 - Always push back, disagree, or suggest a better alternative when warranted.
 - Package license defaults to MIT. A root `LICENSE` file must exist.
 - Every Python source file must include `SPDX-License-Identifier: MIT`, but must not include the full license text.
+- Prefer clear, simple Pythonic comments, and start comment text with a capital letter.
 - Use `Bathymetrix™` only in approved file headers and rare top-level visible branding. Do not use the trademark marker in identifiers, module names, imports, docstrings, or inline comments.
 - Package authorship/licensing metadata must live in exactly one location: `src/mermaid_records/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
 - `CYCLE` / `CYCLE.h` are out of scope for `mermaid-records` and must not be reintroduced unless the user explicitly requests it.
@@ -264,6 +266,7 @@ The compact PSD Stanford-style fixture family under `data/fixtures/465.152-R-000
 
 - If work shifts toward higher-level API design, abstraction tradeoffs, naming strategy, or broader architecture, say when it may be a good moment to consult ChatGPT and provide a concise handoff summary.
 - Do not be territorial about tool choice; suggest ChatGPT when it is likely to help with design-space exploration.
+- When CI status matters, check GitHub Actions with GitHub CLI before relying only on local verification: if `gh` is available, run `gh run list --limit 5` to identify the relevant recent workflow run, then inspect it with `gh run view <run-id> --json status,conclusion,jobs` or equivalent. Report the workflow conclusion and each relevant matrix job conclusion, especially Python-version matrix entries. If `gh` is unavailable or unauthenticated, say so clearly and fall back to local verification. Do not make git-mutating commands unless explicitly asked.
 - The normalize CLI matrix audit workflow should isolate each run in its own output sandbox, capture `stdout`/`stderr` per run, append one JSONL result row per attempt, and keep going after failures.
 - For BIN-backed audit runs, preserve a real decoder `MERMAID` root for automaid while keeping output-resolution tests sandboxed by seeding only the isolated audit root `database/` link when needed.
 
