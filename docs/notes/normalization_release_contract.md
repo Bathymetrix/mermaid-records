@@ -61,6 +61,12 @@ Shared options:
 
 `--decoder-python` and `--decoder-script` must be supplied together when any `BIN` inputs are present.
 
+## Python Import Surface
+
+The supported Python package-root surface is intentionally limited to conservative metadata such as `mermaid_records.__version__`, authorship, and license metadata.
+
+Functional modules and helper functions are implementation details unless a future contract explicitly promotes them. Downstream integrations should prefer the CLI and normalized file contracts over deep Python imports.
+
 ## Execution Modes
 
 ### Stateful
@@ -112,7 +118,7 @@ When the current run performs BIN decode preflight with a durable output directo
 
 ## Instrument Identity
 
-Canonical `instrument_id` resolution is centralized in `src/mermaid_records/parse_instrument_name.py`.
+Canonical `instrument_id` resolution is centralized inside the normalization package.
 
 Examples:
 
