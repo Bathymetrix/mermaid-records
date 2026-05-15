@@ -32,6 +32,52 @@
 - No other hardcoded package version strings are allowed in the repo.
 - The package-root Python surface for v1 is intentionally minimal metadata only; do not re-export broader functional helpers from `mermaid_records.__init__` unless the user explicitly expands the supported API.
 
+## Namespace Consolidation / Public API Discipline
+
+AGENTS should keep future namespace consolidation in mind during all implementation and API decisions.
+
+This project may eventually become part of a larger unified namespace layout such as:
+
+    src/mermaid_records/   -> src/mermaid/records/
+    src/mermaid_timeline/  -> src/mermaid/timeline/
+    src/mermaid_telemetry/ -> src/mermaid/telemetry/
+    src/mermaid_gcmt/      -> src/mermaid/gcmt/
+
+Therefore:
+
+- prioritize stable CLI/file-format contracts over stable internal import paths
+- keep public Python API exposure intentionally small
+- avoid exposing internal helpers/classes/functions unless clearly intended as durable public API
+- avoid documenting deep import paths as stable interfaces
+- prefer CLI-driven workflows over broad import-driven workflows
+
+Key philosophy:
+
+- The primary public contract is:
+  - CLI behavior
+  - documented file formats/schemas
+  - manifests/state behavior
+  - documented validation behavior
+- Internal Python module layout is NOT yet considered stable public API.
+
+Guidelines:
+
+- Avoid unnecessary re-exports in `__init__.py`.
+- Internal modules/functions/classes may be reorganized freely unless explicitly documented as public API.
+- Prefer stable CLI entry points and stable JSONL/file contracts over stable internal module paths.
+- Use centralized constants/helpers for package metadata where practical (package name, schema version, filenames, etc.) rather than scattering hardcoded package names throughout the codebase.
+- Do not over-engineer namespace-package machinery prematurely; just avoid choices that would make later migration painful.
+- Before exposing/importing/re-exporting new symbols publicly, consider whether doing so creates a long-term compatibility obligation.
+- When introducing new public APIs, consider whether they would remain sensible after a future migration from:
+
+      mermaid_<thing>
+
+  to:
+
+      mermaid.<thing>
+
+Tests may import internal modules freely; test imports are not considered stable public API.
+
 ## Project Purpose
 
 `mermaid-records` is a Python package to normalize `BIN`, `LOG`, and `MER` into parseable record families.
