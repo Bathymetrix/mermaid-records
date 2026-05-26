@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 from typing import Callable, Iterator
 
+from .format_datetime import parse_source_datetime
 from .models import OperationalLogEntry
 
 _LOG_LINE_RE = re.compile(
@@ -82,8 +83,8 @@ def _parse_time_text(text: str) -> datetime:
     """Parse either an epoch-seconds prefix or an ISO timestamp."""
 
     if text.isdigit():
-        return datetime.fromtimestamp(int(text), tz=timezone.utc).replace(tzinfo=None)
-    return datetime.fromisoformat(text)
+        return datetime.fromtimestamp(int(text), tz=timezone.utc)
+    return parse_source_datetime(text)
 
 
 def _report_malformed_line(

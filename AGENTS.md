@@ -32,6 +32,7 @@
 - The canonical version must live in `src/mermaid_records/__init__.py` as `__version__`.
 - `pyproject.toml` must use dynamic versioning via `[tool.setuptools.dynamic]` with `version = {attr = "mermaid_records.__version__"}`.
 - No other hardcoded package version strings are allowed in the repo.
+- Until the release is finalized, use release-candidate versions such as `2.0.0-rc1` and bump the `rc` suffix sequentially (`rc2`, `rc3`, etc.) for each candidate.
 - The package-root Python surface for v1 is intentionally minimal metadata only; do not re-export broader functional helpers from `mermaid_records.__init__` unless the user explicitly expands the supported API.
 
 ## Namespace Consolidation / Public API Discipline
@@ -294,6 +295,7 @@ Avoid:
 - Prefer source-literal field names when they exist.
 - One JSONL record should correspond to one real source unit.
 - Normalize structure, not meaning.
+- Except for explicitly preserved raw source strings such as `raw_line`, `raw_lines`, `line`, `raw_info_line`, `raw_format_line`, and `raw_values`, all emitted date/time strings must use UTC ISO8601 with six fractional digits and a `Z` suffix, for example `2020-12-14T05:22:31.000000Z`. Convert timezone-aware inputs to UTC before formatting; do not simply append `Z`.
 
 ## Current Pipeline Rules
 

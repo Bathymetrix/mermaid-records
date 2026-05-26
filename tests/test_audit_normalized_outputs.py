@@ -66,7 +66,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
                 "encoded_payload": "AAAAAA==",
                 "encoded_payload_byte_count": 4,
                 "data_payload_nbytes": 4,
-                "event_info_date": "2024-01-01T00:00:00",
+                "event_info_date": "2024-01-01T00:00:00.000000Z",
                 "pressure": "1.00",
                 "temperature": "2.0000",
                 "criterion": "3.0",
@@ -91,7 +91,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
                 "encoded_payload": "AAAAAA==",
                 "encoded_payload_byte_count": 4,
                 "data_payload_nbytes": 4,
-                "event_info_date": "2024-01-01T00:00:00",
+                "event_info_date": "2024-01-01T00:00:00.000000Z",
                 "rounds": "468",
             }
         ],

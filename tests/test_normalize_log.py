@@ -96,7 +96,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         "message_kind",
         "raw_line",
     ]
-    assert operational_records[0]["record_time"] == "2023-11-14T22:13:20"
+    assert operational_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
     assert operational_records[0]["log_epoch_time"] == "1700000000"
     assert operational_records[0]["source_file"] == log_path.name
     assert operational_records[0]["instrument_serial"] == "0100"
@@ -105,14 +105,14 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
 
     assert transmission_records[1]["referenced_artifact"] == "0100_AAAA0001.MER"
     assert transmission_records[1]["rate_bytes_per_s"] == 83
-    assert transmission_records[1]["record_time"] == "2023-11-14T22:13:21"
+    assert transmission_records[1]["record_time"] == "2023-11-14T22:13:21.000000Z"
     assert transmission_records[1]["log_epoch_time"] == "1700000001"
     assert transmission_records[1]["source_file"] == log_path.name
     assert "time" not in transmission_records[1]
 
     assert pressure_temperature_records[0]["pressure_mbar"] == 20179
     assert pressure_temperature_records[0]["temperature_mdegc"] == 32767
-    assert pressure_temperature_records[0]["record_time"] == "2023-11-14T22:13:22"
+    assert pressure_temperature_records[0]["record_time"] == "2023-11-14T22:13:22.000000Z"
     assert pressure_temperature_records[0]["log_epoch_time"] == "1700000002"
     assert pressure_temperature_records[0]["source_file"] == log_path.name
     assert "time" not in pressure_temperature_records[0]
@@ -121,7 +121,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         record["unclassified_reason"] == "no_family_match"
         for record in unclassified_records
     )
-    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:24"
+    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:24.000000Z"
     assert unclassified_records[0]["log_epoch_time"] == "1700000004"
     assert "time" not in unclassified_records[0]
     assert {
@@ -129,6 +129,23 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     } == {"<WARN>timeout", "buoy 467.174-T-0100"}
     assert all(record["instrument_id"] == "0100" for record in operational_records)
     assert all(record["instrument_serial"] == "0100" for record in operational_records)
+
+
+def test_write_log_jsonl_families_converts_offset_times_to_utc(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_offset.LOG"
+    log_path.write_text(
+        "2023-11-14T22:13:20.123456+02:30:[MAIN  ,0007]buoy 467.174-T-0100\n",
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    write_log_jsonl_families([log_path], output_dir)
+
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+
+    assert operational_records[0]["record_time"] == "2023-11-14T19:43:20.123456Z"
 
 
 def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
@@ -354,12 +371,12 @@ def test_write_log_jsonl_families_emits_acquisition_records(
         ("started", "assertion"),
         ("stopped", "assertion"),
     }
-    assert acquisition_records[0]["record_time"] == "2023-11-14T22:13:20"
+    assert acquisition_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
     assert acquisition_records[0]["log_epoch_time"] == "1700000000"
     assert "time" not in acquisition_records[0]
     assert gps_records[0]["gps_record_kind"] == "fix_attempt"
     assert gps_records[0]["raw_values"] is None
-    assert gps_records[0]["record_time"] == "2023-11-14T22:13:24"
+    assert gps_records[0]["record_time"] == "2023-11-14T22:13:24.000000Z"
     assert gps_records[0]["log_epoch_time"] == "1700000004"
     assert "time" not in gps_records[0]
     assert unclassified_records == []
@@ -406,7 +423,7 @@ def test_write_log_jsonl_families_emits_ascent_request_records(
         "accepted",
         "rejected",
     }
-    assert ascent_request_records[0]["record_time"] == "2023-11-14T22:13:20"
+    assert ascent_request_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
     assert ascent_request_records[0]["log_epoch_time"] == "1700000000"
     assert "time" not in ascent_request_records[0]
     assert operational_records[0]["message_kind"] == "status"
@@ -457,8 +474,8 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
         "episode_index": 0,
         "line_start_index": 2,
         "line_end_index": 5,
-        "start_record_time": "2023-11-14T22:13:21",
-        "end_record_time": "2023-11-14T22:13:21",
+        "start_record_time": "2023-11-14T22:13:21.000000Z",
+        "end_record_time": "2023-11-14T22:13:21.000000Z",
         "start_log_epoch_time": "1700000001",
         "end_log_epoch_time": "1700000001",
         "raw_lines": [
@@ -599,7 +616,7 @@ def test_write_log_jsonl_families_emits_gps_records(
     assert gps_records[2]["raw_values"] == {"hdop": "0.820", "vdop": "1.180"}
     assert gps_records[3]["raw_values"] == {"gpsack": "+0,+0,+0,+0,+0,+0,-30"}
     assert gps_records[4]["raw_values"] == {"gpsoff": "3686327"}
-    assert gps_records[2]["record_time"] == "2023-11-14T22:13:22"
+    assert gps_records[2]["record_time"] == "2023-11-14T22:13:22.000000Z"
     assert gps_records[2]["log_epoch_time"] == "1700000002"
     assert "time" not in gps_records[2]
     assert [record["message"] for record in unclassified_records] == [

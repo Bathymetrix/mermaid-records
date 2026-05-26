@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 from typing import Callable, Iterator
 
+from .format_datetime import parse_source_datetime
 from .models import MerEventBlock, MerFileMetadata
 
 _SECTION_RE = re.compile(
@@ -465,7 +466,7 @@ def _parse_datetime(value: str | None) -> datetime | None:
 
     if value is None:
         return None
-    return datetime.fromisoformat(value)
+    return parse_source_datetime(value)
 
 
 def _parse_int(value: str | None) -> int | None:

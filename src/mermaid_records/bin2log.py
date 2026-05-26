@@ -15,6 +15,8 @@ import tempfile
 from typing import Literal
 from typing import Iterator
 
+from .format_datetime import format_utc_datetime
+
 type BinDecodePreflightMode = Literal["strict", "cached"]
 
 
@@ -362,7 +364,7 @@ def _write_preflight_status(
         "failure_detail": failure_detail,
         "decoder_python": str(config.python_executable),
         "decoder_script": str(config.decoder_script),
-        "written_at": datetime.now(timezone.utc).isoformat(),
+        "written_at": format_utc_datetime(datetime.now(timezone.utc)),
     }
     status_path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",

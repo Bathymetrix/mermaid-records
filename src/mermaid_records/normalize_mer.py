@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 from typing import Iterable
 
+from .format_datetime import format_source_datetime, format_utc_datetime
 from .format_record_filenames import (
     record_filenames,
     validate_instrument_serial,
@@ -377,7 +378,9 @@ def _build_environment_record(
             "true_sample_freq_hz": (
                 _attr_float(attrs, "FS_Hz") if tag_name == "TRUE_SAMPLE_FREQ" else None
             ),
-            "gpsinfo_date": attrs.get("DATE") if tag_name == "GPSINFO" else None,
+            "gpsinfo_date": (
+                format_source_datetime(attrs.get("DATE")) if tag_name == "GPSINFO" else None
+            ),
             "raw_values": raw_values,
             "line": line,
         },
@@ -460,9 +463,9 @@ def _build_event_record(
         **_common_mer_record_fields(instrument_id, path),
         "block_index": block_index,
         "event_index": block_index,
-        "event_info_date": info_attrs.get("DATE"),
+        "event_info_date": format_source_datetime(info_attrs.get("DATE")),
         "event_rounds": info_attrs.get("ROUNDS"),
-        "date": info_attrs.get("DATE"),
+        "date": format_source_datetime(info_attrs.get("DATE")),
         "rounds": info_attrs.get("ROUNDS"),
         "pressure": info_attrs.get("PRESSURE"),
         "temperature": info_attrs.get("TEMPERATURE"),
@@ -596,4 +599,4 @@ def _write_jsonl_line(handle, record: dict[str, object]) -> None:
 def _iso_now() -> str:
     from datetime import datetime, timezone
 
-    return datetime.now(timezone.utc).isoformat()
+    return format_utc_datetime(datetime.now(timezone.utc))

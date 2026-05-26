@@ -9,7 +9,7 @@ def test_iter_operational_log_entries_parses_log_fixture_line() -> None:
     path = Path("data/fixtures/467.174-T-0100/log/0100_6858665E.LOG")
     first_entry = next(iter_operational_log_entries(path))
 
-    assert first_entry.time.isoformat() == "2025-06-22T20:23:58"
+    assert first_entry.time.isoformat() == "2025-06-22T20:23:58+00:00"
     assert first_entry.subsystem == "MAIN"
     assert first_entry.code == "0007"
     assert first_entry.message == "buoy 467.174-T-0100"

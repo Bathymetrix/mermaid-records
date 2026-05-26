@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 from typing import Iterable
 
+from .format_datetime import format_utc_datetime, parse_source_datetime
 from .format_record_filenames import (
     record_filenames,
     validate_instrument_serial,
@@ -208,7 +209,7 @@ def _common_log_record_fields(
         "instrument_id": instrument_id,
         "source_file": entry.source_file.name,
         "source_container": "log",
-        "record_time": entry.time.isoformat(),
+        "record_time": format_utc_datetime(entry.time),
         "log_epoch_time": _log_epoch_time(entry),
         "subsystem": entry.subsystem,
         "code": entry.code,
@@ -755,8 +756,8 @@ def _build_grouped_episode_record(
         "episode_index": episode.episode_index,
         "line_start_index": first_line.line_number,
         "line_end_index": last_line.line_number,
-        "start_record_time": first_line.time.isoformat(),
-        "end_record_time": last_line.time.isoformat(),
+        "start_record_time": format_utc_datetime(first_line.time),
+        "end_record_time": format_utc_datetime(last_line.time),
         "start_log_epoch_time": first_line.log_epoch_time,
         "end_log_epoch_time": last_line.log_epoch_time,
         "raw_lines": [line.raw_line for line in episode.lines],
@@ -837,8 +838,8 @@ def _validate_log_path(path: Path) -> None:
 
 def _parse_time_text(text: str) -> datetime:
     if text.isdigit():
-        return datetime.fromtimestamp(int(text), tz=timezone.utc).replace(tzinfo=None)
-    return datetime.fromisoformat(text)
+        return datetime.fromtimestamp(int(text), tz=timezone.utc)
+    return parse_source_datetime(text)
 
 
 def _report_malformed_line(
@@ -1276,4 +1277,4 @@ def _write_jsonl_line(handle, record: dict[str, object]) -> None:
 
 
 def _iso_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return format_utc_datetime(datetime.now(timezone.utc))

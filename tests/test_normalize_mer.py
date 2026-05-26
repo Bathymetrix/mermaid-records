@@ -104,7 +104,7 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     gpsinfo_record = next(
         record for record in environment_records if record["environment_kind"] == "gpsinfo"
     )
-    assert gpsinfo_record["gpsinfo_date"] == "2024-02-07T22:47:22"
+    assert gpsinfo_record["gpsinfo_date"] == "2024-02-07T22:47:22.000000Z"
     assert gpsinfo_record["raw_values"] == {
         "date": "2024-02-07T22:47:22",
         "lat": "+2845.7300",
@@ -168,8 +168,8 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
         "raw_info_line",
         "raw_format_line",
     ]
-    assert event_records[0]["date"] == "2024-02-07T22:47:22"
-    assert event_records[0]["event_info_date"] == "2024-02-07T22:47:22"
+    assert event_records[0]["date"] == "2024-02-07T22:47:22.000000Z"
+    assert event_records[0]["event_info_date"] == "2024-02-07T22:47:22.000000Z"
     assert event_records[0]["fname"] == "2024-02-07T22_47_22.000000"
     assert event_records[0]["smp_offset"] == "614054"
     assert event_records[0]["true_fs"] == "40.014107"
@@ -201,6 +201,35 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     assert all(record["instrument_serial"] == "0100" for record in event_records)
     assert all(record["source_file"] == mer_path.name for record in event_records)
     assert (output_dir / "mer_event_records.0100.jsonl").exists()
+
+
+def test_write_mer_jsonl_families_converts_offset_dates_to_utc(
+    tmp_path: Path,
+) -> None:
+    mer_path = tmp_path / "0100_offset.MER"
+    mer_path.write_bytes(
+        (
+            "<ENVIRONMENT>\n"
+            "\t<GPSINFO DATE=2024-02-07T22:47:22+02:30 LAT=+2845.7300 LON=+13848.3010 />\n"
+            "</ENVIRONMENT>\n"
+            "<PARAMETERS>\n"
+            "</PARAMETERS>\n"
+            "<EVENT>\n"
+            "\t<INFO DATE=2024-02-07T22:47:22.123456+02:30 ROUNDS=1 />\n"
+            "\t<DATA>ABC</DATA>\n"
+            "</EVENT>\n"
+        ).encode("ascii")
+    )
+
+    output_dir = tmp_path / "jsonl"
+    write_mer_jsonl_families([mer_path], output_dir)
+
+    environment_records = _read_jsonl(output_dir / "mer_environment_records.jsonl")
+    event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
+
+    assert environment_records[0]["gpsinfo_date"] == "2024-02-07T20:17:22.000000Z"
+    assert event_records[0]["event_info_date"] == "2024-02-07T20:17:22.123456Z"
+    assert event_records[0]["date"] == "2024-02-07T20:17:22.123456Z"
 
 
 def test_write_mer_jsonl_families_accepts_canonical_instrument_id_override(tmp_path: Path) -> None:
@@ -507,8 +536,8 @@ def test_write_mer_jsonl_families_supports_stanford_events_without_format(
     assert [record["event_index"] for record in event_records] == [0, 1]
     assert [record["event_rounds"] for record in event_records] == ["468", "469"]
     assert [record["event_info_date"] for record in event_records] == [
-        "2021-10-16T04:31:58.638228",
-        "2021-10-16T01:31:59.250533",
+        "2021-10-16T04:31:58.638228Z",
+        "2021-10-16T01:31:59.250533Z",
     ]
     assert [record["raw_format_line"] for record in event_records] == [None, None]
     assert event_records[0]["encoded_payload"] == base64.b64encode(payload_one).decode("ascii")
@@ -671,8 +700,8 @@ def test_write_mer_jsonl_families_exercises_real_psd_fixture_subset(
         "468",
     ]
     assert event_records[-1]["event_rounds"] == "468"
-    assert event_records[0]["event_info_date"] == "2022-04-12T10:02:58.273497"
-    assert event_records[-1]["event_info_date"] == "2022-04-11T07:03:03.177795"
+    assert event_records[0]["event_info_date"] == "2022-04-12T10:02:58.273497Z"
+    assert event_records[-1]["event_info_date"] == "2022-04-11T07:03:03.177795Z"
     assert [record["raw_format_line"] for record in event_records] == [None] * 10
     assert {record["encoded_payload_byte_count"] for record in event_records} == {512}
     assert {record["data_payload_nbytes"] for record in event_records} == {512}

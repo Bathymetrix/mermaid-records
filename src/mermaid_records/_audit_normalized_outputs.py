@@ -14,6 +14,7 @@ import random
 import re
 from typing import Any
 
+from .format_datetime import format_source_datetime
 from .format_record_filenames import record_family_name
 
 
@@ -417,7 +418,10 @@ def _check_mer_environment_row(row: dict[str, Any]) -> list[str]:
             issues.append("sample_min does not match raw_values['min']")
         if _int_or_none(raw_values.get("max")) != row.get("sample_max"):
             issues.append("sample_max does not match raw_values['max']")
-    if row.get("environment_kind") == "gpsinfo" and raw_values.get("date") != row.get("gpsinfo_date"):
+    if (
+        row.get("environment_kind") == "gpsinfo"
+        and format_source_datetime(raw_values.get("date")) != row.get("gpsinfo_date")
+    ):
         issues.append("gpsinfo_date does not match raw_values['date']")
     return issues
 
@@ -454,7 +458,11 @@ def _check_mer_event_row(row: dict[str, Any]) -> list[str]:
         ("rounds", "ROUNDS"),
     ):
         value = row.get(field_name)
-        if value is not None and f"{token}={value}" not in raw_info_line:
+        if field_name == "event_info_date":
+            raw_value = _raw_info_value(raw_info_line, token)
+            if value is not None and format_source_datetime(raw_value) != value:
+                issues.append(f"{field_name} is not preserved in raw_info_line")
+        elif value is not None and f"{token}={value}" not in raw_info_line:
             issues.append(f"{field_name} is not preserved in raw_info_line")
     raw_format_line = row.get("raw_format_line") or ""
     if raw_format_line:
@@ -531,3 +539,10 @@ def _int_or_none(value: str | None) -> int | None:
     if value is None:
         return None
     return int(value)
+
+
+def _raw_info_value(raw_info_line: str, token: str) -> str | None:
+    match = re.search(rf"\b{re.escape(token)}=([^\s>]+)", raw_info_line)
+    if match is None:
+        return None
+    return match.group(1)

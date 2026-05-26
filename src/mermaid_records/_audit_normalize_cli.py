@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,8 @@ import subprocess
 import sys
 import time
 from typing import Literal
+
+from .format_datetime import format_utc_datetime
 
 
 RAW_SUFFIXES = {".BIN", ".LOG", ".MER"}
@@ -746,11 +749,11 @@ def execute_run_spec(spec: RunSpec) -> RunResult:
 
     started_epoch = time.time()
     started_perf = time.perf_counter()
-    started_at = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(started_epoch))
+    started_at = _iso_from_epoch(started_epoch)
     spec.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     if spec.availability_issue is not None:
-        completed_at = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime())
+        completed_at = _iso_now()
         return RunResult(
             run_id=spec.run_id,
             slug=spec.slug,
@@ -825,7 +828,7 @@ def execute_run_spec(spec: RunSpec) -> RunResult:
         stderr_path.write_text(completed.stderr, encoding="utf-8")
         duration_s = time.perf_counter() - started_perf
         status = classify_result(spec, completed.returncode)
-        completed_at = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime())
+        completed_at = _iso_now()
         return RunResult(
             run_id=spec.run_id,
             slug=spec.slug,
@@ -843,7 +846,7 @@ def execute_run_spec(spec: RunSpec) -> RunResult:
         )
     except Exception as exc:  # pragma: no cover - exercised via tests with fake executables
         duration_s = time.perf_counter() - started_perf
-        completed_at = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime())
+        completed_at = _iso_now()
         stderr_path.write_text(f"{type(exc).__name__}: {exc}\n", encoding="utf-8")
         return RunResult(
             run_id=spec.run_id,
@@ -915,7 +918,7 @@ def summarize_results(
         and result.get("dry_run") is False
     ]
     summary = {
-        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime()),
+        "generated_at": _iso_now(),
         "input_root": input_root.as_posix(),
         "output_root": output_root.as_posix(),
         "audit_root": audit_root.as_posix(),
@@ -1153,6 +1156,14 @@ def _path_from_env(name: str) -> Path | None:
 
     value = os.environ.get(name)
     return Path(value).expanduser().resolve() if value else None
+
+
+def _iso_now() -> str:
+    return format_utc_datetime(datetime.now(timezone.utc))
+
+
+def _iso_from_epoch(epoch_seconds: float) -> str:
+    return format_utc_datetime(datetime.fromtimestamp(epoch_seconds, tz=timezone.utc))
 
 
 def _seed_decoder_database(spec: RunSpec) -> None:

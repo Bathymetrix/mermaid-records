@@ -13,6 +13,7 @@ import secrets
 import subprocess
 from typing import TYPE_CHECKING
 
+from .format_datetime import format_utc_datetime
 from .format_record_filenames import validate_instrument_serial
 
 if TYPE_CHECKING:
@@ -336,11 +337,11 @@ def _hash_file(path: Path) -> str:
 
 
 def _iso_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return format_utc_datetime(datetime.now(timezone.utc))
 
 
 def _manifest_run_id() -> str:
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    timestamp = format_utc_datetime(datetime.now(timezone.utc))
     return f"{timestamp}-{secrets.token_hex(3)}"
 
 

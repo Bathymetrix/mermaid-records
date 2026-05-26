@@ -146,10 +146,10 @@ def test_parse_mer_file_extracts_real_psd_event_blocks_without_format() -> None:
     assert all(block.raw_format_line is None for block in blocks)
     assert {len(block.data_payload or b"") for block in blocks} == {512}
     assert blocks[0].date is not None
-    assert blocks[0].date.isoformat() == "2022-04-12T10:02:58.273497"
+    assert blocks[0].date.isoformat() == "2022-04-12T10:02:58.273497+00:00"
     assert blocks[0].raw_info_line == "<INFO DATE=2022-04-12T10:02:58.273497 ROUNDS=237 />"
     assert blocks[-1].date is not None
-    assert blocks[-1].date.isoformat() == "2022-04-11T07:03:03.177795"
+    assert blocks[-1].date.isoformat() == "2022-04-11T07:03:03.177795+00:00"
     assert blocks[-1].raw_info_line == "<INFO DATE=2022-04-11T07:03:03.177795 ROUNDS=468 />"
 
 
