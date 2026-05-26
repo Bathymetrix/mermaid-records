@@ -15,6 +15,7 @@ from pathlib import Path
 import sys
 import time
 
+from . import __version__
 from .bin2log import Bin2LogConfig
 from .discovery import iter_bin_files
 from .normalize_pipeline import DryRunSummary, NormalizationPipelineSummary, run_normalization_pipeline
@@ -26,6 +27,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mermaid-records",
         description="Bathymetrix™ CLI for the MERMAID normalization pipeline.",
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

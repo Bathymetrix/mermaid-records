@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 import pytest
+from mermaid_records import __version__
 from mermaid_records.cli import build_parser, main
 
 
@@ -15,6 +16,17 @@ def test_cli_help_exposes_only_normalize_subcommand() -> None:
 
     assert "normalize" in help_text
     assert "inspect-mer" not in help_text
+
+
+def test_cli_version_option_reports_package_version(capsys) -> None:
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--version"])
+
+    captured = capsys.readouterr()
+
+    assert excinfo.value.code == 0
+    assert captured.out == f"mermaid-records {__version__}\n"
+    assert captured.err == ""
 
 
 def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) -> None:
