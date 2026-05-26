@@ -33,20 +33,39 @@ def test_stateful_run_writes_per_instrument_outputs_and_manifests(tmp_path: Path
 
     assert summary.mode == "stateful"
     assert [item.instrument_id for item in summary.processed_instruments] == ["P0006"]
-    assert (instrument_dir / "log_operational_records.jsonl").exists()
-    assert (instrument_dir / "mer_environment_records.jsonl").exists()
+    operational_path = _record_path(instrument_dir, "log_operational_records.jsonl")
+    environment_path = _record_path(instrument_dir, "mer_environment_records.jsonl")
+    assert operational_path.name == "log_operational_records.452.020-P-06.jsonl"
+    assert environment_path.name == "mer_environment_records.452.020-P-06.jsonl"
+    assert operational_path.exists()
+    assert environment_path.exists()
     assert run_json["status"] == "success"
+    assert run_json["instrument_serial"] == "452.020-P-06"
+    assert latest["instrument_serial"] == "452.020-P-06"
     assert source_state["input_root"] == input_root.as_posix()
+    assert source_state["instrument_serial"] == "452.020-P-06"
     assert source_state["normalization_version"] == __version__
     assert {item["source_kind"] for item in source_state["raw_sources"]} == {"log", "mer"}
     assert {item["change_kind"] for item in diff_rows} == {"new"}
     assert all(item["run_id"] == latest["run_id"] for item in diff_rows)
     assert {item["source_file"] for item in diff_rows} == {"06_first.LOG", "06_first.MER"}
     assert {item["instrument_id"] for item in diff_rows} == {"P0006"}
+    assert {item["instrument_serial"] for item in diff_rows} == {"452.020-P-06"}
+    operational_rows = _jsonl_lines(operational_path)
+    all_record_rows = [
+        row
+        for path in sorted(instrument_dir.glob("*.jsonl"))
+        for row in _jsonl_lines(path)
+    ]
+    assert operational_rows[0]["instrument_id"] == "P0006"
+    assert operational_rows[0]["instrument_serial"] == "452.020-P-06"
+    assert operational_rows[0]["instrument_id"] != operational_rows[0]["instrument_serial"]
+    assert all(row["instrument_serial"] == "452.020-P-06" for row in all_record_rows)
     assert list(diff_rows[0]) == [
         "source_file",
         "source_kind",
         "instrument_id",
+        "instrument_serial",
         "previous_exists",
         "current_exists",
         "previous_size_bytes",
@@ -76,9 +95,9 @@ def test_stateful_mode_ignores_out_of_scope_file_types(tmp_path: Path) -> None:
 
     assert [item.instrument_id for item in summary.processed_instruments] == ["T0100"]
     assert {item["source_kind"] for item in source_state["raw_sources"]} == {"log"}
-    assert (instrument_dir / "log_operational_records.jsonl").exists()
-    assert (instrument_dir / "mer_environment_records.jsonl").exists()
-    assert (instrument_dir / "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(instrument_dir, "log_operational_records.jsonl").exists()
+    assert _record_path(instrument_dir, "mer_environment_records.jsonl").exists()
+    assert _record_path(instrument_dir, "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()
 
 
@@ -144,7 +163,8 @@ def test_stateful_immediate_reruns_create_distinct_manifest_run_directories(tmp_
     assert len(run_dirs) == 2
     assert run_dirs == sorted([first_latest["run_id"], second_latest["run_id"]])
     assert all(len(run_id.rsplit("-", 1)[-1]) == 6 for run_id in run_dirs)
-    assert all(run_id.count("-") == 1 for run_id in run_dirs)
+    assert all(run_id.count("-") == 3 for run_id in run_dirs)
+    assert all("T" in run_id and ":" in run_id and "Z-" in run_id for run_id in run_dirs)
 
 
 def test_stateful_force_rewrite_rewrites_unchanged_outputs(tmp_path: Path) -> None:
@@ -250,8 +270,8 @@ def test_stateful_rewrite_and_prune_on_changed_or_removed_source(tmp_path: Path)
     pruned_lines = _jsonl_lines(output_root / "467.174-T-0100" / "state" / "pruned_records.jsonl")
 
     assert summary.processed_instruments[0].log_action == "rewrite"
-    assert (output_root / "467.174-T-0100" / "log_operational_records.jsonl").exists()
-    assert (output_root / "467.174-T-0100" / "log_operational_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(output_root / "467.174-T-0100", "log_operational_records.jsonl").exists()
+    assert _record_path(output_root / "467.174-T-0100", "log_operational_records.jsonl").read_text(encoding="utf-8") == ""
     assert pruned_lines[-1]["source_file"] == log_path.as_posix()
     assert pruned_lines[-1]["source_kind"] == "log"
 
@@ -278,8 +298,8 @@ def test_stateful_rewrite_and_prune_on_changed_or_removed_mer_source(tmp_path: P
     pruned_lines = _jsonl_lines(output_root / "467.174-T-0100" / "state" / "pruned_records.jsonl")
 
     assert summary.processed_instruments[0].mer_action == "rewrite"
-    assert (output_root / "467.174-T-0100" / "mer_event_records.jsonl").exists()
-    assert (output_root / "467.174-T-0100" / "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(output_root / "467.174-T-0100", "mer_event_records.jsonl").exists()
+    assert _record_path(output_root / "467.174-T-0100", "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
     assert pruned_lines[-1]["source_file"] == mer_path.as_posix()
     assert pruned_lines[-1]["source_kind"] == "mer"
 
@@ -308,7 +328,7 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
             decoder_script=decoder_a,
         ),
     )
-    log_only_before = (output_root / "0200" / "log_operational_records.jsonl").read_text(encoding="utf-8")
+    log_only_before = _record_path(output_root / "0200", "log_operational_records.jsonl").read_text(encoding="utf-8")
 
     summary = run_normalization_pipeline(
         input_root,
@@ -321,7 +341,7 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
 
     by_instrument = {item.instrument_id: item for item in summary.processed_instruments}
     bin_lines = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
-    log_only_after = (output_root / "0200" / "log_operational_records.jsonl").read_text(encoding="utf-8")
+    log_only_after = _record_path(output_root / "0200", "log_operational_records.jsonl").read_text(encoding="utf-8")
 
     assert by_instrument["0100"].decoder_state_invalidated is True
     assert by_instrument["0100"].log_action == "rewrite"
@@ -437,9 +457,9 @@ def test_stateless_mode_isolated_and_rejects_existing_manifests(tmp_path: Path) 
 
     assert summary.mode == "stateless"
     assert not (output_root / "0100" / "manifests").exists()
-    assert (output_root / "0100" / "log_operational_records.jsonl").exists()
-    assert (output_root / "0100" / "mer_environment_records.jsonl").exists()
-    assert (output_root / "0100" / "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(output_root / "0100", "log_operational_records.jsonl").exists()
+    assert _record_path(output_root / "0100", "mer_environment_records.jsonl").exists()
+    assert _record_path(output_root / "0100", "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
 
     manifests_dir = output_root / "0200" / "manifests"
     manifests_dir.mkdir(parents=True)
@@ -455,7 +475,7 @@ def test_stateless_mode_rejects_unsupported_explicit_input_files(tmp_path: Path)
     unsupported_path = tmp_path / "0100_profile.S61"
     unsupported_path.write_bytes(b"")
 
-    with pytest.raises(ValueError, match="Unsupported input file type for v1.0.0"):
+    with pytest.raises(ValueError, match="Unsupported input file type for the current normalization contract"):
         run_normalization_pipeline(
             output_dir=tmp_path / "output",
             input_files=[unsupported_path],
@@ -664,6 +684,7 @@ def test_stateful_logs_malformed_log_lines_and_continues(tmp_path: Path) -> None
         {
             "error": "line does not match expected LOG pattern",
             "instrument_id": "T0100",
+            "instrument_serial": "467.174-T-0100",
             "line_number": 2,
             "raw_line": "[DIVING,15",
             "run_id": latest["run_id"],
@@ -697,6 +718,7 @@ def test_stateful_records_skipped_log_files(tmp_path: Path, monkeypatch: pytest.
         {
             "error": "simulated unreadable log",
             "instrument_id": "T0100",
+            "instrument_serial": "467.174-T-0100",
             "run_id": latest["run_id"],
             "source_file": log_path.as_posix(),
             "skipped_at": skipped_rows[0]["skipped_at"],
@@ -789,6 +811,7 @@ def test_stateful_logs_incomplete_mer_event_block_and_continues(tmp_path: Path) 
             "block_kind": "event_data",
             "error": "incomplete DATA block: missing </DATA>",
             "instrument_id": "T0100",
+            "instrument_serial": "467.174-T-0100",
             "raw_block": malformed_rows[0]["raw_block"],
             "run_id": latest["run_id"],
             "source_file": mer_path.as_posix(),
@@ -820,6 +843,7 @@ def test_stateful_records_skipped_mer_files(tmp_path: Path, monkeypatch: pytest.
         {
             "error": "simulated unreadable mer",
             "instrument_id": "T0100",
+            "instrument_serial": "467.174-T-0100",
             "run_id": latest["run_id"],
             "source_file": mer_path.as_posix(),
             "skipped_at": skipped_rows[0]["skipped_at"],
@@ -849,6 +873,7 @@ def test_stateful_skips_hopelessly_broken_mer_file(tmp_path: Path) -> None:
                 "or EVENT content"
             ),
             "instrument_id": "T0100",
+            "instrument_serial": "467.174-T-0100",
             "run_id": latest["run_id"],
             "source_file": mer_path.as_posix(),
             "skipped_at": skipped_rows[0]["skipped_at"],
@@ -877,8 +902,8 @@ def test_stateless_malformed_log_recovery_writes_no_manifests(tmp_path: Path) ->
     assert not (output_root / "0100" / "manifests").exists()
     operational_rows = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
     assert [row["message"] for row in operational_rows] == ["first", "second"]
-    assert (output_root / "0100" / "mer_event_records.jsonl").exists()
-    assert (output_root / "0100" / "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(output_root / "0100", "mer_event_records.jsonl").exists()
+    assert _record_path(output_root / "0100", "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
 
 
 def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> None:
@@ -891,30 +916,32 @@ def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> 
     run_normalization_pipeline(input_root, output_dir=output_root)
 
     instrument_dir = output_root / "467.174-T-0100"
+    serial = "467.174-T-0100"
     expected_jsonl = {
-        "log_operational_records.jsonl",
-        "log_acquisition_records.jsonl",
-        "log_ascent_request_records.jsonl",
-        "log_gps_records.jsonl",
-        "log_pressure_temperature_records.jsonl",
-        "log_battery_records.jsonl",
-        "log_parameter_records.jsonl",
-        "log_testmode_records.jsonl",
-        "log_sbe_records.jsonl",
-        "log_transmission_records.jsonl",
-        "log_unclassified_records.jsonl",
-        "mer_environment_records.jsonl",
-        "mer_parameter_records.jsonl",
-        "mer_event_records.jsonl",
+        f"log_operational_records.{serial}.jsonl",
+        f"log_acquisition_records.{serial}.jsonl",
+        f"log_ascent_request_records.{serial}.jsonl",
+        f"log_gps_records.{serial}.jsonl",
+        f"log_pressure_temperature_records.{serial}.jsonl",
+        f"log_battery_records.{serial}.jsonl",
+        f"log_parameter_records.{serial}.jsonl",
+        f"log_testmode_records.{serial}.jsonl",
+        f"log_sbe_records.{serial}.jsonl",
+        f"log_transmission_records.{serial}.jsonl",
+        f"log_unclassified_records.{serial}.jsonl",
+        f"mer_environment_records.{serial}.jsonl",
+        f"mer_parameter_records.{serial}.jsonl",
+        f"mer_event_records.{serial}.jsonl",
     }
 
     assert {path.name for path in instrument_dir.glob("*.jsonl")} == expected_jsonl
-    assert (instrument_dir / "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(instrument_dir, "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
     latest = _read_json(instrument_dir / "manifests" / "latest.json")
     outputs_manifest = _read_json(instrument_dir / latest["outputs_manifest"])
     assert {item["path"] for item in outputs_manifest["jsonl_outputs"]} == expected_jsonl
-    assert outputs_manifest["counts"]["log_operational_records"] == 1
-    assert outputs_manifest["counts"]["mer_event_records"] == 0
+    assert outputs_manifest["instrument_serial"] == serial
+    assert outputs_manifest["counts"][f"log_operational_records.{serial}"] == 1
+    assert outputs_manifest["counts"][f"mer_event_records.{serial}"] == 0
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()
 
 
@@ -1015,5 +1042,18 @@ def _read_json(path: Path) -> dict[str, object]:
 
 
 def _jsonl_lines(path: Path) -> list[dict[str, object]]:
+    path = _record_path(path.parent, path.name)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _record_path(instrument_dir: Path, base_filename: str) -> Path:
+    path = instrument_dir / base_filename
+    if path.exists():
+        return path
+    stem = Path(base_filename).stem
+    suffix = Path(base_filename).suffix
+    matches = sorted(instrument_dir.glob(f"{stem}.*{suffix}"))
+    if len(matches) == 1:
+        return matches[0]
+    return path

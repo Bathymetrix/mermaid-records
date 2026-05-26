@@ -12,10 +12,15 @@ from pathlib import Path
 import re
 from typing import Iterable
 
+from .format_record_filenames import (
+    record_filenames,
+    validate_instrument_serial,
+    with_instrument_serial,
+)
 from .models import OperationalLogEntry
 from .parse_instrument_name import maybe_parse_instrument_name
 
-OUTPUT_FILENAMES = {
+BASE_OUTPUT_FILENAMES = {
     "operational": "log_operational_records.jsonl",
     "acquisition": "log_acquisition_records.jsonl",
     "ascent_request": "log_ascent_request_records.jsonl",
@@ -28,6 +33,7 @@ OUTPUT_FILENAMES = {
     "transmission": "log_transmission_records.jsonl",
     "unclassified": "log_unclassified_records.jsonl",
 }
+OUTPUT_FILENAMES = BASE_OUTPUT_FILENAMES
 
 _LOG_LINE_RE = re.compile(r"^(?P<time>.+?):\[(?P<tag>[^\]]+)\](?P<message>.*)$")
 # Shared structurally parsed LOG line family for wrapped source-literal
@@ -185,6 +191,12 @@ class _DerivedFamilyMatch:
     record: dict[str, object] | None
 
 
+def output_filenames(instrument_serial: str) -> dict[str, str]:
+    """Return LOG-derived output filenames for one instrument serial."""
+
+    return record_filenames(BASE_OUTPUT_FILENAMES, instrument_serial)
+
+
 def _common_log_record_fields(
     entry: OperationalLogEntry,
     *,
@@ -209,6 +221,7 @@ def write_log_jsonl_families(
     output_dir: Path,
     *,
     instrument_id: str | None = None,
+    instrument_serial: str | None = None,
     run_id: str | None = None,
     malformed_log_lines: list[dict[str, object]] | None = None,
     skipped_log_files: list[dict[str, object]] | None = None,
@@ -216,8 +229,14 @@ def write_log_jsonl_families(
     """Write conservative LOG-derived JSONL streams."""
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    sorted_paths = sorted(Path(path) for path in log_paths)
+    output_instrument_serial = _resolve_output_instrument_serial(
+        sorted_paths,
+        instrument_serial=instrument_serial,
+    )
     output_paths = {
-        name: output_dir / filename for name, filename in OUTPUT_FILENAMES.items()
+        name: output_dir / filename
+        for name, filename in output_filenames(output_instrument_serial).items()
     }
 
     total_records = 0
@@ -249,8 +268,6 @@ def write_log_jsonl_families(
     unclassified_examples: list[dict[str, object]] = []
     unclassified_patterns: Counter[tuple[str, str | None, str]] = Counter()
 
-    sorted_paths = sorted(Path(path) for path in log_paths)
-
     with (
         output_paths["operational"].open("w", encoding="utf-8") as operational_handle,
         output_paths["acquisition"].open("w", encoding="utf-8") as acquisition_handle,
@@ -266,6 +283,8 @@ def write_log_jsonl_families(
     ):
         for path in sorted_paths:
             path_instrument_id = instrument_id or _fallback_instrument_id(path)
+            path_instrument_serial = output_instrument_serial
+
             def _record_malformed_line(
                 line_number: int,
                 raw_line: str,
@@ -277,6 +296,7 @@ def write_log_jsonl_families(
                     {
                         "run_id": run_id,
                         "instrument_id": path_instrument_id,
+                        "instrument_serial": path_instrument_serial,
                         "source_file": path.as_posix(),
                         "line_number": line_number,
                         "raw_line": raw_line,
@@ -321,6 +341,10 @@ def write_log_jsonl_families(
                             "message_kind": message_kind,
                             "raw_line": entry.raw_line,
                         }
+                        operational_record = with_instrument_serial(
+                            operational_record,
+                            path_instrument_serial,
+                        )
                         _write_jsonl_line(operational_handle, operational_record)
                         operational_count += 1
 
@@ -328,6 +352,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "acquisition":
                             acquisition_record = derived_match.record
                             assert acquisition_record is not None
+                            acquisition_record = with_instrument_serial(
+                                acquisition_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(acquisition_handle, acquisition_record)
                             acquisition_count += 1
                             acquisition_state_counter[
@@ -345,6 +373,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "ascent_request":
                             ascent_request_record = derived_match.record
                             assert ascent_request_record is not None
+                            ascent_request_record = with_instrument_serial(
+                                ascent_request_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(ascent_request_handle, ascent_request_record)
                             ascent_request_count += 1
                             ascent_request_state_counter[
@@ -358,6 +390,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "gps":
                             gps_record = derived_match.record
                             assert gps_record is not None
+                            gps_record = with_instrument_serial(
+                                gps_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(gps_handle, gps_record)
                             gps_count += 1
                             gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
@@ -366,6 +402,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "transmission":
                             transmission_record = derived_match.record
                             assert transmission_record is not None
+                            transmission_record = with_instrument_serial(
+                                transmission_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(transmission_handle, transmission_record)
                             transmission_count += 1
                             if len(transmission_examples) < 3:
@@ -374,6 +414,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "pressure_temperature":
                             pressure_temperature_record = derived_match.record
                             assert pressure_temperature_record is not None
+                            pressure_temperature_record = with_instrument_serial(
+                                pressure_temperature_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(pressure_temperature_handle, pressure_temperature_record)
                             pressure_temperature_count += 1
                             if len(pressure_temperature_examples) < 3:
@@ -382,6 +426,10 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "battery":
                             battery_record = derived_match.record
                             assert battery_record is not None
+                            battery_record = with_instrument_serial(
+                                battery_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(battery_handle, battery_record)
                             battery_count += 1
                             if len(battery_examples) < 3:
@@ -398,6 +446,10 @@ def write_log_jsonl_families(
                                 "unclassified_reason": "no_family_match",
                                 "raw_line": entry.raw_line,
                             }
+                            unclassified_record = with_instrument_serial(
+                                unclassified_record,
+                                path_instrument_serial,
+                            )
                             _write_jsonl_line(unclassified_handle, unclassified_record)
                             unclassified_count += 1
                             if len(unclassified_examples) < 3:
@@ -412,6 +464,10 @@ def write_log_jsonl_families(
                         item,
                         instrument_id=path_instrument_id,
                         source_file=path,
+                    )
+                    episode_record = with_instrument_serial(
+                        episode_record,
+                        path_instrument_serial,
                     )
                     if item.family == "parameter":
                         _write_jsonl_line(parameter_handle, episode_record)
@@ -435,6 +491,7 @@ def write_log_jsonl_families(
                     {
                         "run_id": run_id,
                         "instrument_id": path_instrument_id,
+                        "instrument_serial": path_instrument_serial,
                         "source_file": path.as_posix(),
                         "error": str(exc),
                         "skipped_at": _iso_now(),
@@ -1141,6 +1198,29 @@ def _fallback_instrument_id(path: Path) -> str:
         parsed = maybe_parse_instrument_name(candidate)
         if parsed is not None:
             return parsed.instrument_id
+    return path.stem.split("_", maxsplit=1)[0]
+
+
+def _resolve_output_instrument_serial(
+    paths: list[Path],
+    *,
+    instrument_serial: str | None,
+) -> str:
+    if instrument_serial is not None:
+        return validate_instrument_serial(instrument_serial)
+    if not paths:
+        raise ValueError("instrument_serial is required when no LOG paths are supplied")
+    return validate_instrument_serial(_fallback_instrument_serial(paths[0]))
+
+
+def _fallback_instrument_serial(path: Path) -> str:
+    for ancestor in (path.parent, *path.parents):
+        parsed = maybe_parse_instrument_name(ancestor.name)
+        if parsed is not None:
+            return parsed.serial
+    parsed = maybe_parse_instrument_name(path.stem)
+    if parsed is not None:
+        return parsed.serial
     return path.stem.split("_", maxsplit=1)[0]
 
 

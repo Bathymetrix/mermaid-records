@@ -14,6 +14,8 @@ import random
 import re
 from typing import Any
 
+from .format_record_filenames import record_family_name
+
 
 BATTERY_PATTERN = re.compile(r"battery\s+(-?\d+)mV,\s*(-?\d+)uA")
 PRESSURE_TEMPERATURE_PATTERN = re.compile(r"P\s*([+-]?\d+)mbar,T\s*([+-]?\d+)mdegC")
@@ -93,7 +95,7 @@ def discover_nonempty_families(records_root: Path) -> list[FamilyInventoryRow]:
         for path in sorted(instrument_dir.glob("*.jsonl")):
             if path.stat().st_size == 0:
                 continue
-            family = path.stem
+            family = record_family_name(path)
             family_files[family] += 1
             family_instruments[family].add(instrument_dir.name)
             family_rows[family] += _count_jsonl_rows(path)
@@ -270,7 +272,7 @@ def _sample_file_row(path: Path, instrument_dir: str, rng: random.Random) -> Fil
     if chosen_row is None:
         return None
     return FileSample(
-        family=path.stem,
+        family=record_family_name(path),
         instrument_dir=instrument_dir,
         path=path,
         row_count=row_count,

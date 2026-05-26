@@ -6,9 +6,9 @@
 
 `mermaid-records` normalizes raw MERMAID `BIN`, `LOG`, and `MER` artifacts into structured JSONL record families. It is a parsing and normalization layer only. It does not perform coordinate conversion, interval inference, waveform analysis, or higher-level interpretation.
 
-## v1 contract
+## Current contract
 
-The release-facing v1 contract is intentionally narrow:
+The release-facing contract is intentionally narrow:
 
 - supported raw inputs are `BIN`, `LOG`, and `MER`
 - the installed CLI surface is `mermaid-records normalize`
@@ -16,6 +16,8 @@ The release-facing v1 contract is intentionally narrow:
 - normalized JSONL outputs are the primary supported output
 
 `BIN` handling still depends on an external decoder step that produces `LOG` content. `mermaid-records` owns normalization around that seam; it does not reimplement the manufacturer decoder.
+
+Version 2.0.0 is a deliberate post-v1 breaking output contract change. Normalized JSONL filenames now include the instrument serial, and every normalized record row includes both `instrument_id` and `instrument_serial`.
 
 ## Installation
 
@@ -70,27 +72,29 @@ Typical per-instrument outputs look like:
 
 ```text
 <output-dir>/
-  <instrument>/
-    log_acquisition_records.jsonl
-    log_ascent_request_records.jsonl
-    log_battery_records.jsonl
-    log_gps_records.jsonl
-    log_operational_records.jsonl
-    log_parameter_records.jsonl
-    log_pressure_temperature_records.jsonl
-    log_sbe_records.jsonl
-    log_testmode_records.jsonl
-    log_transmission_records.jsonl
-    log_unclassified_records.jsonl
-    mer_environment_records.jsonl
-    mer_event_records.jsonl
-    mer_parameter_records.jsonl
+  452.020-P-06/
+    log_acquisition_records.452.020-P-06.jsonl
+    log_ascent_request_records.452.020-P-06.jsonl
+    log_battery_records.452.020-P-06.jsonl
+    log_gps_records.452.020-P-06.jsonl
+    log_operational_records.452.020-P-06.jsonl
+    log_parameter_records.452.020-P-06.jsonl
+    log_pressure_temperature_records.452.020-P-06.jsonl
+    log_sbe_records.452.020-P-06.jsonl
+    log_testmode_records.452.020-P-06.jsonl
+    log_transmission_records.452.020-P-06.jsonl
+    log_unclassified_records.452.020-P-06.jsonl
+    mer_environment_records.452.020-P-06.jsonl
+    mer_event_records.452.020-P-06.jsonl
+    mer_parameter_records.452.020-P-06.jsonl
     manifests/              # stateful mode only
     state/                  # stateful mode only
     preflight_status.json   # only when the current run's BIN decode preflight ran
 ```
 
 Every per-instrument output directory materializes the canonical top-level JSONL file set even when some families are empty.
+
+`instrument_id` is the station/instrument identifier analogous to `kstnm`, for example `P0006`. `instrument_serial` is the full hardware/dataset serial, for example `452.020-P-06`. For stateless explicit-file runs, the pipeline uses the same path/log-derived serial resolution as stateful mode when available and otherwise falls back to the raw file prefix.
 
 ## Fixture coverage
 
@@ -100,11 +104,11 @@ The release-facing fixtures intentionally cover a few concrete float/data classe
 - `465.152-R-0001`: compact real PSD / Stanford-style raw `BIN` + `MER` subset, including a metadata-only `MER` and an event-bearing `MER` with no `<FORMAT>` lines
 - `467.174-T-0100`: BIN-backed family with tracked raw `BIN`, decoded `LOG`, raw `MER`, and `S61` fixture branches
 
-These fixtures are representative test anchors for the implemented v1 behavior. They do not claim coverage for every float generation, record family variant, or decoder edge case.
+These fixtures are representative test anchors for the implemented behavior. They do not claim coverage for every float generation, record family variant, or decoder edge case.
 
 ## Python API posture
 
-For v1, `mermaid_records` exposes only conservative package metadata at the package root. Functional helpers are intentionally not re-exported there as a broader stable API promise.
+`mermaid_records` exposes only conservative package metadata at the package root. Functional helpers are intentionally not re-exported there as a broader stable API promise.
 
 ## Documentation map
 

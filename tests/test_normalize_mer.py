@@ -136,6 +136,7 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     assert event_records[0]["block_index"] == 0
     assert list(event_records[0]) == [
         "instrument_id",
+        "instrument_serial",
         "source_file",
         "source_container",
         "block_index",
@@ -197,7 +198,9 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     assert "record_time" not in event_records[1]
     assert "time" not in event_records[1]
     assert all(record["instrument_id"] == "0100" for record in event_records)
+    assert all(record["instrument_serial"] == "0100" for record in event_records)
     assert all(record["source_file"] == mer_path.name for record in event_records)
+    assert (output_dir / "mer_event_records.0100.jsonl").exists()
 
 
 def test_write_mer_jsonl_families_accepts_canonical_instrument_id_override(tmp_path: Path) -> None:
@@ -221,10 +224,16 @@ def test_write_mer_jsonl_families_accepts_canonical_instrument_id_override(tmp_p
     )
 
     output_dir = tmp_path / "jsonl"
-    write_mer_jsonl_families([mer_path], output_dir, instrument_id="T0100")
+    write_mer_jsonl_families(
+        [mer_path],
+        output_dir,
+        instrument_id="T0100",
+        instrument_serial="467.174-T-0100",
+    )
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
 
     assert event_records[0]["instrument_id"] == "T0100"
+    assert event_records[0]["instrument_serial"] == "467.174-T-0100"
 
 
 def test_write_mer_jsonl_families_supports_rounds_info_field(tmp_path: Path) -> None:
@@ -739,5 +748,15 @@ def test_write_mer_jsonl_families_excludes_stanford_data_framing_bytes_without_f
 
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:
+    path = _resolve_jsonl_path(path)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _resolve_jsonl_path(path: Path) -> Path:
+    if path.exists():
+        return path
+    matches = sorted(path.parent.glob(f"{path.stem}.*{path.suffix}"))
+    if len(matches) == 1:
+        return matches[0]
+    return path

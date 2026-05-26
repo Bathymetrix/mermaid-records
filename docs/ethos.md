@@ -8,7 +8,7 @@ Its role is to transform raw MERMAID artifacts into stable, machine-readable rec
 
 ## Design goals
 
-The v1 design goals are:
+The current design goals are:
 
 - preserve source information conservatively
 - avoid silent data loss

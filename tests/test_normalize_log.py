@@ -84,6 +84,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert operational_records[4]["severity"] == "warn"
     assert list(operational_records[0]) == [
         "instrument_id",
+        "instrument_serial",
         "source_file",
         "source_container",
         "record_time",
@@ -98,6 +99,8 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert operational_records[0]["record_time"] == "2023-11-14T22:13:20"
     assert operational_records[0]["log_epoch_time"] == "1700000000"
     assert operational_records[0]["source_file"] == log_path.name
+    assert operational_records[0]["instrument_serial"] == "0100"
+    assert (output_dir / "log_operational_records.0100.jsonl").exists()
     assert "time" not in operational_records[0]
 
     assert transmission_records[1]["referenced_artifact"] == "0100_AAAA0001.MER"
@@ -125,6 +128,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         record["message"] for record in unclassified_records
     } == {"<WARN>timeout", "buoy 467.174-T-0100"}
     assert all(record["instrument_id"] == "0100" for record in operational_records)
+    assert all(record["instrument_serial"] == "0100" for record in operational_records)
 
 
 def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
@@ -137,10 +141,16 @@ def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
     )
 
     output_dir = tmp_path / "jsonl"
-    write_log_jsonl_families([log_path], output_dir, instrument_id="T0100")
+    write_log_jsonl_families(
+        [log_path],
+        output_dir,
+        instrument_id="T0100",
+        instrument_serial="467.174-T-0100",
+    )
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
 
     assert operational_records[0]["instrument_id"] == "T0100"
+    assert operational_records[0]["instrument_serial"] == "467.174-T-0100"
 
 
 def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
@@ -442,6 +452,7 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
 
     assert parameter_records[0] == {
         "instrument_id": "0100",
+        "instrument_serial": "0100",
         "source_file": log_path.name,
         "episode_index": 0,
         "line_start_index": 2,
@@ -524,10 +535,11 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
     assert rollover_record["switched_to_log_file"] == "0100_NEXT.LOG"
     assert rollover_record["source_file"] == log_path.name
     assert malformed_log_lines == [
-        {
-            "run_id": "run-2",
-            "instrument_id": "0100",
-            "source_file": log_path.as_posix(),
+            {
+                "run_id": "run-2",
+                "instrument_id": "0100",
+                "instrument_serial": "0100",
+                "source_file": log_path.as_posix(),
             "line_number": 10,
             "raw_line": "1700000006:Command list",
             "error": "line does not match expected LOG pattern",
@@ -900,5 +912,15 @@ def test_write_log_jsonl_families_keeps_true_unparsable_junk_malformed(
 
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:
+    path = _resolve_jsonl_path(path)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _resolve_jsonl_path(path: Path) -> Path:
+    if path.exists():
+        return path
+    matches = sorted(path.parent.glob(f"{path.stem}.*{path.suffix}"))
+    if len(matches) == 1:
+        return matches[0]
+    return path

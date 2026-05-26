@@ -163,9 +163,9 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 
 For LOG-derived measurement-adjacent lines:
 
-- dedicated `log_pressure_temperature_records.jsonl` is only for literal `P...mbar,T...mdegC` observations with parsed `pressure_mbar` and `temperature_mdegc`
-- dedicated `log_battery_records.jsonl` is only for literal `battery ...mV, ...uA` telemetry with parsed `voltage_mv` and `current_ua`
-- other lines that were formerly routed into `log_measurement_records.jsonl` now remain only in `log_operational_records.jsonl`; do not expand their parsing without an explicit request
+- dedicated `log_pressure_temperature_records` output family is only for literal `P...mbar,T...mdegC` observations with parsed `pressure_mbar` and `temperature_mdegc`
+- dedicated `log_battery_records` output family is only for literal `battery ...mV, ...uA` telemetry with parsed `voltage_mv` and `current_ua`
+- other lines that were formerly routed into `log_measurement_records` now remain only in `log_operational_records`; do not expand their parsing without an explicit request
 
 For normalized LOG/MER family boundaries:
 
@@ -178,9 +178,9 @@ For derived operational-family prototypes, no parsed `OperationalLogEntry` shoul
 Operational-family routing contract:
 
 - grouped structural LOG routes such as `parameter`, `testmode`, and `sbe` are resolved before ordinary `OperationalLogEntry` family classification
-- every ordinary `OperationalLogEntry` always emits one record to `log_operational_records.jsonl`
+- every ordinary `OperationalLogEntry` always emits one record to the `log_operational_records` family
 - after that, an ordinary operational line may match zero or one derived family
-- zero derived matches route to `log_unclassified_records.jsonl`
+- zero derived matches route to the `log_unclassified_records` family
 - two or more derived matches are a normalization bug and must fail loudly; do not hide them with precedence or multi-family emission
 
 For acquisition evidence prototypes, preserve the distinction between exact transitions and state assertions:
@@ -312,7 +312,16 @@ Avoid:
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.
 - `--force-rewrite` must remove package-owned generated artifacts for each targeted instrument before regeneration: all top-level `log_*.jsonl`, all top-level `mer_*.jsonl`, and package-owned bookkeeping under `manifests/` and `state/`. Do not delete unknown files or the whole instrument directory.
 - `preflight_status.json` is run-scoped bookkeeping: clear stale root artifacts before each real run, and include `preflight_status` in `manifests/latest.json` only when the current run produced that artifact. When no preflight runs, omit the field rather than storing `null`.
-- Every per-instrument output directory must materialize the canonical output file set even when some families are empty. At minimum this means all top-level LOG and MER JSONL family files must exist as empty files when they have no records; in `stateful` mode also keep the state/manifest scaffold present for that instrument, while `stateless` mode still must not create manifests.
+- Every per-instrument output directory must materialize the canonical serial-suffixed output file set even when some families are empty. At minimum this means all top-level LOG and MER JSONL family files named `<family>.<instrument_serial>.jsonl` must exist as empty files when they have no records; in `stateful` mode also keep the state/manifest scaffold present for that instrument, while `stateless` mode still must not create manifests.
 - Future dry-run/report behavior must be completely side-effect free, including no file writes of any kind.
 - Persisted `manifests/runs/<run_id>/input_file_diffs.jsonl` is a strict raw input diff log: file-level fields only, no append/rewrite/noop semantics, and no standalone non-file invalidation records.
 - Canonical `instrument_id` should be parsed from the Osean serial naming rules when a full serial is available, for example `452.020-P-08 -> P0008` and `467.174-T-0100 -> T0100`. Do not derive canonical `instrument_id` independently in multiple modules.
+- Stateful manifest run directories use UTC ISO8601-style IDs with separators, for example `manifests/runs/2026-04-21T22:17:31Z-11a3ef/`.
+
+## Instrument Terminology
+
+- Refer to full names such as `467.174-T-0100` as the **instrument serial**.
+- Refer to canonical 5-character station names such as `T0100` as the  **instrument ID**.
+- Keep `instrument_id` and `instrument_serial` distinct in normalized records, filenames, manifests, state/diagnostic records that already carry instrument context, schema/docs, tests, diagnostics, commit messages, and user-facing explanations.
+- `instrument_id` remains the station/instrument identifier analogous to `kstnm`; `instrument_serial` is the full hardware/dataset serial such as `452.020-P-06`.
+- If stateless `--input-file` context cannot resolve a full serial from nearby path/log context, the current contract falls back to the raw file prefix for `instrument_serial`; document that ambiguity rather than inventing a broader CLI/API surface.

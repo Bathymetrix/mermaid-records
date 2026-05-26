@@ -71,8 +71,8 @@ def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) 
     assert "Processing instrument T0100" in captured.err
     assert "Normalizing LOG for instrument T0100" in captured.err
     assert "Normalizing MER for instrument T0100" in captured.err
-    assert (output_dir / "467.174-T-0100" / "log_operational_records.jsonl").exists()
-    assert (output_dir / "467.174-T-0100" / "mer_environment_records.jsonl").exists()
+    assert _record_path(output_dir / "467.174-T-0100", "log_operational_records.jsonl").exists()
+    assert _record_path(output_dir / "467.174-T-0100", "mer_environment_records.jsonl").exists()
     assert not (output_dir / "467.174-T-0100" / "preflight_status.json").exists()
 
 
@@ -102,7 +102,7 @@ def test_normalize_cli_accepts_comma_and_space_separated_input_files(tmp_path: P
     assert "NORMALIZATION SUMMARY" in captured.out
     assert "mode: stateless" in captured.out
     assert "raw files processed: 3" in captured.out
-    assert (output_dir / "467.174-T-0100" / "log_operational_records.jsonl").exists()
+    assert _record_path(output_dir / "467.174-T-0100", "log_operational_records.jsonl").exists()
 
 
 def test_normalize_cli_dry_run_human_output_is_side_effect_free(tmp_path: Path, capsys) -> None:
@@ -336,7 +336,10 @@ def test_output_dir_resolves_from_mermaid_env(tmp_path: Path, capsys, monkeypatc
 
     assert result == 0
     assert "NORMALIZATION SUMMARY" in captured.out
-    assert (mermaid_root / "records" / "467.174-T-0100" / "log_operational_records.jsonl").exists()
+    assert _record_path(
+        mermaid_root / "records" / "467.174-T-0100",
+        "log_operational_records.jsonl",
+    ).exists()
 
 
 def test_missing_output_dir_and_mermaid_env_errors_clearly(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -473,7 +476,7 @@ def test_bin_free_runs_do_not_require_decoder_env_or_args(
     assert result == 0
     assert "NORMALIZATION SUMMARY" in captured.out
     assert "bin files decoded=0" in captured.out
-    assert (output_dir / "467.174-T-0100" / "log_operational_records.jsonl").exists()
+    assert _record_path(output_dir / "467.174-T-0100", "log_operational_records.jsonl").exists()
 
 
 def test_bin_runs_require_decoder_python_when_unresolved(
@@ -533,5 +536,18 @@ def decrypt_all(path):
 
 
 def _jsonl_lines(path: Path) -> list[dict[str, object]]:
+    path = _record_path(path.parent, path.name)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _record_path(instrument_dir: Path, base_filename: str) -> Path:
+    path = instrument_dir / base_filename
+    if path.exists():
+        return path
+    stem = Path(base_filename).stem
+    suffix = Path(base_filename).suffix
+    matches = sorted(instrument_dir.glob(f"{stem}.*{suffix}"))
+    if len(matches) == 1:
+        return matches[0]
+    return path

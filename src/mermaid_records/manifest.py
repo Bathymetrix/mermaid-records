@@ -13,6 +13,8 @@ import secrets
 import subprocess
 from typing import TYPE_CHECKING
 
+from .format_record_filenames import validate_instrument_serial
+
 if TYPE_CHECKING:
     from .bin2log import Bin2LogConfig
 
@@ -24,11 +26,13 @@ def begin_instrument_run(
     raw_source_paths: list[Path],
     config: Bin2LogConfig | None,
     normalization_version: str,
+    instrument_serial: str,
 ) -> dict[str, object]:
     """Create manifest context for one instrument-level stateful run."""
 
     started_at = _iso_now()
     run_id = _manifest_run_id()
+    serial = validate_instrument_serial(instrument_serial)
     manifests_root = instrument_output_dir / "manifests"
     run_dir = manifests_root / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -37,6 +41,7 @@ def begin_instrument_run(
         config=config if _has_bin(raw_source_paths) else None,
         input_root=input_root,
         normalization_version=normalization_version,
+        instrument_serial=serial,
     )
     return {
         "run_id": run_id,
@@ -44,6 +49,7 @@ def begin_instrument_run(
         "run_dir": run_dir,
         "manifests_root": manifests_root,
         "instrument_output_dir": instrument_output_dir,
+        "instrument_serial": serial,
         "source_state": source_state,
     }
 
@@ -65,8 +71,10 @@ def finalize_instrument_run(
     manifests_root = Path(context["manifests_root"])
     instrument_output_dir = Path(context["instrument_output_dir"])
     source_state = context["source_state"]
+    instrument_serial = validate_instrument_serial(str(context["instrument_serial"]))
     run_json = {
         "run_id": context["run_id"],
+        "instrument_serial": instrument_serial,
         "started_at": context["started_at"],
         "completed_at": _iso_now(),
         "input_root": source_state["input_root"],
@@ -96,6 +104,7 @@ def finalize_instrument_run(
 
     latest_json = {
         "run_id": context["run_id"],
+        "instrument_serial": instrument_serial,
         "status": run_json["status"],
         "started_at": context["started_at"],
         "completed_at": run_json["completed_at"],
@@ -153,9 +162,11 @@ def build_source_state(
     config: Bin2LogConfig | None,
     input_root: Path,
     normalization_version: str,
+    instrument_serial: str,
 ) -> dict[str, object]:
     """Build source state for one instrument-level run."""
 
+    serial = validate_instrument_serial(instrument_serial)
     raw_sources = [
         {
             "source_file": path.as_posix(),
@@ -167,6 +178,7 @@ def build_source_state(
     ]
     return {
         "input_root": input_root.as_posix(),
+        "instrument_serial": serial,
         "normalization_version": normalization_version,
         "raw_sources": raw_sources,
         "decoder_state": _decoder_state(config),
@@ -190,6 +202,7 @@ def build_outputs_manifest(instrument_output_dir: Path) -> dict[str, object]:
         with path.open("r", encoding="utf-8") as handle:
             counts[path.name.removesuffix(".jsonl")] = sum(1 for line in handle if line.strip())
     return {
+        "instrument_serial": instrument_output_dir.name,
         "jsonl_outputs": jsonl_outputs,
         "counts": counts,
     }
@@ -199,6 +212,7 @@ def record_pruned_sources(
     *,
     instrument_output_dir: Path,
     instrument_id: str,
+    instrument_serial: str,
     removed_sources: list[dict[str, object]],
 ) -> None:
     """Append pruned-source records for removed raw files."""
@@ -213,6 +227,7 @@ def record_pruned_sources(
         for source in removed_sources:
             record = {
                 "instrument_id": instrument_id,
+                "instrument_serial": validate_instrument_serial(instrument_serial),
                 "source_file": source.get("_source_path", source["source_file"]),
                 "source_kind": source["source_kind"],
                 "removed_at": removed_at,
@@ -325,7 +340,7 @@ def _iso_now() -> str:
 
 
 def _manifest_run_id() -> str:
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return f"{timestamp}-{secrets.token_hex(3)}"
 
 

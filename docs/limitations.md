@@ -7,7 +7,7 @@
 Stateful mode:
 
 - writes `manifests/latest.json`
-- writes one unique `manifests/runs/<run_id>/...` directory per executed run
+- writes one unique `manifests/runs/<run_id>/...` directory per executed run, using run IDs like `2026-04-21T22:17:31Z-11a3ef`
 - writes `state/pruned_records.jsonl`
 - persists malformed/skipped-source recovery artifacts in the per-run manifest directory
 
@@ -39,7 +39,7 @@ Important consequences:
 - Stanford PSD event blocks that omit `<FORMAT>` are still valid and normalize with `raw_format_line = null`
 - payload byte counts measure only the bytes inside `<DATA>...</DATA>` and exclude surrounding framing whitespace
 
-## Allowed transformations in v1
+## Allowed transformations
 
 Normalization is conservative, but it is not a raw byte dump. The following transformations are intentionally allowed:
 
@@ -48,9 +48,11 @@ Normalization is conservative, but it is not a raw byte dump. The following tran
 - canonicalizing parsed LOG rollover targets to normalized `.LOG` filenames
 - parsing source text into explicit structured fields without adding inferred interpretation
 - resolving canonical `instrument_id` values from recognized serial naming rules when available
-- materializing the canonical top-level JSONL file set as empty files when a family has no rows
+- resolving `instrument_serial` from the same dataset identity when available, with raw-prefix fallback for ambiguous stateless/prefix-only inputs
+- suffixing normalized JSONL family filenames with `instrument_serial`
+- materializing the canonical top-level serial-suffixed JSONL file set as empty files when a family has no rows
 
-No additional interpretation-oriented transformations are part of the v1 contract. In particular, the normalization layer does not do coordinate conversion, derived intervals, mission inference, or waveform interpretation.
+No additional interpretation-oriented transformations are part of the current contract. In particular, the normalization layer does not do coordinate conversion, derived intervals, mission inference, or waveform interpretation.
 
 ## Mode-specific rerun limits
 

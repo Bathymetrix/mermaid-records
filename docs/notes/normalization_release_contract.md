@@ -2,8 +2,10 @@
 
 # Normalization Release Contract
 
-This document is the release-facing contract for `mermaid-records` before `v1.0.0`.
+This document is the release-facing contract for `mermaid-records`.
 It describes the behavior that downstream callers, fixture audits, and future hardening work should treat as stable unless a deliberate breaking change is made.
+
+Version 2.0.0 deliberately breaks the post-v1 output contract by adding `instrument_serial` to normalized rows, suffixing JSONL family filenames with that serial, and using separator-rich UTC run IDs.
 
 ## Scope
 
@@ -13,13 +15,13 @@ It describes the behavior that downstream callers, fixture audits, and future ha
 - `LOG -> JSONL`
 - `MER -> JSONL`
 
-Supported raw input file types for `v1.0.0` are intentionally limited to:
+Supported raw input file types are intentionally limited to:
 
 - `BIN`
 - `LOG`
 - `MER`
 
-Explicitly not supported for `v1.0.0`:
+Explicitly not supported:
 
 - `S41`
 - `S61`
@@ -118,14 +120,16 @@ When the current run performs BIN decode preflight with a durable output directo
 
 ## Instrument Identity
 
-Canonical `instrument_id` resolution is centralized inside the normalization package.
+Canonical `instrument_id` and `instrument_serial` resolution are centralized inside the normalization package.
 
 Examples:
 
 - `452.020-P-08` -> `instrument_id = P0008`
 - `467.174-T-0100` -> `instrument_id = T0100`
 
-When a full serial is unavailable, the pipeline falls back conservatively to the raw file prefix.
+`instrument_id` is the station/instrument identifier analogous to `kstnm`. `instrument_serial` is the full hardware/dataset serial such as `452.020-P-08`.
+
+When a full serial is unavailable, the pipeline falls back conservatively to the raw file prefix for both the output directory and `instrument_serial`. Stateless `--input-file` runs use nearby full serial path context or LOG serial lines when available; otherwise they use that same raw-prefix fallback.
 
 ## Output Layout
 
@@ -133,20 +137,20 @@ Per instrument:
 
 ```text
 <output_root>/<instrument-serial>/
-  log_operational_records.jsonl
-  log_acquisition_records.jsonl
-  log_ascent_request_records.jsonl
-  log_gps_records.jsonl
-  log_pressure_temperature_records.jsonl
-  log_battery_records.jsonl
-  log_parameter_records.jsonl
-  log_testmode_records.jsonl
-  log_sbe_records.jsonl
-  log_transmission_records.jsonl
-  log_unclassified_records.jsonl
-  mer_environment_records.jsonl
-  mer_parameter_records.jsonl
-  mer_event_records.jsonl
+  log_operational_records.<instrument-serial>.jsonl
+  log_acquisition_records.<instrument-serial>.jsonl
+  log_ascent_request_records.<instrument-serial>.jsonl
+  log_gps_records.<instrument-serial>.jsonl
+  log_pressure_temperature_records.<instrument-serial>.jsonl
+  log_battery_records.<instrument-serial>.jsonl
+  log_parameter_records.<instrument-serial>.jsonl
+  log_testmode_records.<instrument-serial>.jsonl
+  log_sbe_records.<instrument-serial>.jsonl
+  log_transmission_records.<instrument-serial>.jsonl
+  log_unclassified_records.<instrument-serial>.jsonl
+  mer_environment_records.<instrument-serial>.jsonl
+  mer_parameter_records.<instrument-serial>.jsonl
+  mer_event_records.<instrument-serial>.jsonl
   preflight_status.json  # only when the current run's BIN decode preflight ran
   manifests/
     latest.json
@@ -175,8 +179,8 @@ Notes:
 - When no preflight runs, `latest.json` omits `preflight_status` rather than storing `null`.
 - Stale preflight artifacts from earlier runs must not be propagated to a new run.
 - `run.json` stores run metadata and status.
-- `outputs.json` stores output inventory and row counts.
-- `source_state.json` stores raw source identity and decoder-state identity.
+- `outputs.json` stores output inventory, row counts, and `instrument_serial`.
+- `source_state.json` stores raw source identity, `instrument_serial`, and decoder-state identity.
 - `input_file_diffs.jsonl` stores one row per raw source file with file-level diff fields only.
 - `malformed_log_lines.jsonl`, `skipped_log_files.jsonl`, `malformed_mer_blocks.jsonl`, and `skipped_mer_files.jsonl` store per-run recovery/reporting artifacts for stateful runs.
 - `state/pruned_records.jsonl` stores removed-source observations from stateful reruns.
@@ -185,34 +189,35 @@ Notes:
 
 LOG families:
 
-- `log_operational_records.jsonl`
-- `log_acquisition_records.jsonl`
-- `log_ascent_request_records.jsonl`
-- `log_gps_records.jsonl`
-- `log_pressure_temperature_records.jsonl`
-- `log_battery_records.jsonl`
-- `log_parameter_records.jsonl`
-- `log_testmode_records.jsonl`
-- `log_sbe_records.jsonl`
-- `log_transmission_records.jsonl`
-- `log_unclassified_records.jsonl`
+- `log_operational_records.<instrument_serial>.jsonl`
+- `log_acquisition_records.<instrument_serial>.jsonl`
+- `log_ascent_request_records.<instrument_serial>.jsonl`
+- `log_gps_records.<instrument_serial>.jsonl`
+- `log_pressure_temperature_records.<instrument_serial>.jsonl`
+- `log_battery_records.<instrument_serial>.jsonl`
+- `log_parameter_records.<instrument_serial>.jsonl`
+- `log_testmode_records.<instrument_serial>.jsonl`
+- `log_sbe_records.<instrument_serial>.jsonl`
+- `log_transmission_records.<instrument_serial>.jsonl`
+- `log_unclassified_records.<instrument_serial>.jsonl`
 
 MER families:
 
-- `mer_environment_records.jsonl`
-- `mer_parameter_records.jsonl`
-- `mer_event_records.jsonl`
+- `mer_environment_records.<instrument_serial>.jsonl`
+- `mer_parameter_records.<instrument_serial>.jsonl`
+- `mer_event_records.<instrument_serial>.jsonl`
 
 ## JSONL Record Schemas
 
 ### LOG
 
-`log_operational_records.jsonl`
+`log_operational_records.<instrument_serial>.jsonl`
 
 - `source_file` is basename-only in normalized JSONL outputs
 - `record_time`
 - `log_epoch_time`
 - `instrument_id`
+- `instrument_serial`
 - `source_container`
 - `source_file`
 - `subsystem`
@@ -223,27 +228,28 @@ MER families:
 - `message_kind`
 - `switched_to_log_file` (only for parsed rollover banner rows such as `*** switching to ... ***`)
 
-`log_acquisition_records.jsonl`
+`log_acquisition_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `acquisition_state`
 - `acquisition_evidence_kind`
 
-`log_ascent_request_records.jsonl`
+`log_ascent_request_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `ascent_request_state`
 
-`log_gps_records.jsonl`
+`log_gps_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `gps_record_kind`
 - `raw_values`
 
-`log_parameter_records.jsonl`
+`log_parameter_records.<instrument_serial>.jsonl`
 
 - grouped startup/dive-parameter episodes preserved from LOG continuation lines
 - `instrument_id`
+- `instrument_serial`
 - `source_file`
 - `episode_index`
 - `line_start_index`
@@ -254,10 +260,11 @@ MER families:
 - `end_log_epoch_time`
 - `raw_lines`
 
-`log_testmode_records.jsonl`
+`log_testmode_records.<instrument_serial>.jsonl`
 
 - grouped test-mode sessions preserved from LOGs
 - `instrument_id`
+- `instrument_serial`
 - `source_file`
 - `episode_index`
 - `line_start_index`
@@ -268,10 +275,11 @@ MER families:
 - `end_log_epoch_time`
 - `raw_lines`
 
-`log_sbe_records.jsonl`
+`log_sbe_records.<instrument_serial>.jsonl`
 
 - grouped SBE/profil operational episodes preserved from LOGs
 - `instrument_id`
+- `instrument_serial`
 - `source_file`
 - `episode_index`
 - `line_start_index`
@@ -282,7 +290,7 @@ MER families:
 - `end_log_epoch_time`
 - `raw_lines`
 
-`log_transmission_records.jsonl`
+`log_transmission_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `transmission_kind`
@@ -294,19 +302,19 @@ MER families:
 - `uploaded_file_count`
 - `disconnect_duration_s`
 
-`log_pressure_temperature_records.jsonl`
+`log_pressure_temperature_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `pressure_mbar`
 - `temperature_mdegc`
 
-`log_battery_records.jsonl`
+`log_battery_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `voltage_mv`
 - `current_ua`
 
-`log_unclassified_records.jsonl`
+`log_unclassified_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
 - `severity`
@@ -317,10 +325,11 @@ MER families:
 Shared MER provenance fields:
 
 - `instrument_id`
+- `instrument_serial`
 - `source_container`
 - `source_file` (basename only in normalized JSONL outputs; full paths remain in manifest/run artifacts)
 
-`mer_environment_records.jsonl`
+`mer_environment_records.<instrument_serial>.jsonl`
 
 - shared MER provenance fields
 - `environment_kind`
@@ -328,14 +337,14 @@ Shared MER provenance fields:
 - `raw_values`
 - `line`
 
-`mer_parameter_records.jsonl`
+`mer_parameter_records.<instrument_serial>.jsonl`
 
 - shared MER provenance fields
 - `parameter_kind`
 - `raw_values`
 - `line`
 
-`mer_event_records.jsonl`
+`mer_event_records.<instrument_serial>.jsonl`
 
 - shared MER provenance fields
 - `block_index`
@@ -369,9 +378,12 @@ Shared MER provenance fields:
 
 ## Persisted Manifest And State Schemas
 
+`run_id` values use UTC ISO8601-style timestamps with separators plus a short random suffix, for example `2026-04-21T22:17:31Z-11a3ef`.
+
 `manifests/latest.json`
 
 - `run_id`
+- `instrument_serial`
 - `status`
 - `started_at`
 - `completed_at`
@@ -383,6 +395,7 @@ Shared MER provenance fields:
 `manifests/runs/<run_id>/run.json`
 
 - `run_id`
+- `instrument_serial`
 - `started_at`
 - `completed_at`
 - `input_root`
@@ -393,6 +406,7 @@ Shared MER provenance fields:
 
 `manifests/runs/<run_id>/outputs.json`
 
+- `instrument_serial`
 - `jsonl_outputs`
   - each row contains `path` and `size_bytes`
 - `counts`
@@ -401,6 +415,7 @@ Shared MER provenance fields:
 `manifests/runs/<run_id>/source_state.json`
 
 - `input_root`
+- `instrument_serial`
 - `normalization_version`
 - `raw_sources`
   - each row contains `source_file`, `source_kind`, `size_bytes`, and `content_hash`
@@ -415,6 +430,7 @@ Shared MER provenance fields:
   - `source_file`
   - `source_kind`
   - `instrument_id`
+  - `instrument_serial`
   - `previous_exists`
   - `current_exists`
   - `previous_size_bytes`
@@ -429,19 +445,19 @@ This file is strictly file-level. It does not store append/rewrite/noop decision
 
 `manifests/runs/<run_id>/malformed_log_lines.jsonl`
 
-- one row per recoverably malformed LOG line recorded during a stateful run
+- one row per recoverably malformed LOG line recorded during a stateful run, including `instrument_id` and `instrument_serial`
 
 `manifests/runs/<run_id>/skipped_log_files.jsonl`
 
-- one row per skipped LOG file recorded during a stateful run
+- one row per skipped LOG file recorded during a stateful run, including `instrument_id` and `instrument_serial`
 
 `manifests/runs/<run_id>/malformed_mer_blocks.jsonl`
 
-- one row per recoverably malformed MER block or metadata line recorded during a stateful run
+- one row per recoverably malformed MER block or metadata line recorded during a stateful run, including `instrument_id` and `instrument_serial`
 
 `manifests/runs/<run_id>/skipped_mer_files.jsonl`
 
-- one row per skipped MER file recorded during a stateful run
+- one row per skipped MER file recorded during a stateful run, including `instrument_id` and `instrument_serial`
 
 `preflight_status.json`
 
@@ -455,11 +471,14 @@ This file is strictly file-level. It does not store append/rewrite/noop decision
 - `decoder_script`
 - `written_at`
 
+`preflight_status.json` remains decoder-run status, not a normalized record stream; instrument identity for that artifact is provided by its containing instrument directory and the run/latest manifests.
+
 `state/pruned_records.jsonl`
 
 - `source_file`
 - `source_kind`
 - `instrument_id`
+- `instrument_serial`
 - `removed_at`
 
 `removed_at` is the UTC timestamp when the pipeline detected and recorded the removal, not the underlying filesystem deletion time.

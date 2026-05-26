@@ -16,7 +16,7 @@ from mermaid_records._audit_normalized_outputs import (
 def test_discover_nonempty_families_counts_only_nonempty_jsonl_files(tmp_path: Path) -> None:
     instrument_dir = tmp_path / "452.020-P-0001"
     instrument_dir.mkdir()
-    (instrument_dir / "log_battery_records.jsonl").write_text(
+    (instrument_dir / "log_battery_records.452.020-P-0001.jsonl").write_text(
         json.dumps(
             {
                 "raw_line": "1700000000:[MONITR,461]battery 15000mV,   12000uA",
@@ -28,7 +28,7 @@ def test_discover_nonempty_families_counts_only_nonempty_jsonl_files(tmp_path: P
         + "\n",
         encoding="utf-8",
     )
-    (instrument_dir / "log_unclassified_records.jsonl").write_text("", encoding="utf-8")
+    (instrument_dir / "log_unclassified_records.452.020-P-0001.jsonl").write_text("", encoding="utf-8")
 
     inventory = discover_nonempty_families(tmp_path)
 
@@ -46,7 +46,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
     tmp_path: Path,
 ) -> None:
     _write_jsonl_rows(
-        tmp_path / "452.020-P-0001" / "log_battery_records.jsonl",
+        tmp_path / "452.020-P-0001" / "log_battery_records.452.020-P-0001.jsonl",
         [
             {
                 "raw_line": "1700000000:[MONITR,461]battery 15000mV,   12000uA",
@@ -58,7 +58,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
         ],
     )
     _write_jsonl_rows(
-        tmp_path / "452.020-P-0002" / "mer_event_records.jsonl",
+        tmp_path / "452.020-P-0002" / "mer_event_records.452.020-P-0002.jsonl",
         [
             {
                 "raw_info_line": "<INFO DATE=2024-01-01T00:00:00 PRESSURE=1.00 TEMPERATURE=2.0000 CRITERION=3.0 SNR=4.0 TRIG=5 DETRIG=6 />",
@@ -83,7 +83,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
         ],
     )
     _write_jsonl_rows(
-        tmp_path / "465.152-R-0001" / "mer_event_records.jsonl",
+        tmp_path / "465.152-R-0001" / "mer_event_records.465.152-R-0001.jsonl",
         [
             {
                 "raw_info_line": "<INFO DATE=2024-01-01T00:00:00 ROUNDS=468 />",
@@ -105,7 +105,7 @@ def test_sample_family_rows_covers_every_nonempty_family_and_keeps_stanford_mer_
 
 def test_inspect_sample_row_reports_battery_mismatch(tmp_path: Path) -> None:
     _write_jsonl_rows(
-        tmp_path / "452.020-P-0001" / "log_battery_records.jsonl",
+        tmp_path / "452.020-P-0001" / "log_battery_records.452.020-P-0001.jsonl",
         [
             {
                 "raw_line": "1700000000:[MONITR,461]battery 15000mV,   12000uA",
@@ -124,7 +124,7 @@ def test_inspect_sample_row_reports_battery_mismatch(tmp_path: Path) -> None:
 
 def test_audit_rows_reports_findings_and_full_coverage(tmp_path: Path) -> None:
     _write_jsonl_rows(
-        tmp_path / "452.020-P-0001" / "log_pressure_temperature_records.jsonl",
+        tmp_path / "452.020-P-0001" / "log_pressure_temperature_records.452.020-P-0001.jsonl",
         [
             {
                 "raw_line": "1700000000:[PRESS , 81]P  +1000mbar,T+2000mdegC",

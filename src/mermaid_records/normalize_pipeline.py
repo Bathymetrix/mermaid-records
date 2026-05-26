@@ -14,6 +14,7 @@ from typing import Callable
 
 from .bin2log import Bin2LogConfig, decode_workspace_logs, prepare_decode_workspace
 from .discovery import iter_bin_files, iter_log_files, iter_mer_files
+from .format_record_filenames import validate_instrument_serial
 from .manifest import (
     begin_instrument_run,
     build_outputs_manifest,
@@ -24,20 +25,15 @@ from .manifest import (
     output_dir_contains_manifests,
     record_pruned_sources,
 )
-from .normalize_log import OUTPUT_FILENAMES as LOG_OUTPUT_FILENAMES
+from .normalize_log import output_filenames as log_output_filenames
 from .normalize_log import write_log_jsonl_families
-from .normalize_mer import OUTPUT_FILENAMES as MER_OUTPUT_FILENAMES
+from .normalize_mer import output_filenames as mer_output_filenames
 from .normalize_mer import write_mer_jsonl_families
 from .parse_instrument_name import (
     InstrumentName,
     instrument_name_from_vit_path,
     maybe_parse_instrument_name,
 )
-
-CANONICAL_INSTRUMENT_JSONL_FILENAMES = tuple(
-    [*LOG_OUTPUT_FILENAMES.values(), *MER_OUTPUT_FILENAMES.values()]
-)
-
 
 type ExecutionMode = str
 type ProgressCallback = Callable[[str], None]
@@ -48,6 +44,7 @@ class InstrumentRunSummary:
     """Per-instrument execution summary for one normalization run."""
 
     instrument_id: str
+    instrument_serial: str
     mode: str
     output_dir: str
     bin_count: int
@@ -209,6 +206,10 @@ def _run_stateful(
             previous_output_dir=previous_output_dir,
             instrument_name=instrument_name,
         )
+        instrument_serial = _derive_instrument_serial(
+            instrument_name=instrument_name,
+            fallback=instrument_output_name,
+        )
         instrument_output_dir = output_dir / instrument_output_name
         if not dry_run:
             _migrate_output_dir(previous_output_dir, instrument_output_dir)
@@ -218,6 +219,7 @@ def _run_stateful(
             config=config if _has_kind(current_sources, "bin") else None,
             input_root=input_root,
             normalization_version=normalization_version,
+            instrument_serial=instrument_serial,
         )
         decoder_state_invalidated = _decoder_state_invalidated(previous_state, current_state)
         input_file_diffs = _diff_sources(
@@ -225,6 +227,7 @@ def _run_stateful(
             current_state,
             {"bin", "log", "mer"},
             instrument_id=canonical_instrument_id,
+            instrument_serial=instrument_serial,
             run_id=None,
             decoder_state_changed=decoder_state_invalidated,
         )
@@ -232,6 +235,7 @@ def _run_stateful(
         mer_diff = _select_diff_rows(input_file_diffs, {"mer"})
         summary = InstrumentRunSummary(
             instrument_id=canonical_instrument_id,
+            instrument_serial=instrument_serial,
             mode="stateful",
             output_dir=instrument_output_dir.as_posix(),
             bin_count=_count_kind(current_sources, "bin"),
@@ -290,12 +294,14 @@ def _run_stateful(
         _ensure_canonical_instrument_layout(
             instrument_output_dir=plan.instrument_output_dir,
             include_state_files=True,
+            instrument_serial=summary.instrument_serial,
         )
         _reset_preflight_status(plan.instrument_output_dir)
 
         record_pruned_sources(
             instrument_output_dir=plan.instrument_output_dir,
             instrument_id=summary.instrument_id,
+            instrument_serial=summary.instrument_serial,
             removed_sources=plan.log_diff["removed"] + plan.mer_diff["removed"],
         )
 
@@ -305,6 +311,7 @@ def _run_stateful(
             raw_source_paths=current_sources,
             config=config if _has_kind(current_sources, "bin") else None,
             normalization_version=normalization_version,
+            instrument_serial=summary.instrument_serial,
         )
         run_id = str(run_context["run_id"])
         input_file_diffs = [{**row, "run_id": run_id} for row in plan.input_file_diffs]
@@ -325,6 +332,7 @@ def _run_stateful(
                 bin_paths=bin_paths,
                 config=config,
                 instrument_id=summary.instrument_id,
+                instrument_serial=summary.instrument_serial,
                 progress=progress,
                 run_id=run_id,
                 malformed_log_lines=malformed_log_lines,
@@ -335,6 +343,7 @@ def _run_stateful(
                 action=summary.mer_action,
                 mer_paths=mer_paths,
                 instrument_id=summary.instrument_id,
+                instrument_serial=summary.instrument_serial,
                 progress=progress,
                 run_id=run_id,
                 malformed_mer_blocks=malformed_mer_blocks,
@@ -347,6 +356,7 @@ def _run_stateful(
             _ensure_canonical_instrument_layout(
                 instrument_output_dir=plan.instrument_output_dir,
                 include_state_files=True,
+                instrument_serial=summary.instrument_serial,
             )
             _emit_progress(progress, f"Writing manifests for instrument {summary.instrument_id}")
             finalize_instrument_run(
@@ -421,11 +431,16 @@ def _run_stateless(
             serial_map={},
         )
         canonical_instrument_id = _canonical_instrument_id(group_key=group_key, instrument_name=instrument_name)
-        instrument_output_dir = output_dir / _instrument_output_name(
+        instrument_output_name = _instrument_output_name(
             group_key=group_key,
             previous_output_dir=None,
             instrument_name=instrument_name,
         )
+        instrument_serial = _derive_instrument_serial(
+            instrument_name=instrument_name,
+            fallback=instrument_output_name,
+        )
+        instrument_output_dir = output_dir / instrument_output_name
         input_file_diffs = _diff_sources(
             None,
             build_source_state(
@@ -433,14 +448,17 @@ def _run_stateless(
                 config=config if _has_kind(current_sources, "bin") else None,
                 input_root=Path("."),
                 normalization_version=normalization_version,
+                instrument_serial=instrument_serial,
             ),
             {"bin", "log", "mer"},
             instrument_id=canonical_instrument_id,
+            instrument_serial=instrument_serial,
             run_id=None,
             decoder_state_changed=False,
         )
         summary = InstrumentRunSummary(
             instrument_id=canonical_instrument_id,
+            instrument_serial=instrument_serial,
             mode="stateless",
             output_dir=instrument_output_dir.as_posix(),
             bin_count=_count_kind(current_sources, "bin"),
@@ -482,6 +500,7 @@ def _run_stateless(
         _ensure_canonical_instrument_layout(
             instrument_output_dir=instrument_output_dir,
             include_state_files=False,
+            instrument_serial=summary.instrument_serial,
         )
         _reset_preflight_status(instrument_output_dir)
         malformed_log_lines: list[dict[str, object]] = []
@@ -498,6 +517,7 @@ def _run_stateless(
             bin_paths=bin_paths,
             config=config,
             instrument_id=summary.instrument_id,
+            instrument_serial=summary.instrument_serial,
             progress=progress,
             run_id="stateless",
             malformed_log_lines=malformed_log_lines,
@@ -508,6 +528,7 @@ def _run_stateless(
             action=summary.mer_action,
             mer_paths=mer_paths,
             instrument_id=summary.instrument_id,
+            instrument_serial=summary.instrument_serial,
             progress=progress,
             run_id="stateless",
             malformed_mer_blocks=malformed_mer_blocks,
@@ -516,6 +537,7 @@ def _run_stateless(
         _ensure_canonical_instrument_layout(
             instrument_output_dir=instrument_output_dir,
             include_state_files=False,
+            instrument_serial=summary.instrument_serial,
         )
         _accumulate_issue_metrics(
             metrics,
@@ -563,12 +585,14 @@ def _execute_log_family(
     bin_paths: list[Path],
     config: Bin2LogConfig | None,
     instrument_id: str,
+    instrument_serial: str,
     progress: ProgressCallback | None,
     run_id: str | None,
     malformed_log_lines: list[dict[str, object]] | None,
     skipped_log_files: list[dict[str, object]] | None,
 ) -> None:
-    destinations = [instrument_output_dir / filename for filename in LOG_OUTPUT_FILENAMES.values()]
+    output_filenames = log_output_filenames(instrument_serial)
+    destinations = [instrument_output_dir / filename for filename in output_filenames.values()]
     if action == "noop":
         return
     if action == "rewrite" and not log_paths and not bin_paths:
@@ -609,6 +633,7 @@ def _execute_log_family(
             rendered_paths,
             temp_dir,
             instrument_id=instrument_id,
+            instrument_serial=instrument_serial,
             run_id=run_id,
             malformed_log_lines=malformed_log_lines,
             skipped_log_files=skipped_log_files,
@@ -617,13 +642,13 @@ def _execute_log_family(
             _append_rendered_outputs(
                 temp_dir=temp_dir,
                 destination_dir=instrument_output_dir,
-                filenames=list(LOG_OUTPUT_FILENAMES.values()),
+                filenames=list(output_filenames.values()),
             )
         else:
             _replace_rendered_outputs(
                 temp_dir=temp_dir,
                 destination_dir=instrument_output_dir,
-                filenames=list(LOG_OUTPUT_FILENAMES.values()),
+                filenames=list(output_filenames.values()),
             )
 
 
@@ -633,12 +658,14 @@ def _execute_mer_family(
     action: str,
     mer_paths: list[Path],
     instrument_id: str,
+    instrument_serial: str,
     progress: ProgressCallback | None,
     run_id: str | None,
     malformed_mer_blocks: list[dict[str, object]] | None,
     skipped_mer_files: list[dict[str, object]] | None,
 ) -> None:
-    destinations = [instrument_output_dir / filename for filename in MER_OUTPUT_FILENAMES.values()]
+    output_filenames = mer_output_filenames(instrument_serial)
+    destinations = [instrument_output_dir / filename for filename in output_filenames.values()]
     if action == "noop":
         return
     if action == "rewrite" and not mer_paths:
@@ -655,6 +682,7 @@ def _execute_mer_family(
             mer_paths,
             temp_dir,
             instrument_id=instrument_id,
+            instrument_serial=instrument_serial,
             run_id=run_id,
             malformed_mer_blocks=malformed_mer_blocks,
             skipped_mer_files=skipped_mer_files,
@@ -663,13 +691,13 @@ def _execute_mer_family(
             _append_rendered_outputs(
                 temp_dir=temp_dir,
                 destination_dir=instrument_output_dir,
-                filenames=list(MER_OUTPUT_FILENAMES.values()),
+                filenames=list(output_filenames.values()),
             )
         else:
             _replace_rendered_outputs(
                 temp_dir=temp_dir,
                 destination_dir=instrument_output_dir,
-                filenames=list(MER_OUTPUT_FILENAMES.values()),
+                filenames=list(output_filenames.values()),
             )
 
 
@@ -739,10 +767,12 @@ def _ensure_canonical_instrument_layout(
     *,
     instrument_output_dir: Path,
     include_state_files: bool,
+    instrument_serial: str,
 ) -> None:
     instrument_output_dir.mkdir(parents=True, exist_ok=True)
     _ensure_files(
-        instrument_output_dir / filename for filename in CANONICAL_INSTRUMENT_JSONL_FILENAMES
+        instrument_output_dir / filename
+        for filename in _canonical_instrument_jsonl_filenames(instrument_serial)
     )
     if include_state_files:
         _ensure_files([instrument_output_dir / "state" / "pruned_records.jsonl"])
@@ -790,6 +820,25 @@ def _instrument_output_name(
     if previous_output_dir is not None:
         return previous_output_dir.name
     return group_key
+
+
+def _derive_instrument_serial(
+    *,
+    instrument_name: InstrumentName | None,
+    fallback: str,
+) -> str:
+    if instrument_name is not None:
+        return validate_instrument_serial(instrument_name.serial)
+    return validate_instrument_serial(fallback)
+
+
+def _canonical_instrument_jsonl_filenames(instrument_serial: str) -> tuple[str, ...]:
+    return tuple(
+        [
+            *log_output_filenames(instrument_serial).values(),
+            *mer_output_filenames(instrument_serial).values(),
+        ]
+    )
 
 
 def _instrument_names_from_vit(input_root: Path) -> dict[str, InstrumentName]:
@@ -903,7 +952,7 @@ def _kind_for_path(path: Path) -> str:
         return "log"
     if suffix == ".MER":
         return "mer"
-    raise ValueError(f"Unsupported input file type for v1.0.0: {path}")
+    raise ValueError(f"Unsupported input file type for the current normalization contract: {path}")
 
 
 def _has_kind(paths: list[Path], kind: str) -> bool:
@@ -924,6 +973,7 @@ def _diff_sources(
     kinds: set[str],
     *,
     instrument_id: str,
+    instrument_serial: str,
     run_id: str | None,
     decoder_state_changed: bool,
 ) -> list[dict[str, object]]:
@@ -963,6 +1013,7 @@ def _diff_sources(
                 "_source_path": source_file,
                 "source_kind": source["source_kind"],
                 "instrument_id": instrument_id,
+                "instrument_serial": instrument_serial,
                 "previous_exists": previous_exists,
                 "current_exists": current_exists,
                 "previous_size_bytes": previous_size,
@@ -1016,6 +1067,7 @@ def _general_invalidation(
         return False
     return (
         previous_state.get("input_root") != current_state.get("input_root")
+        or previous_state.get("instrument_serial") != current_state.get("instrument_serial")
         or previous_state.get("normalization_version") != current_state.get("normalization_version")
     )
 
@@ -1161,6 +1213,7 @@ def _dry_run_instrument_payload(plan: PlannedInstrumentRun) -> dict[str, object]
     }
     return {
         "instrument_id": plan.summary.instrument_id,
+        "instrument_serial": plan.summary.instrument_serial,
         "output_dir": plan.summary.output_dir,
         "counts": counts,
         "families": {

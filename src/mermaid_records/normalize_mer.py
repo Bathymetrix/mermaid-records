@@ -12,14 +12,20 @@ from pathlib import Path
 import re
 from typing import Iterable
 
+from .format_record_filenames import (
+    record_filenames,
+    validate_instrument_serial,
+    with_instrument_serial,
+)
 from .parse_mer import parse_mer_file, parse_mer_file_recoverable
 from .parse_instrument_name import maybe_parse_instrument_name
 
-OUTPUT_FILENAMES = {
+BASE_OUTPUT_FILENAMES = {
     "environment": "mer_environment_records.jsonl",
     "parameter": "mer_parameter_records.jsonl",
     "event": "mer_event_records.jsonl",
 }
+OUTPUT_FILENAMES = BASE_OUTPUT_FILENAMES
 
 _ATTR_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_\[\]]*)=([^\s>]+)")
 _BARE_TAG_RE = re.compile(r"^<(?P<tag>[A-Z0-9_]+)\s+(?P<value>[^>]+?)\s*/>$")
@@ -123,6 +129,12 @@ class MerJsonlSummary:
     example_event_with_trigger_fields: dict[str, object] | None
 
 
+def output_filenames(instrument_serial: str) -> dict[str, str]:
+    """Return MER-derived output filenames for one instrument serial."""
+
+    return record_filenames(BASE_OUTPUT_FILENAMES, instrument_serial)
+
+
 def _common_mer_record_fields(instrument_id: str, path: Path) -> dict[str, object]:
     """Return shared provenance fields for MER-derived records."""
 
@@ -138,6 +150,7 @@ def write_mer_jsonl_families(
     output_dir: Path,
     *,
     instrument_id: str | None = None,
+    instrument_serial: str | None = None,
     run_id: str | None = None,
     malformed_mer_blocks: list[dict[str, object]] | None = None,
     skipped_mer_files: list[dict[str, object]] | None = None,
@@ -145,8 +158,14 @@ def write_mer_jsonl_families(
     """Write conservative MER-derived JSONL streams."""
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    sorted_paths = sorted(Path(path) for path in mer_paths)
+    output_instrument_serial = _resolve_output_instrument_serial(
+        sorted_paths,
+        instrument_serial=instrument_serial,
+    )
     output_paths = {
-        name: output_dir / filename for name, filename in OUTPUT_FILENAMES.items()
+        name: output_dir / filename
+        for name, filename in output_filenames(output_instrument_serial).items()
     }
 
     environment_count = 0
@@ -172,10 +191,12 @@ def write_mer_jsonl_families(
         output_paths["parameter"].open("w", encoding="utf-8") as parameter_handle,
         output_paths["event"].open("w", encoding="utf-8") as event_handle,
     ):
-        for path in sorted(Path(path) for path in mer_paths):
+        for path in sorted_paths:
             try:
                 total_mer_files += 1
                 path_instrument_id = instrument_id or _fallback_instrument_id(path)
+                path_instrument_serial = output_instrument_serial
+
                 def _record_malformed_block(
                     block_index: int | None,
                     block_kind: str,
@@ -188,6 +209,7 @@ def write_mer_jsonl_families(
                         {
                             "run_id": run_id,
                             "instrument_id": path_instrument_id,
+                            "instrument_serial": path_instrument_serial,
                             "source_file": path.as_posix(),
                             "block_index": block_index,
                             "block_kind": block_kind,
@@ -214,6 +236,7 @@ def write_mer_jsonl_families(
                         path=path,
                         line=line,
                     )
+                    record = with_instrument_serial(record, path_instrument_serial)
                     _write_jsonl_line(environment_handle, record)
                     environment_count += 1
                     environment_kind_counter[record["environment_kind"]] += 1
@@ -236,6 +259,7 @@ def write_mer_jsonl_families(
                         path=path,
                         line=line,
                     )
+                    record = with_instrument_serial(record, path_instrument_serial)
                     _write_jsonl_line(parameter_handle, record)
                     parameter_count += 1
                     parameter_kind_counter[record["parameter_kind"]] += 1
@@ -260,6 +284,7 @@ def write_mer_jsonl_families(
                             data_payload=block.data_payload,
                         )
                     )
+                    record = with_instrument_serial(record, path_instrument_serial)
                     file_unknown_info_keys.update(block_unknown_info_keys)
                     file_unknown_format_keys.update(block_unknown_format_keys)
                     _write_jsonl_line(event_handle, record)
@@ -288,6 +313,7 @@ def write_mer_jsonl_families(
                     {
                         "run_id": run_id,
                         "instrument_id": path_instrument_id,
+                        "instrument_serial": path_instrument_serial,
                         "source_file": path.as_posix(),
                         "error": str(exc),
                         "skipped_at": _iso_now(),
@@ -536,6 +562,29 @@ def _fallback_instrument_id(path: Path) -> str:
         parsed = maybe_parse_instrument_name(candidate)
         if parsed is not None:
             return parsed.instrument_id
+    return path.stem.split("_", maxsplit=1)[0]
+
+
+def _resolve_output_instrument_serial(
+    paths: list[Path],
+    *,
+    instrument_serial: str | None,
+) -> str:
+    if instrument_serial is not None:
+        return validate_instrument_serial(instrument_serial)
+    if not paths:
+        raise ValueError("instrument_serial is required when no MER paths are supplied")
+    return validate_instrument_serial(_fallback_instrument_serial(paths[0]))
+
+
+def _fallback_instrument_serial(path: Path) -> str:
+    for ancestor in (path.parent, *path.parents):
+        parsed = maybe_parse_instrument_name(ancestor.name)
+        if parsed is not None:
+            return parsed.serial
+    parsed = maybe_parse_instrument_name(path.stem)
+    if parsed is not None:
+        return parsed.serial
     return path.stem.split("_", maxsplit=1)[0]
 
 

@@ -24,7 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_VERSION = Version(__version__)
 NORMALIZED_SOURCE_VERSION = str(SOURCE_VERSION)
 FINAL_RELEASE_ENV_VAR = "MERMAID_RECORDS_REQUIRE_FINAL_RELEASE"
-EXPECTED_FINAL_RELEASE_VERSION = Version("1.0.0")
+EXPECTED_FINAL_RELEASE_VERSION = Version("2.0.0")
 EXPECTED_MIN_PYTHON = "3.12"
 
 
@@ -57,6 +57,8 @@ def test_readme_documents_release_cli_contract_and_python_support() -> None:
     assert "--preflight-mode {strict,cached}" in readme
     assert "stateful mode" in readme
     assert "stateless mode" in readme
+    assert "instrument_serial" in readme
+    assert "log_operational_records.452.020-P-06.jsonl" in readme
     assert "preflight_status.json" in readme
     assert "the field is absent rather than `null`" in readme
     assert "does not silently duplicate JSONL rows" in readme
@@ -75,7 +77,7 @@ def test_release_version_and_built_wheel_metadata_stay_in_sync(tmp_path: Path) -
 def test_final_release_version_gate() -> None:
     if os.environ.get(FINAL_RELEASE_ENV_VAR) != "1":
         pytest.skip(
-            f"set {FINAL_RELEASE_ENV_VAR}=1 to require the final 1.0.0 release version"
+            f"set {FINAL_RELEASE_ENV_VAR}=1 to require the final 2.0.0 release version"
         )
 
     assert SOURCE_VERSION == EXPECTED_FINAL_RELEASE_VERSION
@@ -91,6 +93,8 @@ def test_cli_docs_capture_current_mode_and_flag_contract() -> None:
     assert "state/" in cli_doc
     assert "preflight_status.json" in cli_doc
     assert "can therefore appear in either execution mode" in cli_doc
+    assert "log_operational_records.452.020-P-06.jsonl" in cli_doc
+    assert "instrument_serial" in cli_doc
     assert "omits `preflight_status` rather than storing `null`" in cli_doc
     assert "safe to rerun because stateless mode rewrites the targeted output families" in cli_doc
 
@@ -107,6 +111,15 @@ def test_limitations_doc_matches_current_preservation_and_mode_rules() -> None:
     assert "raw_format_line = null" in limitations
     assert "payload byte counts measure only the bytes inside `<DATA>...</DATA>`" in limitations
     assert "reruns do not silently duplicate rows" in limitations
+    assert "suffixing normalized JSONL family filenames with `instrument_serial`" in limitations
+
+
+def test_changelog_records_breaking_output_contract_update() -> None:
+    changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+
+    assert "## 2.0.0" in changelog
+    assert "instrument_serial" in changelog
+    assert "<family>.<instrument_serial>.jsonl" in changelog
 
 
 def test_readme_lists_release_facing_fixture_families() -> None:

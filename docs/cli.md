@@ -22,7 +22,7 @@ Exactly one of these must be supplied:
   - accepts repeated uses plus comma-separated or space-separated file lists
   - normalizes only the explicitly listed raw files
 
-Supported raw input types in v1 are `BIN`, `LOG`, and `MER`.
+Supported raw input types are `BIN`, `LOG`, and `MER`.
 
 ## Output resolution
 
@@ -97,6 +97,7 @@ That rewrite-only `stateless` contract is the safety mechanism that prevents sil
 ## Manifest and preflight artifacts
 
 - `manifests/` and `state/` are stateful-only
+- stateful run directories use UTC ISO8601-style IDs such as `manifests/runs/2026-04-21T22:17:31Z-11a3ef/`
 - `preflight_status.json` is written only when the current run performs BIN decode preflight with a durable instrument output directory
 - `preflight_status.json` can therefore appear in either execution mode if the run actually performs BIN-backed normalization with decoder preflight
 - in `stateful` mode, `manifests/latest.json` includes `preflight_status` only when the current run produced that artifact
@@ -121,6 +122,17 @@ On repeated runs against the same `/tmp/mermaid-records-stateless` target:
 - the package-owned LOG and MER family outputs for instrument `P0006` are rewritten
 - rows from prior stateless runs are not silently duplicated
 - unknown non-package files in the instrument directory are preserved
+
+## Record identity and filenames
+
+Normalized JSONL record-family filenames include the instrument serial before `.jsonl`, for example `log_operational_records.452.020-P-06.jsonl`.
+
+Every normalized LOG/MER record includes:
+
+- `instrument_id`: station/instrument identifier analogous to `kstnm`, for example `P0006`
+- `instrument_serial`: full hardware/dataset serial, for example `452.020-P-06`
+
+For stateless `--input-file` runs, serial resolution uses nearby full serial path context or LOG serial lines when available. If no full serial can be resolved, the pipeline falls back to the raw file prefix, matching the existing output-directory fallback.
 
 ## Related references
 
