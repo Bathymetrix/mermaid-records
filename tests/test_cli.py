@@ -29,6 +29,17 @@ def test_cli_version_option_reports_package_version(capsys) -> None:
     assert captured.err == ""
 
 
+def test_cli_reserves_top_level_short_v_for_future_verbose() -> None:
+    option_strings = {
+        option_string
+        for action in build_parser()._actions
+        for option_string in action.option_strings
+    }
+
+    assert "--version" in option_strings
+    assert "-v" not in option_strings
+
+
 def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()

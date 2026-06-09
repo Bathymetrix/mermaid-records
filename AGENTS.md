@@ -13,6 +13,7 @@
 - Prefer small, coherent commits and always tell the user when the current state is a good time to commit.
 - Any time suggesting a commit, also suggest a matching commit message.
 - Do not suggest `type: message` commit subjects by default; prefer clear, simple, project-specific commit messages.
+- Any time you suggest a commit message also bump version (`major`, `minor`, or `patch`) and alert user.
 - Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.

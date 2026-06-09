@@ -29,7 +29,6 @@ def build_parser() -> argparse.ArgumentParser:
         description="Bathymetrix™ CLI for the MERMAID normalization pipeline.",
     )
     parser.add_argument(
-        "-v",
         "--version",
         action="version",
         version=f"%(prog)s {__version__}",
