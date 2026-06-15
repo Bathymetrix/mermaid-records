@@ -51,15 +51,15 @@ def test_stateful_run_writes_per_instrument_outputs_and_manifests(tmp_path: Path
     assert {item["source_file"] for item in diff_rows} == {"06_first.LOG", "06_first.MER"}
     assert {item["instrument_id"] for item in diff_rows} == {"P0006"}
     assert {item["instrument_serial"] for item in diff_rows} == {"452.020-P-06"}
-    operational_rows = _jsonl_lines(operational_path)
+    unclassified_rows = _jsonl_lines(instrument_dir / "log_unclassified_records.jsonl")
     all_record_rows = [
         row
         for path in sorted(instrument_dir.glob("*.jsonl"))
         for row in _jsonl_lines(path)
     ]
-    assert operational_rows[0]["instrument_id"] == "P0006"
-    assert operational_rows[0]["instrument_serial"] == "452.020-P-06"
-    assert operational_rows[0]["instrument_id"] != operational_rows[0]["instrument_serial"]
+    assert unclassified_rows[0]["instrument_id"] == "P0006"
+    assert unclassified_rows[0]["instrument_serial"] == "452.020-P-06"
+    assert unclassified_rows[0]["instrument_id"] != unclassified_rows[0]["instrument_serial"]
     assert all(row["instrument_serial"] == "452.020-P-06" for row in all_record_rows)
     assert list(diff_rows[0]) == [
         "source_file",
@@ -113,12 +113,12 @@ def test_stateful_append_path_appends_only_new_files(tmp_path: Path) -> None:
     summary = run_normalization_pipeline(input_root, output_dir=output_root)
 
     instrument_summary = summary.processed_instruments[0]
-    operational_lines = _jsonl_lines(output_root / "467.174-T-0100" / "log_operational_records.jsonl")
+    unclassified_lines = _jsonl_lines(output_root / "467.174-T-0100" / "log_unclassified_records.jsonl")
 
     assert instrument_summary.log_action == "append"
-    assert len(operational_lines) == 2
-    assert operational_lines[0]["message"] == "first"
-    assert operational_lines[1]["message"] == "second"
+    assert len(unclassified_lines) == 2
+    assert unclassified_lines[0]["message"] == "first"
+    assert unclassified_lines[1]["message"] == "second"
 
 
 def test_stateful_second_run_with_no_raw_source_changes_is_noop(tmp_path: Path) -> None:
@@ -187,13 +187,13 @@ def test_stateful_force_rewrite_rewrites_unchanged_outputs(tmp_path: Path) -> No
     diff_rows = _jsonl_lines(
         output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"] / "input_file_diffs.jsonl"
     )
-    operational_rows = _jsonl_lines(output_root / "467.174-T-0100" / "log_operational_records.jsonl")
+    unclassified_rows = _jsonl_lines(output_root / "467.174-T-0100" / "log_unclassified_records.jsonl")
     event_rows = _jsonl_lines(output_root / "467.174-T-0100" / "mer_event_records.jsonl")
 
     assert instrument_summary.log_action == "rewrite"
     assert instrument_summary.mer_action == "rewrite"
     assert {row["change_kind"] for row in diff_rows} == {"unchanged"}
-    assert [row["message"] for row in operational_rows] == ["first"]
+    assert [row["message"] for row in unclassified_rows] == ["first"]
     assert len(event_rows) == 1
 
 
@@ -259,7 +259,7 @@ def test_stateful_rewrite_and_prune_on_changed_or_removed_source(tmp_path: Path)
     run_normalization_pipeline(input_root, output_dir=output_root)
     _write_log(log_path, "first changed")
     summary = run_normalization_pipeline(input_root, output_dir=output_root)
-    lines_after_change = _jsonl_lines(output_root / "467.174-T-0100" / "log_operational_records.jsonl")
+    lines_after_change = _jsonl_lines(output_root / "467.174-T-0100" / "log_unclassified_records.jsonl")
 
     assert summary.processed_instruments[0].log_action == "rewrite"
     assert len(lines_after_change) == 1
@@ -270,8 +270,8 @@ def test_stateful_rewrite_and_prune_on_changed_or_removed_source(tmp_path: Path)
     pruned_lines = _jsonl_lines(output_root / "467.174-T-0100" / "state" / "pruned_records.jsonl")
 
     assert summary.processed_instruments[0].log_action == "rewrite"
-    assert _record_path(output_root / "467.174-T-0100", "log_operational_records.jsonl").exists()
-    assert _record_path(output_root / "467.174-T-0100", "log_operational_records.jsonl").read_text(encoding="utf-8") == ""
+    assert _record_path(output_root / "467.174-T-0100", "log_unclassified_records.jsonl").exists()
+    assert _record_path(output_root / "467.174-T-0100", "log_unclassified_records.jsonl").read_text(encoding="utf-8") == ""
     assert pruned_lines[-1]["source_file"] == log_path.as_posix()
     assert pruned_lines[-1]["source_kind"] == "log"
 
@@ -328,7 +328,7 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
             decoder_script=decoder_a,
         ),
     )
-    log_only_before = _record_path(output_root / "0200", "log_operational_records.jsonl").read_text(encoding="utf-8")
+    log_only_before = _record_path(output_root / "0200", "log_unclassified_records.jsonl").read_text(encoding="utf-8")
 
     summary = run_normalization_pipeline(
         input_root,
@@ -340,8 +340,8 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
     )
 
     by_instrument = {item.instrument_id: item for item in summary.processed_instruments}
-    bin_lines = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
-    log_only_after = _record_path(output_root / "0200", "log_operational_records.jsonl").read_text(encoding="utf-8")
+    bin_lines = _jsonl_lines(output_root / "0100" / "log_unclassified_records.jsonl")
+    log_only_after = _record_path(output_root / "0200", "log_unclassified_records.jsonl").read_text(encoding="utf-8")
 
     assert by_instrument["0100"].decoder_state_invalidated is True
     assert by_instrument["0100"].log_action == "rewrite"
@@ -508,10 +508,10 @@ def test_stateless_rerun_rewrites_existing_outputs_without_duplication(tmp_path:
     run_normalization_pipeline(output_dir=output_root, input_files=[first_log])
     summary = run_normalization_pipeline(output_dir=output_root, input_files=[first_log])
 
-    operational_rows = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
+    unclassified_rows = _jsonl_lines(output_root / "0100" / "log_unclassified_records.jsonl")
 
     assert summary.processed_instruments[0].log_action == "rewrite"
-    assert [row["message"] for row in operational_rows] == ["first"]
+    assert [row["message"] for row in unclassified_rows] == ["first"]
 
 
 def test_stateless_rerun_rewrites_existing_outputs_without_force_rewrite(tmp_path: Path) -> None:
@@ -524,10 +524,10 @@ def test_stateless_rerun_rewrites_existing_outputs_without_force_rewrite(tmp_pat
     run_normalization_pipeline(output_dir=output_root, input_files=[first_log])
     summary = run_normalization_pipeline(output_dir=output_root, input_files=[second_log])
 
-    operational_rows = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
+    unclassified_rows = _jsonl_lines(output_root / "0100" / "log_unclassified_records.jsonl")
 
     assert summary.processed_instruments[0].log_action == "rewrite"
-    assert [row["message"] for row in operational_rows] == ["second"]
+    assert [row["message"] for row in unclassified_rows] == ["second"]
 
 
 def test_stateless_force_rewrite_removes_stale_package_outputs(tmp_path: Path) -> None:
@@ -676,10 +676,10 @@ def test_stateful_logs_malformed_log_lines_and_continues(tmp_path: Path) -> None
     latest = _read_json(output_root / "467.174-T-0100" / "manifests" / "latest.json")
     run_dir = output_root / "467.174-T-0100" / "manifests" / "runs" / latest["run_id"]
     malformed_rows = _jsonl_lines(run_dir / "malformed_log_lines.jsonl")
-    operational_rows = _jsonl_lines(output_root / "467.174-T-0100" / "log_operational_records.jsonl")
+    unclassified_rows = _jsonl_lines(output_root / "467.174-T-0100" / "log_unclassified_records.jsonl")
 
-    assert [row["message"] for row in operational_rows] == ["first", "second"]
-    assert [row["source_file"] for row in operational_rows] == ["0100_malformed.LOG", "0100_malformed.LOG"]
+    assert [row["message"] for row in unclassified_rows] == ["first", "second"]
+    assert [row["source_file"] for row in unclassified_rows] == ["0100_malformed.LOG", "0100_malformed.LOG"]
     assert malformed_rows == [
         {
             "error": "line does not match expected LOG pattern",
@@ -900,8 +900,8 @@ def test_stateless_malformed_log_recovery_writes_no_manifests(tmp_path: Path) ->
     run_normalization_pipeline(output_dir=output_root, input_files=[log_path])
 
     assert not (output_root / "0100" / "manifests").exists()
-    operational_rows = _jsonl_lines(output_root / "0100" / "log_operational_records.jsonl")
-    assert [row["message"] for row in operational_rows] == ["first", "second"]
+    unclassified_rows = _jsonl_lines(output_root / "0100" / "log_unclassified_records.jsonl")
+    assert [row["message"] for row in unclassified_rows] == ["first", "second"]
     assert _record_path(output_root / "0100", "mer_event_records.jsonl").exists()
     assert _record_path(output_root / "0100", "mer_event_records.jsonl").read_text(encoding="utf-8") == ""
 
@@ -940,7 +940,8 @@ def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> 
     outputs_manifest = _read_json(instrument_dir / latest["outputs_manifest"])
     assert {item["path"] for item in outputs_manifest["jsonl_outputs"]} == expected_jsonl
     assert outputs_manifest["instrument_serial"] == serial
-    assert outputs_manifest["counts"][f"log_operational_records.{serial}"] == 1
+    assert outputs_manifest["counts"][f"log_operational_records.{serial}"] == 0
+    assert outputs_manifest["counts"][f"log_unclassified_records.{serial}"] == 1
     assert outputs_manifest["counts"][f"mer_event_records.{serial}"] == 0
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()
 

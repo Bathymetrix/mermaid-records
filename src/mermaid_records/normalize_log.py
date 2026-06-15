@@ -335,21 +335,27 @@ def write_log_jsonl_families(
                         )
                         common_fields = _common_log_record_fields(entry, instrument_id=path_instrument_id)
                         rollover_fields = _rollover_fields(entry)
-                        operational_record = {
-                            **common_fields,
-                            **rollover_fields,
-                            "severity": severity,
-                            "message_kind": message_kind,
-                            "raw_line": entry.raw_line,
-                        }
-                        operational_record = with_instrument_serial(
-                            operational_record,
-                            path_instrument_serial,
-                        )
-                        _write_jsonl_line(operational_handle, operational_record)
-                        operational_count += 1
-
                         classified = derived_match is not None
+                        unclassified = _routes_to_unclassified(
+                            classified=classified,
+                            message_kind=message_kind,
+                            rollover_fields=rollover_fields,
+                        )
+                        if not unclassified:
+                            operational_record = {
+                                **common_fields,
+                                **rollover_fields,
+                                "severity": severity,
+                                "message_kind": message_kind,
+                                "raw_line": entry.raw_line,
+                            }
+                            operational_record = with_instrument_serial(
+                                operational_record,
+                                path_instrument_serial,
+                            )
+                            _write_jsonl_line(operational_handle, operational_record)
+                            operational_count += 1
+
                         if derived_match is not None and derived_match.family == "acquisition":
                             acquisition_record = derived_match.record
                             assert acquisition_record is not None
@@ -439,7 +445,7 @@ def write_log_jsonl_families(
                         if derived_match is not None and derived_match.family == "operational_measurement":
                             routed_measurement_to_operational_count += 1
 
-                        if not classified:
+                        if unclassified:
                             unclassified_record = {
                                 **common_fields,
                                 **rollover_fields,
@@ -879,6 +885,19 @@ def _message_kind(
     if _GPS_RE.search(message):
         return "gps"
     return "raw"
+
+
+def _routes_to_unclassified(
+    *,
+    classified: bool,
+    message_kind: str,
+    rollover_fields: dict[str, object],
+) -> bool:
+    if classified:
+        return False
+    if rollover_fields:
+        return False
+    return message_kind == "raw"
 
 
 def _severity(message: str) -> str | None:

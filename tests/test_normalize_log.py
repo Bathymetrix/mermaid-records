@@ -38,7 +38,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     summary = write_log_jsonl_families([log_path], output_dir)
 
     assert summary.total_records == 6
-    assert summary.operational_records == 6
+    assert summary.operational_records == 5
     assert summary.acquisition_records == 0
     assert summary.ascent_request_records == 0
     assert summary.gps_records == 0
@@ -49,7 +49,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 0
     assert summary.routed_measurement_to_operational_records == 1
-    assert summary.unclassified_records == 2
+    assert summary.unclassified_records == 1
 
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
@@ -67,7 +67,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert len(operational_records) == 6
+    assert len(operational_records) == 5
     assert acquisition_records == []
     assert ascent_request_records == []
     assert gps_records == []
@@ -77,7 +77,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert testmode_records == []
     assert sbe_records == []
     assert len(transmission_records) == 2
-    assert len(unclassified_records) == 2
+    assert len(unclassified_records) == 1
 
     assert operational_records[0]["message_kind"] == "upload"
     assert operational_records[2]["message_kind"] == "measurement"
@@ -121,12 +121,13 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         record["unclassified_reason"] == "no_family_match"
         for record in unclassified_records
     )
-    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:24.000000Z"
-    assert unclassified_records[0]["log_epoch_time"] == "1700000004"
+    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:25.000000Z"
+    assert unclassified_records[0]["log_epoch_time"] == "1700000005"
     assert "time" not in unclassified_records[0]
-    assert {
-        record["message"] for record in unclassified_records
-    } == {"<WARN>timeout", "buoy 467.174-T-0100"}
+    assert [record["message"] for record in unclassified_records] == [
+        "buoy 467.174-T-0100"
+    ]
+    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
     assert all(record["instrument_id"] == "0100" for record in operational_records)
     assert all(record["instrument_serial"] == "0100" for record in operational_records)
 
@@ -143,9 +144,9 @@ def test_write_log_jsonl_families_converts_offset_times_to_utc(
     output_dir = tmp_path / "jsonl"
     write_log_jsonl_families([log_path], output_dir)
 
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert operational_records[0]["record_time"] == "2023-11-14T19:43:20.123456Z"
+    assert unclassified_records[0]["record_time"] == "2023-11-14T19:43:20.123456Z"
 
 
 def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
@@ -164,10 +165,57 @@ def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
         instrument_id="T0100",
         instrument_serial="467.174-T-0100",
     )
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert operational_records[0]["instrument_id"] == "T0100"
-    assert operational_records[0]["instrument_serial"] == "467.174-T-0100"
+    assert unclassified_records[0]["instrument_id"] == "T0100"
+    assert unclassified_records[0]["instrument_serial"] == "467.174-T-0100"
+
+
+def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational(
+    tmp_path: Path,
+) -> None:
+    internal_log_path = tmp_path / "0026_5D3CDB8D.LOG"
+    internal_log_path.write_text(
+        "1564269461:[MAIN  ,408]internal pressure 78680Pa\n",
+        encoding="utf-8",
+    )
+    shared_log_path = tmp_path / "0026_5D48EAB8.LOG"
+    shared_log_path.write_text(
+        "\n".join(
+            [
+                "1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)",
+                "1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)",
+                "1565060029:[SURF  ,328]7 cmd(s) received",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families(
+        [shared_log_path, internal_log_path],
+        output_dir,
+        instrument_id="P0026",
+        instrument_serial="452.020-P-0026",
+    )
+
+    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
+
+    assert summary.operational_records == 0
+    assert summary.unclassified_records == 4
+    assert operational_records == []
+    assert {
+        (record["source_file"], record["message"])
+        for record in unclassified_records
+    } == {
+        ("0026_5D3CDB8D.LOG", "internal pressure 78680Pa"),
+        ("0026_5D48EAB8.LOG", "Vbat 14681mV (min 13967mV)"),
+        ("0026_5D48EAB8.LOG", "Pext -45mbar (rng 30mbar)"),
+        ("0026_5D48EAB8.LOG", "7 cmd(s) received"),
+    }
+    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
 
 
 def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
@@ -460,11 +508,17 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
         malformed_log_lines=malformed_log_lines,
     )
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 3
-    assert summary.operational_records == 2
+    assert summary.operational_records == 0
     assert summary.parameter_records == 1
+    assert summary.unclassified_records == 2
     assert len(parameter_records) == 1
+    assert [record["message"] for record in unclassified_records] == [
+        "internal pressure 85448Pa",
+        "turn off bluetooth",
+    ]
     assert malformed_log_lines == []
 
     assert parameter_records[0] == {
@@ -521,10 +575,12 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
     )
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
     operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 7
-    assert summary.operational_records == 4
+    assert summary.operational_records == 2
     assert summary.parameter_records == 3
+    assert summary.unclassified_records == 2
     assert [record["episode_index"] for record in parameter_records] == [0, 1, 2]
     assert [record["line_start_index"] for record in parameter_records] == [2, 5, 8]
     assert [record["line_end_index"] for record in parameter_records] == [3, 6, 9]
@@ -543,12 +599,15 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
         ],
     ]
     assert [record["message"] for record in operational_records] == [
-        "internal pressure 85448Pa",
         "<WARN>timeout",
         "*** switching to 0100/NEXT.LOG ***",
+    ]
+    assert [record["message"] for record in unclassified_records] == [
+        "internal pressure 85448Pa",
         "buoy 467.174-T-0100",
     ]
-    rollover_record = operational_records[2]
+    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
+    rollover_record = operational_records[1]
     assert rollover_record["switched_to_log_file"] == "0100_NEXT.LOG"
     assert rollover_record["source_file"] == log_path.name
     assert malformed_log_lines == [
@@ -675,7 +734,7 @@ def test_write_log_jsonl_families_groups_sbe_and_profil_fixture_blocks_from_0100
 
     sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.sbe_records == 6
     assert len(sbe_records) == 6
@@ -689,7 +748,7 @@ def test_write_log_jsonl_families_groups_sbe_and_profil_fixture_blocks_from_0100
     assert sbe_records[0]["raw_lines"][0] == "1687246390:[STAGE ,0091]Stage [1] surfacing 43200s (<93600s) SBE61 "
     assert sbe_records[0]["raw_lines"][-1] == "1687246390:[PROFIL,0299]    speed_control=10mbar/s"
     assert any("[PROFIL,0284]" in line for line in sbe_records[0]["raw_lines"])
-    assert "turn off bluetooth" in {record["message"] for record in operational_records}
+    assert "turn off bluetooth" in {record["message"] for record in unclassified_records}
     assert all("manual_profil=1" not in row["raw_line"] for row in malformed_log_lines)
 
 
@@ -808,7 +867,6 @@ def test_write_log_jsonl_families_broadens_transmission_classification_conservat
         "Iridium...",
         "Go dive (Minimum surface delay expired and no more file to upload)",
         "<WARN>peer mute",
-        "<WARN>timeout",
         "failed to connect #1, code -8, net 1, qual 5, dial 1",
     }
 
@@ -876,10 +934,9 @@ def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified
         malformed_log_lines=malformed_log_lines,
     )
 
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.operational_records == 3
+    assert summary.operational_records == 0
     assert summary.unclassified_records == 3
     assert summary.transmission_records == 0
     assert malformed_log_lines == []
@@ -888,7 +945,7 @@ def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified
         "<WRN>peer mute",
         "<WARN>mission empty",
     ]
-    assert [record["severity"] for record in operational_records] == [
+    assert [record["severity"] for record in unclassified_records] == [
         "err",
         "warn",
         "warn",
@@ -932,6 +989,13 @@ def _read_jsonl(path: Path) -> list[dict[str, object]]:
     path = _resolve_jsonl_path(path)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _source_keys(records: list[dict[str, object]]) -> set[tuple[object, object, object]]:
+    return {
+        (record["source_file"], record["record_time"], record["raw_line"])
+        for record in records
+    }
 
 
 def _resolve_jsonl_path(path: Path) -> Path:

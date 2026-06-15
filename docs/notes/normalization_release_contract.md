@@ -213,6 +213,8 @@ MER families:
 
 `log_operational_records.<instrument_serial>.jsonl`
 
+- Contains derived-family matches, explicit non-raw operational/status rows, and parsed rollover banner rows.
+- Raw unmatched LOG rows are exclusive to `log_unclassified_records.<instrument_serial>.jsonl`.
 - `source_file` is basename-only in normalized JSONL outputs
 - `record_time`
 - `log_epoch_time`
@@ -316,6 +318,7 @@ MER families:
 
 `log_unclassified_records.<instrument_serial>.jsonl`
 
+- Contains raw unmatched LOG rows that do not also appear in `log_operational_records.<instrument_serial>.jsonl`.
 - all operational provenance/source fields
 - `severity`
 - `unclassified_reason`

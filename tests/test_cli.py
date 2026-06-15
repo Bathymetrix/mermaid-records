@@ -403,7 +403,7 @@ def test_decoder_python_resolves_from_env_for_bin_runs(
 
     assert result == 0
     assert "bin files decoded=1" in captured.out
-    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    rows = _jsonl_lines(output_dir / "0100" / "log_unclassified_records.jsonl")
     assert rows[0]["message"] == "decoded from env python"
 
 
@@ -431,7 +431,7 @@ def test_decoder_script_resolves_from_env_for_bin_runs(
 
     assert result == 0
     assert "bin files decoded=1" in captured.out
-    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    rows = _jsonl_lines(output_dir / "0100" / "log_unclassified_records.jsonl")
     assert rows[0]["message"] == "decoded from env script"
 
 
@@ -472,7 +472,7 @@ def test_explicit_cli_decoder_args_override_env(
 
     assert result == 0
     assert "bin files decoded=1" in captured.out
-    rows = _jsonl_lines(output_dir / "0100" / "log_operational_records.jsonl")
+    rows = _jsonl_lines(output_dir / "0100" / "log_unclassified_records.jsonl")
     assert rows[0]["message"] == "decoded from cli"
 
 
