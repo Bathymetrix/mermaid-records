@@ -454,11 +454,28 @@ def write_log_jsonl_families(
         1 for key in ordinary_line_keys if assignment_counts.get(key, 0) == 0
     )
     if duplicate_assignments or missing_assignments:
+        duplicate_examples = [
+            f"{source_path}:{line_number} {raw_line!r} -> {count}"
+            for (source_path, line_number, raw_line), count in assignment_counts.items()
+            if count > 1
+        ][:3]
+        missing_examples = [
+            f"{source_path}:{line_number} {raw_line!r}"
+            for source_path, line_number, raw_line in ordinary_line_keys
+            if assignment_counts.get((source_path, line_number, raw_line), 0) == 0
+        ][:3]
+        example_parts = []
+        if duplicate_examples:
+            example_parts.append(f"duplicate_examples={duplicate_examples!r}")
+        if missing_examples:
+            example_parts.append(f"missing_examples={missing_examples!r}")
+        examples_text = " " + " ".join(example_parts) if example_parts else ""
         raise ValueError(
             "LOG source-line assignment invariant failed: "
             f"ordinary_lines={len(ordinary_line_keys)} "
             f"assignments={sum(assignment_counts.values())} "
             f"duplicates={duplicate_assignments} missing={missing_assignments}"
+            f"{examples_text}"
         )
     family_record_counts = {
         "log_acquisition_records.jsonl": acquisition_count,
@@ -742,7 +759,7 @@ def _build_grouped_episode_record(
 def _source_line_keys_for_entry(entry: OperationalLogEntry) -> set[tuple[str, int, str]]:
     if entry.line_number is None:
         raise ValueError(f"Parsed LOG entry is missing source line number: {entry.raw_line!r}")
-    return {(entry.source_file.name, entry.line_number, entry.raw_line)}
+    return {(entry.source_file.as_posix(), entry.line_number, entry.raw_line)}
 
 
 def _source_line_keys_for_episode(
@@ -751,7 +768,7 @@ def _source_line_keys_for_episode(
     source_file: Path,
 ) -> set[tuple[str, int, str]]:
     return {
-        (source_file.name, line.line_number, line.raw_line)
+        (source_file.as_posix(), line.line_number, line.raw_line)
         for line in episode.lines
         if line.raw_line.strip()
     }

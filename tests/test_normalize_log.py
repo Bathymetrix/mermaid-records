@@ -156,6 +156,43 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
+def test_write_log_jsonl_families_counts_source_identity_by_path(
+    tmp_path: Path,
+) -> None:
+    first_log_path = tmp_path / "first" / "0100_same.LOG"
+    second_log_path = tmp_path / "second" / "0100_same.LOG"
+    first_log_path.parent.mkdir()
+    second_log_path.parent.mkdir()
+    raw_line = "1700000000:[MAIN  ,0007]same source text"
+    first_log_path.write_text(f"{raw_line}\n", encoding="utf-8")
+    second_log_path.write_text(f"{raw_line}\n", encoding="utf-8")
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families(
+        [first_log_path, second_log_path],
+        output_dir,
+        instrument_serial="0100",
+    )
+
+    assert summary.total_records == 2
+    assert summary.unclassified_records == 2
+    assert summary.ordinary_log_lines_examined == 2
+    assert summary.source_line_assignments == 2
+    assert summary.duplicate_assignments == 0
+    assert summary.missing_assignments == 0
+
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
+    assert [record["source_file"] for record in unclassified_records] == [
+        "0100_same.LOG",
+        "0100_same.LOG",
+    ]
+    assert [record["source_line_number"] for record in unclassified_records] == [1, 1]
+    assert [record["raw_line"] for record in unclassified_records] == [
+        raw_line,
+        raw_line,
+    ]
+
+
 def test_write_log_jsonl_families_converts_offset_times_to_utc(
     tmp_path: Path,
 ) -> None:

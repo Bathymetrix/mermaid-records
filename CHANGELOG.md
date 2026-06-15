@@ -10,3 +10,4 @@ Breaking output contract changes:
 - Changed stateful run directory IDs to UTC ISO8601-style timestamps such as `2026-04-21T22:17:31Z-11a3ef`.
 - Removed `log_operational_records`; LOG families are now mutually exclusive by source-line assignment.
 - Added LOG source-line provenance fields for exact assignment accounting.
+- Fixed LOG assignment accounting to distinguish same-named source files by full source path internally.
