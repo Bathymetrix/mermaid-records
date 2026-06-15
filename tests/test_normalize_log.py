@@ -218,6 +218,43 @@ def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational
     assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
 
 
+def test_write_log_jsonl_families_keeps_unclassified_disjoint_from_all_log_families(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_all_families.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[UPLOAD,0248]Upload data files...",
+                '1700000001:[UPLOAD,0231]"0100/AAAA0001.MER" uploaded at 83bytes/s',
+                "1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC",
+                "1700000003:[MONITR,0461]battery 14685mV,   12688uA",
+                "1700000004:[MRMAID,0002]acq started",
+                "1700000005:[MRMAID,0583]ascent request accepted",
+                "1700000006:[SURF  ,0022]GPS fix...",
+                "1700000007:[PUMP  ,0016]pump during 30000ms",
+                "1700000008:[SURF  ,0071]<WARN>timeout",
+                "1700000009:[MAIN  ,0007]raw unmatched line",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families([log_path], output_dir)
+
+    assert summary.unclassified_records == 1
+    assert summary.transmission_records == 2
+    assert summary.pressure_temperature_records == 1
+    assert summary.battery_records == 1
+    assert summary.acquisition_records == 1
+    assert summary.ascent_request_records == 1
+    assert summary.gps_records == 1
+    assert summary.routed_measurement_to_operational_records == 1
+    _assert_unclassified_disjoint_from_all_log_families(output_dir)
+
+
 def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
     tmp_path: Path,
 ) -> None:
@@ -995,6 +1032,32 @@ def _source_keys(records: list[dict[str, object]]) -> set[tuple[object, object, 
     return {
         (record["source_file"], record["record_time"], record["raw_line"])
         for record in records
+    }
+
+
+def _assert_unclassified_disjoint_from_all_log_families(output_dir: Path) -> None:
+    unclassified_keys = _source_keys(
+        _read_jsonl(output_dir / "log_unclassified_records.jsonl")
+    )
+    overlaps: dict[str, set[tuple[object, object, object]]] = {}
+    for path in sorted(output_dir.glob("log_*.jsonl")):
+        if path.name.startswith("log_unclassified_records"):
+            continue
+        records = _read_jsonl(path)
+        family_keys = _source_keys_for_records_with_raw_line(records)
+        overlap = unclassified_keys & family_keys
+        if overlap:
+            overlaps[path.name] = overlap
+    assert overlaps == {}
+
+
+def _source_keys_for_records_with_raw_line(
+    records: list[dict[str, object]],
+) -> set[tuple[object, object, object]]:
+    return {
+        (record["source_file"], record["record_time"], record["raw_line"])
+        for record in records
+        if {"source_file", "record_time", "raw_line"} <= record.keys()
     }
 
 
