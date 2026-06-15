@@ -38,7 +38,6 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     summary = write_log_jsonl_families([log_path], output_dir)
 
     assert summary.total_records == 6
-    assert summary.operational_records == 5
     assert summary.acquisition_records == 0
     assert summary.ascent_request_records == 0
     assert summary.gps_records == 0
@@ -48,10 +47,12 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert summary.transmission_records == 2
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 0
-    assert summary.routed_measurement_to_operational_records == 1
-    assert summary.unclassified_records == 1
+    assert summary.unclassified_records == 3
+    assert summary.ordinary_log_lines_examined == 6
+    assert summary.source_line_assignments == 6
+    assert summary.duplicate_assignments == 0
+    assert summary.missing_assignments == 0
 
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
     ascent_request_records = _read_jsonl(
         output_dir / "log_ascent_request_records.jsonl"
@@ -67,7 +68,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert len(operational_records) == 5
+    assert not (output_dir / "log_operational_records.jsonl").exists()
     assert acquisition_records == []
     assert ascent_request_records == []
     assert gps_records == []
@@ -77,12 +78,9 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert testmode_records == []
     assert sbe_records == []
     assert len(transmission_records) == 2
-    assert len(unclassified_records) == 1
+    assert len(unclassified_records) == 3
 
-    assert operational_records[0]["message_kind"] == "upload"
-    assert operational_records[2]["message_kind"] == "measurement"
-    assert operational_records[4]["severity"] == "warn"
-    assert list(operational_records[0]) == [
+    assert list(transmission_records[0]) == [
         "instrument_id",
         "instrument_serial",
         "source_file",
@@ -92,16 +90,40 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         "subsystem",
         "code",
         "message",
+        "source_line_number",
+        "referenced_artifact",
+        "rate_bytes_per_s",
+        "byte_count",
+        "byte_offset",
+        "artifact_size_bytes",
+        "uploaded_file_count",
+        "disconnect_duration_s",
+        "raw_line",
+        "transmission_kind",
+    ]
+    assert transmission_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
+    assert transmission_records[0]["log_epoch_time"] == "1700000000"
+    assert transmission_records[0]["source_file"] == log_path.name
+    assert transmission_records[0]["instrument_serial"] == "0100"
+    assert transmission_records[0]["source_line_number"] == 1
+    assert (output_dir / "log_transmission_records.0100.jsonl").exists()
+    assert "time" not in transmission_records[0]
+
+    assert list(unclassified_records[0]) == [
+        "instrument_id",
+        "instrument_serial",
+        "source_file",
+        "source_container",
+        "record_time",
+        "log_epoch_time",
+        "subsystem",
+        "code",
+        "message",
+        "source_line_number",
         "severity",
-        "message_kind",
+        "unclassified_reason",
         "raw_line",
     ]
-    assert operational_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
-    assert operational_records[0]["log_epoch_time"] == "1700000000"
-    assert operational_records[0]["source_file"] == log_path.name
-    assert operational_records[0]["instrument_serial"] == "0100"
-    assert (output_dir / "log_operational_records.0100.jsonl").exists()
-    assert "time" not in operational_records[0]
 
     assert transmission_records[1]["referenced_artifact"] == "0100_AAAA0001.MER"
     assert transmission_records[1]["rate_bytes_per_s"] == 83
@@ -121,15 +143,17 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         record["unclassified_reason"] == "no_family_match"
         for record in unclassified_records
     )
-    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:25.000000Z"
-    assert unclassified_records[0]["log_epoch_time"] == "1700000005"
+    assert unclassified_records[0]["record_time"] == "2023-11-14T22:13:23.000000Z"
+    assert unclassified_records[0]["log_epoch_time"] == "1700000003"
     assert "time" not in unclassified_records[0]
     assert [record["message"] for record in unclassified_records] == [
+        "pump during 30000ms",
+        "<WARN>timeout",
         "buoy 467.174-T-0100"
     ]
-    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
-    assert all(record["instrument_id"] == "0100" for record in operational_records)
-    assert all(record["instrument_serial"] == "0100" for record in operational_records)
+    assert all(record["instrument_id"] == "0100" for record in transmission_records)
+    assert all(record["instrument_serial"] == "0100" for record in transmission_records)
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_converts_offset_times_to_utc(
@@ -200,12 +224,10 @@ def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational
         instrument_serial="452.020-P-0026",
     )
 
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.operational_records == 0
     assert summary.unclassified_records == 4
-    assert operational_records == []
+    assert not (output_dir / "log_operational_records.jsonl").exists()
     assert {
         (record["source_file"], record["message"])
         for record in unclassified_records
@@ -215,7 +237,7 @@ def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational
         ("0026_5D48EAB8.LOG", "Pext -45mbar (rng 30mbar)"),
         ("0026_5D48EAB8.LOG", "7 cmd(s) received"),
     }
-    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_keeps_unclassified_disjoint_from_all_log_families(
@@ -244,15 +266,14 @@ def test_write_log_jsonl_families_keeps_unclassified_disjoint_from_all_log_famil
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    assert summary.unclassified_records == 1
+    assert summary.unclassified_records == 3
     assert summary.transmission_records == 2
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 1
     assert summary.acquisition_records == 1
     assert summary.ascent_request_records == 1
     assert summary.gps_records == 1
-    assert summary.routed_measurement_to_operational_records == 1
-    _assert_unclassified_disjoint_from_all_log_families(output_dir)
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
@@ -281,16 +302,19 @@ def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
     assert summary.total_records == 2
     assert summary.pressure_temperature_records == 0
     assert summary.battery_records == 0
-    assert summary.routed_measurement_to_operational_records == 2
     assert summary.ascent_request_records == 0
     assert summary.gps_records == 0
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
     assert summary.sbe_records == 0
-    assert summary.unclassified_records == 0
+    assert summary.unclassified_records == 2
     assert pressure_temperature_records == []
     assert battery_records == []
-    assert unclassified_records == []
+    assert [record["message"] for record in unclassified_records] == [
+        "during 900000ms",
+        "Outflow calculated : 2711",
+    ]
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_preserves_old_measurement_population_accounting(
@@ -320,26 +344,26 @@ def test_write_log_jsonl_families_preserves_old_measurement_population_accountin
         output_dir / "log_pressure_temperature_records.jsonl"
     )
     battery_records = _read_jsonl(output_dir / "log_battery_records.jsonl")
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    old_measurement_population = 8
-    new_total = (
-        len(pressure_temperature_records)
-        + len(battery_records)
-        + summary.routed_measurement_to_operational_records
-    )
-
-    assert old_measurement_population == new_total
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 1
-    assert summary.routed_measurement_to_operational_records == 6
+    assert summary.unclassified_records == 6
     assert [record["message"] for record in pressure_temperature_records] == [
         "P    +0mbar,T-10881mdegC"
     ]
     assert [record["message"] for record in battery_records] == [
         "battery 14685mV,   12688uA"
     ]
-    assert [record["message_kind"] for record in operational_records] == ["measurement"] * 8
+    assert [record["message"] for record in unclassified_records] == [
+        "pump during 30000ms",
+        "Outflow calculated : 2711",
+        "New pressure offset: 40mbar",
+        "from +2mbar/s to +4mbar/s",
+        "P +12,T -34,S +56",
+        "need to transfer +6mL (pump during 7185ms)",
+    ]
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_fails_loudly_on_derived_family_multi_match(
@@ -393,7 +417,7 @@ def test_write_log_jsonl_families_keeps_grouped_sbe_routing_outside_operational_
     def _fail_if_called(*args, **kwargs):
         raise AssertionError("Operational exclusivity collector should not run for grouped SBE episodes")
 
-    monkeypatch.setattr(normalize_log_module, "_single_operational_family_match", _fail_if_called)
+    monkeypatch.setattr(normalize_log_module, "_single_specific_family_match", _fail_if_called)
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
@@ -423,13 +447,11 @@ def test_write_log_jsonl_families_emits_acquisition_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     acquisition_records = _read_jsonl(output_dir / "log_acquisition_records.jsonl")
     gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 5
-    assert summary.operational_records == 5
     assert summary.acquisition_records == 4
     assert summary.ascent_request_records == 0
     assert summary.gps_records == 1
@@ -443,13 +465,6 @@ def test_write_log_jsonl_families_emits_acquisition_records(
         "assertion": 2,
     }
 
-    assert len(operational_records) == 5
-    assert [record["message_kind"] for record in operational_records[:4]] == [
-        "acquisition",
-        "acquisition",
-        "acquisition",
-        "acquisition",
-    ]
     assert {(record["acquisition_state"], record["acquisition_evidence_kind"]) for record in acquisition_records} == {
         ("started", "transition"),
         ("stopped", "transition"),
@@ -465,6 +480,7 @@ def test_write_log_jsonl_families_emits_acquisition_records(
     assert gps_records[0]["log_epoch_time"] == "1700000004"
     assert "time" not in gps_records[0]
     assert unclassified_records == []
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_emits_ascent_request_records(
@@ -485,7 +501,6 @@ def test_write_log_jsonl_families_emits_ascent_request_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     ascent_request_records = _read_jsonl(
         output_dir / "log_ascent_request_records.jsonl"
     )
@@ -493,7 +508,6 @@ def test_write_log_jsonl_families_emits_ascent_request_records(
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 3
-    assert summary.operational_records == 3
     assert summary.ascent_request_records == 2
     assert summary.gps_records == 1
     assert summary.parameter_records == 0
@@ -511,10 +525,9 @@ def test_write_log_jsonl_families_emits_ascent_request_records(
     assert ascent_request_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
     assert ascent_request_records[0]["log_epoch_time"] == "1700000000"
     assert "time" not in ascent_request_records[0]
-    assert operational_records[0]["message_kind"] == "status"
-    assert operational_records[1]["message_kind"] == "status"
     assert gps_records[0]["gps_record_kind"] == "fix_attempt"
     assert unclassified_records == []
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
@@ -548,7 +561,6 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 3
-    assert summary.operational_records == 0
     assert summary.parameter_records == 1
     assert summary.unclassified_records == 2
     assert len(parameter_records) == 1
@@ -565,6 +577,7 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
         "episode_index": 0,
         "line_start_index": 2,
         "line_end_index": 5,
+        "source_line_numbers": [2, 3, 4, 5],
         "start_record_time": "2023-11-14T22:13:21.000000Z",
         "end_record_time": "2023-11-14T22:13:21.000000Z",
         "start_log_epoch_time": "1700000001",
@@ -576,6 +589,7 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
             "1700000001:    stage[1] 150000mbar (+/-5000mbar) 648000s (<708000s)",
         ],
     }
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries(
@@ -611,13 +625,11 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
         malformed_log_lines=malformed_log_lines,
     )
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.total_records == 7
-    assert summary.operational_records == 2
     assert summary.parameter_records == 3
-    assert summary.unclassified_records == 2
+    assert summary.unclassified_records == 4
     assert [record["episode_index"] for record in parameter_records] == [0, 1, 2]
     assert [record["line_start_index"] for record in parameter_records] == [2, 5, 8]
     assert [record["line_end_index"] for record in parameter_records] == [3, 6, 9]
@@ -635,18 +647,16 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
             "1700000005:    ascent 8mbar/s (8mbar/s stored)",
         ],
     ]
-    assert [record["message"] for record in operational_records] == [
-        "<WARN>timeout",
-        "*** switching to 0100/NEXT.LOG ***",
-    ]
     assert [record["message"] for record in unclassified_records] == [
         "internal pressure 85448Pa",
+        "<WARN>timeout",
+        "*** switching to 0100/NEXT.LOG ***",
         "buoy 467.174-T-0100",
     ]
-    assert _source_keys(operational_records).isdisjoint(_source_keys(unclassified_records))
-    rollover_record = operational_records[1]
+    rollover_record = unclassified_records[2]
     assert rollover_record["switched_to_log_file"] == "0100_NEXT.LOG"
     assert rollover_record["source_file"] == log_path.name
+    _assert_log_source_line_assignments_exact_once(output_dir)
     assert malformed_log_lines == [
             {
                 "run_id": "run-2",
@@ -681,7 +691,6 @@ def test_write_log_jsonl_families_emits_gps_records(
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
@@ -696,13 +705,6 @@ def test_write_log_jsonl_families_emits_gps_records(
     }
     assert summary.unclassified_records == 1
     assert len(gps_records) == 5
-    assert [record["message_kind"] for record in operational_records[:5]] == [
-        "gps",
-        "gps",
-        "gps",
-        "gps",
-        "gps",
-    ]
     assert gps_records[0]["gps_record_kind"] == "fix_attempt"
     assert gps_records[0]["raw_values"] is None
     assert gps_records[1]["raw_values"] == {
@@ -718,6 +720,7 @@ def test_write_log_jsonl_families_emits_gps_records(
     assert [record["message"] for record in unclassified_records] == [
         "buoy 467.174-T-0100"
     ]
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_groups_testmode_fixture_session_from_0100_examples(
@@ -926,11 +929,9 @@ def test_write_log_jsonl_families_classifies_wrapped_tagged_transmission_lines(
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    operational_records = _read_jsonl(output_dir / "log_operational_records.jsonl")
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.operational_records == 2
     assert summary.transmission_records == 2
     assert summary.unclassified_records == 0
     assert [record["transmission_kind"] for record in transmission_records] == [
@@ -940,10 +941,8 @@ def test_write_log_jsonl_families_classifies_wrapped_tagged_transmission_lines(
     assert transmission_records[0]["referenced_artifact"] == "0048_607503A2.MER"
     assert transmission_records[0]["artifact_size_bytes"] == 118847
     assert transmission_records[0]["byte_offset"] == 4294967294
-    assert operational_records[0]["severity"] == "err"
-    assert operational_records[1]["severity"] == "warn"
-    assert operational_records[1]["message"] == "<WRN>transfer interrupted , retry"
     assert unclassified_records == []
+    _assert_log_source_line_assignments_exact_once(output_dir)
 
 
 def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified(
@@ -973,7 +972,6 @@ def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified
 
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.operational_records == 0
     assert summary.unclassified_records == 3
     assert summary.transmission_records == 0
     assert malformed_log_lines == []
@@ -1014,7 +1012,6 @@ def test_write_log_jsonl_families_keeps_true_unparsable_junk_malformed(
         malformed_log_lines=malformed_log_lines,
     )
 
-    assert summary.operational_records == 0
     assert summary.unclassified_records == 0
     assert [row["raw_line"] for row in malformed_log_lines] == [
         "1700000000:<ERR>broken wrapper without subsystem tag",
@@ -1028,37 +1025,35 @@ def _read_jsonl(path: Path) -> list[dict[str, object]]:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def _source_keys(records: list[dict[str, object]]) -> set[tuple[object, object, object]]:
-    return {
-        (record["source_file"], record["record_time"], record["raw_line"])
-        for record in records
-    }
-
-
-def _assert_unclassified_disjoint_from_all_log_families(output_dir: Path) -> None:
-    unclassified_keys = _source_keys(
-        _read_jsonl(output_dir / "log_unclassified_records.jsonl")
-    )
-    overlaps: dict[str, set[tuple[object, object, object]]] = {}
+def _assert_log_source_line_assignments_exact_once(output_dir: Path) -> None:
+    assignments: dict[tuple[object, object, object], list[str]] = {}
     for path in sorted(output_dir.glob("log_*.jsonl")):
-        if path.name.startswith("log_unclassified_records"):
-            continue
-        records = _read_jsonl(path)
-        family_keys = _source_keys_for_records_with_raw_line(records)
-        overlap = unclassified_keys & family_keys
-        if overlap:
-            overlaps[path.name] = overlap
-    assert overlaps == {}
+        for record in _read_jsonl(path):
+            for source_key in _source_line_keys(record):
+                assignments.setdefault(source_key, []).append(path.name)
 
-
-def _source_keys_for_records_with_raw_line(
-    records: list[dict[str, object]],
-) -> set[tuple[object, object, object]]:
-    return {
-        (record["source_file"], record["record_time"], record["raw_line"])
-        for record in records
-        if {"source_file", "record_time", "raw_line"} <= record.keys()
+    duplicates = {
+        source_key: families
+        for source_key, families in assignments.items()
+        if len(families) > 1
     }
+    assert duplicates == {}
+
+
+def _source_line_keys(record: dict[str, object]) -> list[tuple[object, object, object]]:
+    if "raw_line" in record:
+        return [(record["source_file"], record["source_line_number"], record["raw_line"])]
+    if "raw_lines" not in record:
+        return []
+    return [
+        (record["source_file"], line_number, raw_line)
+        for line_number, raw_line in zip(
+            record["source_line_numbers"],
+            record["raw_lines"],
+            strict=True,
+        )
+        if str(raw_line).strip()
+    ]
 
 
 def _resolve_jsonl_path(path: Path) -> Path:

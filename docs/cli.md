@@ -125,7 +125,7 @@ On repeated runs against the same `/tmp/mermaid-records-stateless` target:
 
 ## Record identity and filenames
 
-Normalized JSONL record-family filenames include the instrument serial before `.jsonl`, for example `log_operational_records.452.020-P-06.jsonl`.
+Normalized JSONL record-family filenames include the instrument serial before `.jsonl`, for example `log_unclassified_records.452.020-P-06.jsonl`.
 
 Every normalized LOG/MER record includes:
 

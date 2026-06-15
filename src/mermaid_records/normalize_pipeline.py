@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
+import json
 from pathlib import Path
 import re
 import shutil
@@ -128,6 +129,10 @@ class RunMetrics:
     skipped_mer_files: int = 0
     bin_files_decoded: int = 0
     preflight_mode: str | None = None
+    log_family_source_line_counts: dict[str, int] = field(default_factory=dict)
+    log_source_line_assignments: int = 0
+    log_duplicate_assignments: int = 0
+    log_missing_assignments: int = 0
 
 
 def run_normalization_pipeline(
@@ -380,6 +385,7 @@ def _run_stateful(
         metrics.bin_files_decoded += len(bin_paths) if summary.log_action != "noop" else 0
         _accumulate_output_metrics(
             metrics,
+            instrument_output_dir=plan.instrument_output_dir,
             previous_outputs=previous_outputs,
             current_outputs=build_outputs_manifest(plan.instrument_output_dir),
             log_action=summary.log_action,
@@ -549,6 +555,7 @@ def _run_stateless(
         metrics.bin_files_decoded += len(bin_paths)
         _accumulate_output_metrics(
             metrics,
+            instrument_output_dir=instrument_output_dir,
             previous_outputs=None,
             current_outputs=build_outputs_manifest(instrument_output_dir),
             log_action=summary.log_action,
@@ -1164,6 +1171,7 @@ def _accumulate_issue_metrics(
 def _accumulate_output_metrics(
     metrics: RunMetrics,
     *,
+    instrument_output_dir: Path,
     previous_outputs: dict[str, object] | None,
     current_outputs: dict[str, object],
     log_action: str,
@@ -1190,9 +1198,69 @@ def _accumulate_output_metrics(
         metrics.mer_records_written += _sum_counts(current_counts, "mer_")
         metrics.mer_records_removed += _sum_counts(previous_counts, "mer_")
 
+    _accumulate_log_assignment_metrics(metrics, instrument_output_dir)
+
 
 def _sum_counts(counts: dict[str, object], prefix: str) -> int:
     return sum(int(value) for key, value in counts.items() if key.startswith(prefix))
+
+
+def _accumulate_log_assignment_metrics(
+    metrics: RunMetrics,
+    output_dir: Path,
+) -> None:
+    counts, duplicate_assignments = _log_source_line_assignment_counts(output_dir)
+    for family, count in counts.items():
+        metrics.log_family_source_line_counts[family] = (
+            metrics.log_family_source_line_counts.get(family, 0) + count
+        )
+        metrics.log_source_line_assignments += count
+    metrics.log_duplicate_assignments += duplicate_assignments
+
+
+def _log_source_line_assignment_counts(output_dir: Path) -> tuple[dict[str, int], int]:
+    counts: dict[str, int] = {}
+    assignments: dict[tuple[str, int, str], list[str]] = {}
+    for path in sorted(output_dir.glob("log_*.jsonl")):
+        family_count = 0
+        with path.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                record = json.loads(line)
+                for source_key in _source_line_keys_from_log_record(record):
+                    family_count += 1
+                    assignments.setdefault(source_key, []).append(path.name)
+        counts[path.name] = family_count
+    duplicate_assignments = sum(
+        len(families) - 1 for families in assignments.values() if len(families) > 1
+    )
+    return counts, duplicate_assignments
+
+
+def _source_line_keys_from_log_record(
+    record: dict[str, object],
+) -> list[tuple[str, int, str]]:
+    source_file = str(record.get("source_file", ""))
+    if "raw_line" in record and "source_line_number" in record:
+        return [
+            (
+                source_file,
+                int(record["source_line_number"]),
+                str(record["raw_line"]),
+            )
+        ]
+    if "raw_lines" not in record or "source_line_numbers" not in record:
+        return []
+    return [
+        (source_file, int(line_number), str(raw_line))
+        for line_number, raw_line in zip(
+            record["source_line_numbers"],
+            record["raw_lines"],
+            strict=True,
+        )
+        if str(raw_line).strip()
+    ]
 
 
 def _overall_instrument_action(summary: InstrumentRunSummary) -> str:

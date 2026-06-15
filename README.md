@@ -77,7 +77,6 @@ Typical per-instrument outputs look like:
     log_ascent_request_records.452.020-P-06.jsonl
     log_battery_records.452.020-P-06.jsonl
     log_gps_records.452.020-P-06.jsonl
-    log_operational_records.452.020-P-06.jsonl
     log_parameter_records.452.020-P-06.jsonl
     log_pressure_temperature_records.452.020-P-06.jsonl
     log_sbe_records.452.020-P-06.jsonl

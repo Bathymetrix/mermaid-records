@@ -148,7 +148,6 @@ Preserve source identity via `source_kind = "log"`.
 
 Normalized record-family direction to keep in mind during cleanup and naming:
 
-- `operational_records`
 - `location_records`
 - `transmission_records`
 - `acquisition_records`
@@ -161,13 +160,13 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 - `pressure_temperature_records`
 - `battery_records`
 - `gps_records`
-- `unclassified_operational_records`
+- `unclassified_records`
 
 For LOG-derived measurement-adjacent lines:
 
 - dedicated `log_pressure_temperature_records` output family is only for literal `P...mbar,T...mdegC` observations with parsed `pressure_mbar` and `temperature_mdegc`
 - dedicated `log_battery_records` output family is only for literal `battery ...mV, ...uA` telemetry with parsed `voltage_mv` and `current_ua`
-- other lines that were formerly routed into `log_measurement_records` now remain only in `log_operational_records`; do not expand their parsing without an explicit request
+- other lines that were formerly routed into `log_measurement_records` now route to `log_unclassified_records` unless a specific LOG family is explicitly added
 
 For normalized LOG/MER family boundaries:
 
@@ -175,16 +174,16 @@ For normalized LOG/MER family boundaries:
 - keep structurally different line kinds together when they describe one process or state machine, using internal `*_kind` fields instead of fragmenting them into one-file-per-scalar outputs
 - avoid reviving vague mixed-domain buckets like the former measurement family
 
-For derived operational-family prototypes, no parsed `OperationalLogEntry` should disappear silently. Each ordinary parsed LOG line must end up in at least one normalized LOG family, with raw unmatched lines routed only to `log_unclassified_records`.
+For LOG family routing, no parsed ordinary LOG source line should disappear silently or contribute to more than one family. A source line may be represented by a dedicated record derived from that line, or as part of a grouped/contextual record whose provenance includes that source line.
 
-Operational-family routing contract:
+LOG-family routing contract:
 
 - grouped structural LOG routes such as `parameter`, `testmode`, and `sbe` are resolved before ordinary `OperationalLogEntry` family classification
-- an ordinary operational line may match zero or one derived family
-- derived-family matches and explicit non-raw operational/status rows emit to `log_operational_records`
-- raw rows with zero derived matches route only to `log_unclassified_records`; do not duplicate them in `log_operational_records`
-- parsed rollover banner rows remain operational records even when they have no derived-family match
-- two or more derived matches are a normalization bug and must fail loudly; do not hide them with precedence or multi-family emission
+- every ordinary LOG source line has exactly one family assignment
+- specific family matches emit only to that specific family
+- zero specific matches route to `log_unclassified_records`
+- parsed rollover banner rows route to `log_unclassified_records` with `switched_to_log_file` unless a future specific rollover family is added
+- two or more specific matches are a normalization bug and must fail loudly; do not hide them with precedence or multi-family emission
 
 For acquisition evidence prototypes, preserve the distinction between exact transitions and state assertions:
 

@@ -33,11 +33,12 @@ def test_stateful_run_writes_per_instrument_outputs_and_manifests(tmp_path: Path
 
     assert summary.mode == "stateful"
     assert [item.instrument_id for item in summary.processed_instruments] == ["P0006"]
-    operational_path = _record_path(instrument_dir, "log_operational_records.jsonl")
+    unclassified_path = _record_path(instrument_dir, "log_unclassified_records.jsonl")
     environment_path = _record_path(instrument_dir, "mer_environment_records.jsonl")
-    assert operational_path.name == "log_operational_records.452.020-P-06.jsonl"
+    assert unclassified_path.name == "log_unclassified_records.452.020-P-06.jsonl"
     assert environment_path.name == "mer_environment_records.452.020-P-06.jsonl"
-    assert operational_path.exists()
+    assert unclassified_path.exists()
+    assert not _record_path(instrument_dir, "log_operational_records.jsonl").exists()
     assert environment_path.exists()
     assert run_json["status"] == "success"
     assert run_json["instrument_serial"] == "452.020-P-06"
@@ -95,7 +96,8 @@ def test_stateful_mode_ignores_out_of_scope_file_types(tmp_path: Path) -> None:
 
     assert [item.instrument_id for item in summary.processed_instruments] == ["T0100"]
     assert {item["source_kind"] for item in source_state["raw_sources"]} == {"log"}
-    assert _record_path(instrument_dir, "log_operational_records.jsonl").exists()
+    assert _record_path(instrument_dir, "log_unclassified_records.jsonl").exists()
+    assert not _record_path(instrument_dir, "log_operational_records.jsonl").exists()
     assert _record_path(instrument_dir, "mer_environment_records.jsonl").exists()
     assert _record_path(instrument_dir, "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()
@@ -457,7 +459,8 @@ def test_stateless_mode_isolated_and_rejects_existing_manifests(tmp_path: Path) 
 
     assert summary.mode == "stateless"
     assert not (output_root / "0100" / "manifests").exists()
-    assert _record_path(output_root / "0100", "log_operational_records.jsonl").exists()
+    assert _record_path(output_root / "0100", "log_unclassified_records.jsonl").exists()
+    assert not _record_path(output_root / "0100", "log_operational_records.jsonl").exists()
     assert _record_path(output_root / "0100", "mer_environment_records.jsonl").exists()
     assert _record_path(output_root / "0100", "mer_environment_records.jsonl").read_text(encoding="utf-8") == ""
 
@@ -918,7 +921,6 @@ def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> 
     instrument_dir = output_root / "467.174-T-0100"
     serial = "467.174-T-0100"
     expected_jsonl = {
-        f"log_operational_records.{serial}.jsonl",
         f"log_acquisition_records.{serial}.jsonl",
         f"log_ascent_request_records.{serial}.jsonl",
         f"log_gps_records.{serial}.jsonl",
@@ -940,7 +942,6 @@ def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> 
     outputs_manifest = _read_json(instrument_dir / latest["outputs_manifest"])
     assert {item["path"] for item in outputs_manifest["jsonl_outputs"]} == expected_jsonl
     assert outputs_manifest["instrument_serial"] == serial
-    assert outputs_manifest["counts"][f"log_operational_records.{serial}"] == 0
     assert outputs_manifest["counts"][f"log_unclassified_records.{serial}"] == 1
     assert outputs_manifest["counts"][f"mer_event_records.{serial}"] == 0
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()

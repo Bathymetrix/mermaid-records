@@ -137,7 +137,6 @@ Per instrument:
 
 ```text
 <output_root>/<instrument-serial>/
-  log_operational_records.<instrument-serial>.jsonl
   log_acquisition_records.<instrument-serial>.jsonl
   log_ascent_request_records.<instrument-serial>.jsonl
   log_gps_records.<instrument-serial>.jsonl
@@ -189,7 +188,6 @@ Notes:
 
 LOG families:
 
-- `log_operational_records.<instrument_serial>.jsonl`
 - `log_acquisition_records.<instrument_serial>.jsonl`
 - `log_ascent_request_records.<instrument_serial>.jsonl`
 - `log_gps_records.<instrument_serial>.jsonl`
@@ -211,11 +209,12 @@ MER families:
 
 ### LOG
 
-`log_operational_records.<instrument_serial>.jsonl`
+LOG record families are mutually exclusive. Each ordinary LOG source line is represented exactly once in normalized output, either by a dedicated record derived from that line or as part of a grouped/contextual record whose provenance includes that source line. No ordinary LOG source line may contribute to more than one LOG family, and no ordinary LOG source line may be omitted from all LOG families.
 
-- Contains derived-family matches, explicit non-raw operational/status rows, and parsed rollover banner rows.
-- Raw unmatched LOG rows are exclusive to `log_unclassified_records.<instrument_serial>.jsonl`.
+Shared direct LOG record fields:
+
 - `source_file` is basename-only in normalized JSONL outputs
+- `source_line_number`
 - `record_time`
 - `log_epoch_time`
 - `instrument_id`
@@ -256,6 +255,7 @@ MER families:
 - `episode_index`
 - `line_start_index`
 - `line_end_index`
+- `source_line_numbers`
 - `start_record_time`
 - `end_record_time`
 - `start_log_epoch_time`
@@ -271,6 +271,7 @@ MER families:
 - `episode_index`
 - `line_start_index`
 - `line_end_index`
+- `source_line_numbers`
 - `start_record_time`
 - `end_record_time`
 - `start_log_epoch_time`
@@ -286,6 +287,7 @@ MER families:
 - `episode_index`
 - `line_start_index`
 - `line_end_index`
+- `source_line_numbers`
 - `start_record_time`
 - `end_record_time`
 - `start_log_epoch_time`
@@ -318,7 +320,7 @@ MER families:
 
 `log_unclassified_records.<instrument_serial>.jsonl`
 
-- Contains raw unmatched LOG rows that do not also appear in `log_operational_records.<instrument_serial>.jsonl`.
+- Contains ordinary LOG rows that do not match a specific LOG family.
 - all operational provenance/source fields
 - `severity`
 - `unclassified_reason`

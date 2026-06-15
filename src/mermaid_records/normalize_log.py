@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from contextlib import ExitStack
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -22,7 +23,6 @@ from .models import OperationalLogEntry
 from .parse_instrument_name import maybe_parse_instrument_name
 
 BASE_OUTPUT_FILENAMES = {
-    "operational": "log_operational_records.jsonl",
     "acquisition": "log_acquisition_records.jsonl",
     "ascent_request": "log_ascent_request_records.jsonl",
     "gps": "log_gps_records.jsonl",
@@ -103,23 +103,10 @@ _UPLOAD_DISCONNECT_RE = re.compile(
     re.IGNORECASE,
 )
 _UPLOAD_BATCH_RE = re.compile(r"^Upload data files\.\.\.$", re.IGNORECASE)
-_P_T_S_RE = re.compile(r"\bP\s*[+-]?\d+,\s*T\s*[+-]?\d+,\s*S\s*[+-]?\d+\b")
 _PRESS_TEMP_RE = re.compile(
     r"\bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b"
 )
 _BATTERY_RE = re.compile(r"\bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b", re.IGNORECASE)
-_TRANSFER_RE = re.compile(
-    r"need to transfer\s+(?P<ml>[+-]?\d+)mL\s+\(pump during\s+(?P<ms>\d+)ms\)",
-    re.IGNORECASE,
-)
-_PUMP_RE = re.compile(r"\bpump during\s+(?P<ms>\d+)ms\b", re.IGNORECASE)
-_DURATION_ONLY_RE = re.compile(r"^during\s+(?P<ms>\d+)ms$", re.IGNORECASE)
-_OUTFLOW_RE = re.compile(
-    r"Outflow calculated\s*:\s*(?P<value>[+-]?\d+)",
-    re.IGNORECASE,
-)
-_PRESSURE_VALUE_RE = re.compile(r"\bP\s*(?P<pressure>[+-]?\d+)mbar\b")
-_GPS_RE = re.compile(r"\bgps\b|\$GPS|GPRMC|hdop|vdop|lat|lon", re.IGNORECASE)
 _GPS_POSITION_RE = re.compile(
     r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)"
 )
@@ -134,7 +121,6 @@ class LogJsonlSummary:
     """Summary of generated LOG-derived JSONL streams."""
 
     total_records: int
-    operational_records: int
     acquisition_records: int
     ascent_request_records: int
     gps_records: int
@@ -144,8 +130,13 @@ class LogJsonlSummary:
     testmode_records: int
     sbe_records: int
     transmission_records: int
-    routed_measurement_to_operational_records: int
     unclassified_records: int
+    ordinary_log_lines_examined: int
+    source_line_assignments: int
+    duplicate_assignments: int
+    missing_assignments: int
+    family_record_counts: dict[str, int]
+    family_source_line_counts: dict[str, int]
     acquisition_state_counts: dict[str, int]
     acquisition_evidence_kind_counts: dict[str, int]
     acquisition_examples: dict[str, dict[str, object]]
@@ -187,9 +178,15 @@ class _ParsedTaggedLogLine:
 
 
 @dataclass(slots=True)
+class _FamilyAssignment:
+    family: str
+    record: dict[str, object]
+
+
+@dataclass(slots=True)
 class _DerivedFamilyMatch:
     family: str
-    record: dict[str, object] | None
+    record: dict[str, object]
 
 
 def output_filenames(instrument_serial: str) -> dict[str, str]:
@@ -205,7 +202,7 @@ def _common_log_record_fields(
 ) -> dict[str, object]:
     """Return shared provenance and source fields for LOG-derived records."""
 
-    return {
+    fields: dict[str, object] = {
         "instrument_id": instrument_id,
         "source_file": entry.source_file.name,
         "source_container": "log",
@@ -215,6 +212,9 @@ def _common_log_record_fields(
         "code": entry.code,
         "message": entry.message,
     }
+    if entry.line_number is not None:
+        fields["source_line_number"] = entry.line_number
+    return fields
 
 
 def write_log_jsonl_families(
@@ -241,7 +241,6 @@ def write_log_jsonl_families(
     }
 
     total_records = 0
-    operational_count = 0
     acquisition_count = 0
     ascent_request_count = 0
     gps_count = 0
@@ -251,8 +250,10 @@ def write_log_jsonl_families(
     transmission_count = 0
     pressure_temperature_count = 0
     battery_count = 0
-    routed_measurement_to_operational_count = 0
     unclassified_count = 0
+    ordinary_line_keys: set[tuple[str, int, str]] = set()
+    assignment_counts: Counter[tuple[str, int, str]] = Counter()
+    family_source_line_counter: Counter[str] = Counter()
     acquisition_state_counter: Counter[str] = Counter()
     acquisition_evidence_kind_counter: Counter[str] = Counter()
     acquisition_examples: dict[str, dict[str, object]] = {}
@@ -269,19 +270,11 @@ def write_log_jsonl_families(
     unclassified_examples: list[dict[str, object]] = []
     unclassified_patterns: Counter[tuple[str, str | None, str]] = Counter()
 
-    with (
-        output_paths["operational"].open("w", encoding="utf-8") as operational_handle,
-        output_paths["acquisition"].open("w", encoding="utf-8") as acquisition_handle,
-        output_paths["ascent_request"].open("w", encoding="utf-8") as ascent_request_handle,
-        output_paths["gps"].open("w", encoding="utf-8") as gps_handle,
-        output_paths["pressure_temperature"].open("w", encoding="utf-8") as pressure_temperature_handle,
-        output_paths["battery"].open("w", encoding="utf-8") as battery_handle,
-        output_paths["parameter"].open("w", encoding="utf-8") as parameter_handle,
-        output_paths["testmode"].open("w", encoding="utf-8") as testmode_handle,
-        output_paths["sbe"].open("w", encoding="utf-8") as sbe_handle,
-        output_paths["transmission"].open("w", encoding="utf-8") as transmission_handle,
-        output_paths["unclassified"].open("w", encoding="utf-8") as unclassified_handle,
-    ):
+    with ExitStack() as stack:
+        handles = {
+            family: stack.enter_context(path.open("w", encoding="utf-8"))
+            for family, path in output_paths.items()
+        }
         for path in sorted_paths:
             path_instrument_id = instrument_id or _fallback_instrument_id(path)
             path_instrument_serial = output_instrument_serial
@@ -312,161 +305,80 @@ def write_log_jsonl_families(
                     if isinstance(item, OperationalLogEntry):
                         total_records += 1
                         entry = item
-                        derived_match = _single_operational_family_match(
+                        source_keys = _source_line_keys_for_entry(entry)
+                        ordinary_line_keys.update(source_keys)
+                        assignment = _classify_log_line(
                             entry,
                             instrument_id=path_instrument_id,
                         )
-                        severity = _severity(entry.message)
-                        message_kind = _message_kind(
-                            entry,
-                            has_acquisition=derived_match is not None and derived_match.family == "acquisition",
-                            has_ascent_request=(
-                                derived_match is not None and derived_match.family == "ascent_request"
-                            ),
-                            has_gps=derived_match is not None and derived_match.family == "gps",
-                            has_transmission=(
-                                derived_match is not None and derived_match.family == "transmission"
-                            ),
-                            has_measurement=(
-                                derived_match is not None
-                                and derived_match.family
-                                in {"pressure_temperature", "battery", "operational_measurement"}
-                            ),
+                        record = with_instrument_serial(
+                            assignment.record,
+                            path_instrument_serial,
                         )
-                        common_fields = _common_log_record_fields(entry, instrument_id=path_instrument_id)
-                        rollover_fields = _rollover_fields(entry)
-                        classified = derived_match is not None
-                        unclassified = _routes_to_unclassified(
-                            classified=classified,
-                            message_kind=message_kind,
-                            rollover_fields=rollover_fields,
+                        _write_jsonl_line(handles[assignment.family], record)
+                        _record_source_line_assignments(
+                            assignment_counts,
+                            family_source_line_counter,
+                            family=assignment.family,
+                            source_keys=source_keys,
                         )
-                        if not unclassified:
-                            operational_record = {
-                                **common_fields,
-                                **rollover_fields,
-                                "severity": severity,
-                                "message_kind": message_kind,
-                                "raw_line": entry.raw_line,
-                            }
-                            operational_record = with_instrument_serial(
-                                operational_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(operational_handle, operational_record)
-                            operational_count += 1
 
-                        if derived_match is not None and derived_match.family == "acquisition":
-                            acquisition_record = derived_match.record
-                            assert acquisition_record is not None
-                            acquisition_record = with_instrument_serial(
-                                acquisition_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(acquisition_handle, acquisition_record)
+                        if assignment.family == "acquisition":
                             acquisition_count += 1
                             acquisition_state_counter[
-                                acquisition_record["acquisition_state"]
+                                record["acquisition_state"]
                             ] += 1
                             acquisition_evidence_kind_counter[
-                                acquisition_record["acquisition_evidence_kind"]
+                                record["acquisition_evidence_kind"]
                             ] += 1
                             example_key = (
-                                f"{acquisition_record['acquisition_state']}:"
-                                f"{acquisition_record['acquisition_evidence_kind']}"
+                                f"{record['acquisition_state']}:"
+                                f"{record['acquisition_evidence_kind']}"
                             )
-                            acquisition_examples.setdefault(example_key, acquisition_record)
+                            acquisition_examples.setdefault(example_key, record)
 
-                        if derived_match is not None and derived_match.family == "ascent_request":
-                            ascent_request_record = derived_match.record
-                            assert ascent_request_record is not None
-                            ascent_request_record = with_instrument_serial(
-                                ascent_request_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(ascent_request_handle, ascent_request_record)
+                        elif assignment.family == "ascent_request":
                             ascent_request_count += 1
                             ascent_request_state_counter[
-                                ascent_request_record["ascent_request_state"]
+                                record["ascent_request_state"]
                             ] += 1
                             ascent_request_examples.setdefault(
-                                ascent_request_record["ascent_request_state"],
-                                ascent_request_record,
+                                record["ascent_request_state"],
+                                record,
                             )
 
-                        if derived_match is not None and derived_match.family == "gps":
-                            gps_record = derived_match.record
-                            assert gps_record is not None
-                            gps_record = with_instrument_serial(
-                                gps_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(gps_handle, gps_record)
+                        elif assignment.family == "gps":
                             gps_count += 1
-                            gps_record_kind_counter[gps_record["gps_record_kind"]] += 1
-                            gps_examples.setdefault(gps_record["gps_record_kind"], gps_record)
+                            gps_record_kind_counter[record["gps_record_kind"]] += 1
+                            gps_examples.setdefault(record["gps_record_kind"], record)
 
-                        if derived_match is not None and derived_match.family == "transmission":
-                            transmission_record = derived_match.record
-                            assert transmission_record is not None
-                            transmission_record = with_instrument_serial(
-                                transmission_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(transmission_handle, transmission_record)
+                        elif assignment.family == "transmission":
                             transmission_count += 1
                             if len(transmission_examples) < 3:
-                                transmission_examples.append(transmission_record)
+                                transmission_examples.append(record)
 
-                        if derived_match is not None and derived_match.family == "pressure_temperature":
-                            pressure_temperature_record = derived_match.record
-                            assert pressure_temperature_record is not None
-                            pressure_temperature_record = with_instrument_serial(
-                                pressure_temperature_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(pressure_temperature_handle, pressure_temperature_record)
+                        elif assignment.family == "pressure_temperature":
                             pressure_temperature_count += 1
                             if len(pressure_temperature_examples) < 3:
-                                pressure_temperature_examples.append(pressure_temperature_record)
+                                pressure_temperature_examples.append(record)
 
-                        if derived_match is not None and derived_match.family == "battery":
-                            battery_record = derived_match.record
-                            assert battery_record is not None
-                            battery_record = with_instrument_serial(
-                                battery_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(battery_handle, battery_record)
+                        elif assignment.family == "battery":
                             battery_count += 1
                             if len(battery_examples) < 3:
-                                battery_examples.append(battery_record)
+                                battery_examples.append(record)
 
-                        if derived_match is not None and derived_match.family == "operational_measurement":
-                            routed_measurement_to_operational_count += 1
-
-                        if unclassified:
-                            unclassified_record = {
-                                **common_fields,
-                                **rollover_fields,
-                                "severity": severity,
-                                "unclassified_reason": "no_family_match",
-                                "raw_line": entry.raw_line,
-                            }
-                            unclassified_record = with_instrument_serial(
-                                unclassified_record,
-                                path_instrument_serial,
-                            )
-                            _write_jsonl_line(unclassified_handle, unclassified_record)
+                        elif assignment.family == "unclassified":
                             unclassified_count += 1
                             if len(unclassified_examples) < 3:
-                                unclassified_examples.append(unclassified_record)
+                                unclassified_examples.append(record)
                             unclassified_patterns[
                                 (entry.subsystem, entry.code, entry.message)
                             ] += 1
                         continue
 
                     total_records += 1
+                    source_keys = _source_line_keys_for_episode(item, source_file=path)
+                    ordinary_line_keys.update(source_keys)
                     episode_record = _build_grouped_episode_record(
                         item,
                         instrument_id=path_instrument_id,
@@ -477,18 +389,36 @@ def write_log_jsonl_families(
                         path_instrument_serial,
                     )
                     if item.family == "parameter":
-                        _write_jsonl_line(parameter_handle, episode_record)
+                        _write_jsonl_line(handles["parameter"], episode_record)
                         parameter_count += 1
+                        _record_source_line_assignments(
+                            assignment_counts,
+                            family_source_line_counter,
+                            family="parameter",
+                            source_keys=source_keys,
+                        )
                         if len(parameter_examples) < 3:
                             parameter_examples.append(episode_record)
                     elif item.family == "testmode":
-                        _write_jsonl_line(testmode_handle, episode_record)
+                        _write_jsonl_line(handles["testmode"], episode_record)
                         testmode_count += 1
+                        _record_source_line_assignments(
+                            assignment_counts,
+                            family_source_line_counter,
+                            family="testmode",
+                            source_keys=source_keys,
+                        )
                         if len(testmode_examples) < 3:
                             testmode_examples.append(episode_record)
                     else:
-                        _write_jsonl_line(sbe_handle, episode_record)
+                        _write_jsonl_line(handles["sbe"], episode_record)
                         sbe_count += 1
+                        _record_source_line_assignments(
+                            assignment_counts,
+                            family_source_line_counter,
+                            family="sbe",
+                            source_keys=source_keys,
+                        )
                         if len(sbe_examples) < 3:
                             sbe_examples.append(episode_record)
             except OSError as exc:
@@ -517,10 +447,38 @@ def write_log_jsonl_families(
         }
         for (subsystem, code, message), count in unclassified_patterns.most_common(10)
     ]
+    duplicate_assignments = sum(
+        count - 1 for count in assignment_counts.values() if count > 1
+    )
+    missing_assignments = sum(
+        1 for key in ordinary_line_keys if assignment_counts.get(key, 0) == 0
+    )
+    if duplicate_assignments or missing_assignments:
+        raise ValueError(
+            "LOG source-line assignment invariant failed: "
+            f"ordinary_lines={len(ordinary_line_keys)} "
+            f"assignments={sum(assignment_counts.values())} "
+            f"duplicates={duplicate_assignments} missing={missing_assignments}"
+        )
+    family_record_counts = {
+        "log_acquisition_records.jsonl": acquisition_count,
+        "log_ascent_request_records.jsonl": ascent_request_count,
+        "log_gps_records.jsonl": gps_count,
+        "log_pressure_temperature_records.jsonl": pressure_temperature_count,
+        "log_battery_records.jsonl": battery_count,
+        "log_parameter_records.jsonl": parameter_count,
+        "log_testmode_records.jsonl": testmode_count,
+        "log_sbe_records.jsonl": sbe_count,
+        "log_transmission_records.jsonl": transmission_count,
+        "log_unclassified_records.jsonl": unclassified_count,
+    }
+    family_source_line_counts = {
+        filename: family_source_line_counter[family]
+        for family, filename in BASE_OUTPUT_FILENAMES.items()
+    }
 
     return LogJsonlSummary(
         total_records=total_records,
-        operational_records=operational_count,
         acquisition_records=acquisition_count,
         ascent_request_records=ascent_request_count,
         gps_records=gps_count,
@@ -530,8 +488,13 @@ def write_log_jsonl_families(
         testmode_records=testmode_count,
         sbe_records=sbe_count,
         transmission_records=transmission_count,
-        routed_measurement_to_operational_records=routed_measurement_to_operational_count,
         unclassified_records=unclassified_count,
+        ordinary_log_lines_examined=len(ordinary_line_keys),
+        source_line_assignments=sum(assignment_counts.values()),
+        duplicate_assignments=duplicate_assignments,
+        missing_assignments=missing_assignments,
+        family_record_counts=family_record_counts,
+        family_source_line_counts=family_source_line_counts,
         acquisition_state_counts=dict(acquisition_state_counter),
         acquisition_evidence_kind_counts=dict(acquisition_evidence_kind_counter),
         acquisition_examples=acquisition_examples,
@@ -651,6 +614,7 @@ def _iter_log_source_units(
                         source_kind="log",
                         raw_line=line,
                         source_file=path,
+                        line_number=line_number,
                     )
                 except Exception as exc:
                     _report_malformed_line(
@@ -675,7 +639,11 @@ def _iter_log_source_units(
             episode = _flush_episode()
             if episode is not None:
                 yield episode
-            rollover_entry = _parse_rollover_banner(path=path, line=line)
+            rollover_entry = _parse_rollover_banner(
+                path=path,
+                line=line,
+                line_number=line_number,
+            )
             if rollover_entry is not None:
                 yield rollover_entry
                 continue
@@ -762,12 +730,43 @@ def _build_grouped_episode_record(
         "episode_index": episode.episode_index,
         "line_start_index": first_line.line_number,
         "line_end_index": last_line.line_number,
+        "source_line_numbers": [line.line_number for line in episode.lines],
         "start_record_time": format_utc_datetime(first_line.time),
         "end_record_time": format_utc_datetime(last_line.time),
         "start_log_epoch_time": first_line.log_epoch_time,
         "end_log_epoch_time": last_line.log_epoch_time,
         "raw_lines": [line.raw_line for line in episode.lines],
     }
+
+
+def _source_line_keys_for_entry(entry: OperationalLogEntry) -> set[tuple[str, int, str]]:
+    if entry.line_number is None:
+        raise ValueError(f"Parsed LOG entry is missing source line number: {entry.raw_line!r}")
+    return {(entry.source_file.name, entry.line_number, entry.raw_line)}
+
+
+def _source_line_keys_for_episode(
+    episode: _GroupedEpisode,
+    *,
+    source_file: Path,
+) -> set[tuple[str, int, str]]:
+    return {
+        (source_file.name, line.line_number, line.raw_line)
+        for line in episode.lines
+        if line.raw_line.strip()
+    }
+
+
+def _record_source_line_assignments(
+    assignment_counts: Counter[tuple[str, int, str]],
+    family_source_line_counter: Counter[str],
+    *,
+    family: str,
+    source_keys: set[tuple[str, int, str]],
+) -> None:
+    for source_key in source_keys:
+        assignment_counts[source_key] += 1
+        family_source_line_counter[family] += 1
 
 
 def _is_testmode_start_line(tagged_line: _ParsedTaggedLogLine) -> bool:
@@ -859,47 +858,6 @@ def _report_malformed_line(
         callback(line_number, raw_line, error)
 
 
-def _message_kind(
-    entry: OperationalLogEntry,
-    *,
-    has_acquisition: bool,
-    has_ascent_request: bool,
-    has_gps: bool,
-    has_transmission: bool,
-    has_measurement: bool,
-) -> str:
-    if has_acquisition:
-        return "acquisition"
-    if has_ascent_request:
-        return "status"
-    if has_gps:
-        return "gps"
-    if has_transmission:
-        return "upload"
-    if has_measurement:
-        return "measurement"
-    message = entry.message
-    lowered = message.lower()
-    if lowered.startswith("sleep") or lowered.startswith("wake") or "timeout" in lowered:
-        return "status"
-    if _GPS_RE.search(message):
-        return "gps"
-    return "raw"
-
-
-def _routes_to_unclassified(
-    *,
-    classified: bool,
-    message_kind: str,
-    rollover_fields: dict[str, object],
-) -> bool:
-    if classified:
-        return False
-    if rollover_fields:
-        return False
-    return message_kind == "raw"
-
-
 def _severity(message: str) -> str | None:
     if "<ERR>" in message:
         return "err"
@@ -908,7 +866,28 @@ def _severity(message: str) -> str | None:
     return None
 
 
-def _collect_operational_family_matches(
+def _classify_log_line(
+    entry: OperationalLogEntry,
+    *,
+    instrument_id: str,
+) -> _FamilyAssignment:
+    match = _single_specific_family_match(entry, instrument_id=instrument_id)
+    if match is not None:
+        return _FamilyAssignment(family=match.family, record=match.record)
+
+    return _FamilyAssignment(
+        family="unclassified",
+        record={
+            **_common_log_record_fields(entry, instrument_id=instrument_id),
+            **_rollover_fields(entry),
+            "severity": _severity(entry.message),
+            "unclassified_reason": "no_family_match",
+            "raw_line": entry.raw_line,
+        },
+    )
+
+
+def _collect_specific_family_matches(
     entry: OperationalLogEntry,
     *,
     instrument_id: str,
@@ -927,27 +906,15 @@ def _collect_operational_family_matches(
     ):
         if record is not None:
             matches.append(_DerivedFamilyMatch(family=family, record=record))
-
-    routed_measurement_kind = _classify_operational_measurement_fallback(entry)
-    if routed_measurement_kind is not None:
-        matches.append(
-            _DerivedFamilyMatch(
-                family="operational_measurement",
-                record={
-                    "measurement_kind": routed_measurement_kind,
-                    "message": entry.message,
-                },
-            )
-        )
     return matches
 
 
-def _single_operational_family_match(
+def _single_specific_family_match(
     entry: OperationalLogEntry,
     *,
     instrument_id: str,
 ) -> _DerivedFamilyMatch | None:
-    matches = _collect_operational_family_matches(entry, instrument_id=instrument_id)
+    matches = _collect_specific_family_matches(entry, instrument_id=instrument_id)
     if len(matches) <= 1:
         return matches[0] if matches else None
 
@@ -1190,29 +1157,6 @@ def _classify_battery(
     }
 
 
-def _classify_operational_measurement_fallback(entry: OperationalLogEntry) -> str | None:
-    message = entry.message
-    if _P_T_S_RE.search(message):
-        return "pressure_temperature_salinity"
-    if _TRANSFER_RE.search(message):
-        return "transfer"
-    if _PUMP_RE.search(message):
-        return "pump_duration"
-    if _DURATION_ONLY_RE.search(message) and entry.subsystem == "PUMP":
-        return "pump_duration"
-    if _OUTFLOW_RE.search(message):
-        return "outflow"
-    lowered = message.lower()
-    if "mbar" in message and any(
-        token in lowered
-        for token in ("rate ", "surface ", "near ", "middle ", "far ", "ascent ", "offset")
-    ):
-        return "pressure_setting"
-    if "mbar/s" in message and "from " in lowered and " to " in lowered:
-        return "pressure_rate"
-    return None
-
-
 def _fallback_instrument_id(path: Path) -> str:
     for candidate in (path.parent.name, path.stem):
         parsed = maybe_parse_instrument_name(candidate)
@@ -1244,7 +1188,12 @@ def _fallback_instrument_serial(path: Path) -> str:
     return path.stem.split("_", maxsplit=1)[0]
 
 
-def _parse_rollover_banner(*, path: Path, line: str) -> OperationalLogEntry | None:
+def _parse_rollover_banner(
+    *,
+    path: Path,
+    line: str,
+    line_number: int,
+) -> OperationalLogEntry | None:
     match = _TIMESTAMPED_LINE_RE.match(line)
     if match is None:
         return None
@@ -1260,6 +1209,7 @@ def _parse_rollover_banner(*, path: Path, line: str) -> OperationalLogEntry | No
         source_kind="log",
         raw_line=line,
         source_file=path,
+        line_number=line_number,
     )
 
 

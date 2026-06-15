@@ -8,4 +8,5 @@ Breaking output contract changes:
 - Renamed normalized JSONL family files to `<family>.<instrument_serial>.jsonl`.
 - Added `instrument_serial` to relevant manifests and state/diagnostic rows that already carry instrument context.
 - Changed stateful run directory IDs to UTC ISO8601-style timestamps such as `2026-04-21T22:17:31Z-11a3ef`.
-- Kept raw unmatched LOG rows exclusive to `log_unclassified_records` instead of duplicating them in `log_operational_records`.
+- Removed `log_operational_records`; LOG families are now mutually exclusive by source-line assignment.
+- Added LOG source-line provenance fields for exact assignment accounting.

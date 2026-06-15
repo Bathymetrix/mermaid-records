@@ -58,7 +58,8 @@ def test_readme_documents_release_cli_contract_and_python_support() -> None:
     assert "stateful mode" in readme
     assert "stateless mode" in readme
     assert "instrument_serial" in readme
-    assert "log_operational_records.452.020-P-06.jsonl" in readme
+    assert "log_unclassified_records.452.020-P-06.jsonl" in readme
+    assert "log_operational_records.452.020-P-06.jsonl" not in readme
     assert "preflight_status.json" in readme
     assert "the field is absent rather than `null`" in readme
     assert "does not silently duplicate JSONL rows" in readme
@@ -93,7 +94,8 @@ def test_cli_docs_capture_current_mode_and_flag_contract() -> None:
     assert "state/" in cli_doc
     assert "preflight_status.json" in cli_doc
     assert "can therefore appear in either execution mode" in cli_doc
-    assert "log_operational_records.452.020-P-06.jsonl" in cli_doc
+    assert "log_unclassified_records.452.020-P-06.jsonl" in cli_doc
+    assert "log_operational_records.452.020-P-06.jsonl" not in cli_doc
     assert "instrument_serial" in cli_doc
     assert "omits `preflight_status` rather than storing `null`" in cli_doc
     assert "safe to rerun because stateless mode rewrites the targeted output families" in cli_doc

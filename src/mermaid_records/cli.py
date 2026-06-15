@@ -330,6 +330,8 @@ def _format_run_summary(
         f"bin files decoded={metrics.bin_files_decoded} "
         f"preflight mode={metrics.preflight_mode or 'n/a'}"
     )
+    if not isinstance(summary, DryRunSummary):
+        lines.extend(_format_log_family_assignment_table(metrics))
     lines.append(f"  runtime: total wall-clock time={elapsed_s:.2f}s")
 
     if verbose:
@@ -357,6 +359,39 @@ def _format_run_summary(
             lines.append(f"  explicit input files: {len(summary.input_files)}")
 
     return "\n".join(lines)
+
+
+def _format_log_family_assignment_table(metrics) -> list[str]:
+    if not metrics.log_family_source_line_counts:
+        return []
+    family_width = max(
+        len("Family"),
+        *(len(family) for family in metrics.log_family_source_line_counts),
+        len("Ordinary LOG lines"),
+    )
+    count_width = max(
+        len("Records"),
+        *(len(f"{count:,}") for count in metrics.log_family_source_line_counts.values()),
+        len(f"{metrics.log_source_line_assignments:,}"),
+    )
+    separator = "-" * (family_width + 2 + count_width)
+    lines = [
+        "",
+        f"{'Family':<{family_width}}  {'Records':>{count_width}}",
+        separator,
+    ]
+    for family, count in sorted(metrics.log_family_source_line_counts.items()):
+        lines.append(f"{family:<{family_width}}  {count:>{count_width},}")
+    lines.extend(
+        [
+            separator,
+            f"{'TOTAL':<{family_width}}  {metrics.log_source_line_assignments:>{count_width},}",
+            "",
+            f"{'Ordinary LOG lines':<{family_width}}  {metrics.log_source_line_assignments:>{count_width},}",
+            f"{'Difference':<{family_width}}  {metrics.log_missing_assignments + metrics.log_duplicate_assignments:>{count_width},}",
+        ]
+    )
+    return lines
 
 
 def _format_per_instrument_outputs(

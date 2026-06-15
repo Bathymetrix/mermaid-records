@@ -27,6 +27,7 @@ class OperationalLogEntry:
     source_kind: OperationalSourceKind
     raw_line: str
     source_file: Path
+    line_number: int | None = None
 
 
 @dataclass(slots=True)
