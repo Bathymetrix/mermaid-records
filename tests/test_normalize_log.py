@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 
 import pytest
 
@@ -13,6 +14,47 @@ from mermaid_records.normalize_log import write_log_jsonl_families
 FIXTURES_ROOT = (
     Path(__file__).resolve().parents[1] / "data" / "fixtures" / "467.174-T-0100" / "log"
 )
+DOCS_ROOT = Path(__file__).resolve().parents[1] / "docs"
+
+
+def test_log_record_family_schema_doc_hit_examples_classify_as_documented(
+    tmp_path: Path,
+) -> None:
+    doc_examples = _log_schema_doc_hit_examples()
+    assert set(doc_examples) == {
+        "log_acquisition_records.jsonl",
+        "log_ascent_request_records.jsonl",
+        "log_battery_records.jsonl",
+        "log_gps_records.jsonl",
+        "log_parameter_records.jsonl",
+        "log_pressure_temperature_records.jsonl",
+        "log_sbe_records.jsonl",
+        "log_testmode_records.jsonl",
+        "log_transmission_records.jsonl",
+        "log_unclassified_records.jsonl",
+    }
+
+    for filename, raw_lines in doc_examples.items():
+        family_stem = filename.removesuffix(".jsonl")
+        log_path = tmp_path / f"0100_doc_{family_stem}.LOG"
+        log_path.write_text("\n".join([*raw_lines, ""]), encoding="utf-8")
+        output_dir = tmp_path / family_stem
+
+        write_log_jsonl_families(
+            [log_path],
+            output_dir,
+            instrument_id="T0100",
+            instrument_serial="467.174-T-0100",
+        )
+
+        raw_lines_by_output = _raw_lines_by_output_file(output_dir)
+        target_output = f"{filename.removesuffix('.jsonl')}.467.174-T-0100.jsonl"
+        assert set(raw_lines) <= raw_lines_by_output[target_output]
+
+        for other_filename, output_raw_lines in raw_lines_by_output.items():
+            if other_filename == target_output:
+                continue
+            assert set(raw_lines).isdisjoint(output_raw_lines)
 
 
 def test_write_log_jsonl_families_preserves_unclassified_records(
@@ -1060,6 +1102,42 @@ def _read_jsonl(path: Path) -> list[dict[str, object]]:
     path = _resolve_jsonl_path(path)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _log_schema_doc_hit_examples() -> dict[str, list[str]]:
+    doc_text = (DOCS_ROOT / "log_record_family_schemas.md").read_text(
+        encoding="utf-8"
+    )
+    examples: dict[str, list[str]] = {}
+    section_re = re.compile(
+        r"^## `(?P<filename>log_[^`]+\.jsonl)`\n"
+        r"(?P<body>.*?)(?=^## `log_|\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    hits_re = re.compile(r"^Hits:\n\n```text\n(?P<hits>.*?)\n```", re.MULTILINE | re.DOTALL)
+    for section_match in section_re.finditer(doc_text):
+        filename = section_match.group("filename")
+        hits_match = hits_re.search(section_match.group("body"))
+        assert hits_match is not None, f"{filename} is missing a Hits block"
+        examples[filename] = [
+            line
+            for line in hits_match.group("hits").splitlines()
+            if line.strip()
+        ]
+    return examples
+
+
+def _raw_lines_by_output_file(output_dir: Path) -> dict[str, set[str]]:
+    raw_lines_by_output: dict[str, set[str]] = {}
+    for path in sorted(output_dir.glob("log_*.jsonl")):
+        raw_lines: set[str] = set()
+        for record in _read_jsonl(path):
+            if "raw_line" in record:
+                raw_lines.add(str(record["raw_line"]))
+            else:
+                raw_lines.update(str(line) for line in record.get("raw_lines", []))
+        raw_lines_by_output[path.name] = raw_lines
+    return raw_lines_by_output
 
 
 def _assert_log_source_line_assignments_exact_once(output_dir: Path) -> None:

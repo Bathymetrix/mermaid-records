@@ -14,3 +14,4 @@ Breaking output contract changes:
 - Changed the CLI LOG assignment report to accumulate writer summaries instead of rereading generated JSONL outputs.
 - Kept LOG assignment summary count keys aligned with generated serial-suffixed output filenames.
 - Added a developer reference for LOG record family schemas and classifier hit rules.
+- Added tests that audit documented LOG family hit examples against the normalizer.

@@ -6,6 +6,10 @@ This is a developer-facing reference for LOG-derived JSONL families emitted by
 before `.jsonl`, for example `log_gps_records.467.174-T-0100.jsonl`.
 
 The source of truth is `src/mermaid_records/normalize_log.py`.
+This document is a generated/audited companion to that source: update it
+whenever LOG family filenames, emitted fields, grouping behavior, classifier
+hit rules, or exclusivity behavior change. The documented `Hits:` examples are
+covered by tests so classifier drift should fail loudly.
 
 ## Shared LOG Parsing Contract
 
@@ -59,7 +63,9 @@ These fields appear on every single-line family:
 
 ## Common Grouped-Episode Fields
 
-These fields appear on grouped episode families:
+These fields appear on grouped episode families. Grouped episode records do not
+currently include `source_container`, `subsystem`, `code`, `message`, or
+`raw_line`.
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
@@ -67,8 +73,8 @@ These fields appear on grouped episode families:
 | `instrument_serial` | string | no | Full hardware/dataset serial used in output filenames. | n/a | Pipeline context or fallback from LOG path. |
 | `source_file` | string | no | Basename of the source LOG file. | n/a | Source LOG path basename. |
 | `episode_index` | integer | no | Zero-based episode number within the source file and family. | n/a | Incremented by grouped parser. |
-| `line_start_index` | integer | no | First timestamped line number in the episode. | lines | First grouped line with parsed time. |
-| `line_end_index` | integer | no | Last timestamped line number in the episode. | lines | Last grouped line with parsed time. |
+| `line_start_index` | integer | no | 1-based source line number for the first timestamped line in the episode. | lines | First grouped line with parsed time. |
+| `line_end_index` | integer | no | 1-based source line number for the last timestamped line in the episode. | lines | Last grouped line with parsed time. |
 | `source_line_numbers` | array of integers | no | 1-based source line numbers included in the episode. | lines | All grouped lines, including blank testmode lines. |
 | `start_record_time` | string | no | UTC ISO8601 time for first timestamped line. | UTC time | Parsed first timestamped grouped line. |
 | `end_record_time` | string | no | UTC ISO8601 time for last timestamped line. | UTC time | Parsed last timestamped grouped line. |
@@ -242,7 +248,7 @@ Field table: common single-line fields plus:
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
 | `gps_record_kind` | string | no | One of `fix_attempt`, `fix_position`, `dop`, `gps_ack`, `gps_off`. | n/a | First matching GPS predicate. |
-| `raw_values` | object or null | yes | Parsed raw GPS scalar strings, or null for fix attempts. | source literal | Regex capture groups. |
+| `raw_values` | object or null | yes | Parsed raw GPS scalar strings, or null for fix attempts. The key is always emitted. | source literal | Regex capture groups. |
 
 Classifier hit rules:
 
@@ -502,8 +508,9 @@ These lines previously would have been part of broad operational preservation
 before `log_operational_records` was dissolved.
 
 Known gaps / edge cases: an unterminated testmode episode is flushed at EOF.
-Blank lines inside testmode are preserved in `raw_lines` but do not count as
-source-line assignments because assignment accounting ignores blank raw lines.
+Blank lines inside testmode are emitted in `raw_lines` and have corresponding
+entries in `source_line_numbers`; assignment accounting ignores only blank raw
+lines when checking exact once-per-source-line family assignment.
 
 ## `log_transmission_records.jsonl`
 
@@ -615,7 +622,7 @@ Field table: common single-line fields plus:
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
 | `switched_to_log_file` | string | yes | Canonical rollover target LOG filename. Field is present only for rollover banners. | n/a | Rollover regex group `target`, `/` normalized to `_`, `.LOG` default suffix when absent. |
-| `severity` | string or null | yes | `err`, `warn`, or null. | n/a | Presence of `<ERR>`, `<WARN>`, or `<WRN>` in `message`. |
+| `severity` | string or null | yes | `err`, `warn`, or null. This key is emitted on every unclassified record. | n/a | Presence of `<ERR>`, `<WARN>`, or `<WRN>` in `message`. |
 | `unclassified_reason` | string | no | Currently always `no_family_match`. | n/a | Constant for parsed non-matching lines. |
 
 Classifier hit rules:
@@ -664,5 +671,6 @@ replacement preservation surface for parsed ordinary lines that formerly would
 have appeared in dissolved/base operational records.
 
 Known gaps / edge cases: malformed raw lines are reported through run manifest
-diagnostics when enabled; they are not emitted to `log_unclassified_records`.
+diagnostics when enabled, or skipped from JSONL output when diagnostics are not
+requested; they are not emitted to `log_unclassified_records`.
 Severity is a coarse substring check, not a parsed field from the LOG tag.
