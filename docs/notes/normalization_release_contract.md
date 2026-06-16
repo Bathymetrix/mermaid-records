@@ -319,6 +319,11 @@ Shared direct LOG record fields:
 - all operational provenance/source fields
 - `pressure_mbar`
 - `temperature_mdegc`
+- `pressure_dbar`
+- `temperature_degc`
+- `internal_pressure_pa`
+- `external_pressure_mbar`
+- `external_pressure_range_mbar`
 
 `log_battery_records.<instrument_serial>.jsonl`
 

@@ -350,8 +350,8 @@ an unknown prefix is malformed or a boundary, not a parameter record.
 
 ## `log_pressure_temperature_records.jsonl`
 
-Purpose / scope: literal pressure/temperature telemetry observations in mbar
-and millidegrees Celsius.
+Purpose / scope: literal pressure/temperature and pressure-only telemetry
+observations in the units used by the source LOG line.
 
 Representative object:
 
@@ -363,15 +363,24 @@ Field table: common single-line fields plus:
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
-| `pressure_mbar` | integer | no | Pressure value. | mbar | Regex group `pressure_mbar`. |
-| `temperature_mdegc` | integer | no | Temperature value. | mdegC | Regex group `temperature_mdegc`. |
+| `pressure_mbar` | integer | yes | Pressure value for `P...mbar,T...mdegC` observations. | mbar | Regex group `pressure_mbar`; emitted only for matching source lines. |
+| `temperature_mdegc` | integer | yes | Temperature value for `P...mbar,T...mdegC` observations. | mdegC | Regex group `temperature_mdegc`; emitted only for matching source lines. |
+| `pressure_dbar` | integer | yes | Pressure value for `...dbar, ...degC` observations. | dbar | Regex group `pressure_dbar`; emitted only for matching source lines. |
+| `temperature_degc` | integer | yes | Temperature value for `...dbar, ...degC` observations. | degC | Regex group `temperature_degc`; emitted only for matching source lines. |
+| `internal_pressure_pa` | integer | yes | Internal pressure value from `internal pressure ...Pa` or `Pint ...Pa` observations. | Pa | Regex group `internal_pressure_pa`; emitted only for matching source lines. |
+| `external_pressure_mbar` | integer | yes | External pressure value from `Pext ...mbar` observations. | mbar | Regex group `external_pressure_mbar`; emitted only for matching source lines. |
+| `external_pressure_range_mbar` | integer | yes | External pressure range value from `Pext ... (rng ...mbar)` observations. | mbar | Regex group `external_pressure_range_mbar`; emitted only for matching source lines. |
 
 Classifier hit rules:
 
-Regex, case-sensitive, searched anywhere in `message`:
+Regexes, case-sensitive, searched anywhere in `message`:
 
 ```text
 \bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b
+\b(?P<pressure_dbar>[+-]?\d+)dbar,\s*(?P<temperature_degc>[+-]?\d+)degC\b
+\binternal pressure\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b
+\bPint\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b
+\bPext\s+(?P<external_pressure_mbar>[+-]?\d+)mbar\s+\(rng\s+(?P<external_pressure_range_mbar>[+-]?\d+)mbar\)\b
 ```
 
 Hits:
@@ -379,26 +388,31 @@ Hits:
 ```text
 1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC
 1700000000:[PRESS ,0081]P    +0mbar,T-10881mdegC
+1535842096:[MRMAID,565]1523dbar, -11degC
+1564269461:[MAIN  ,408]internal pressure 78680Pa
+1696784664:[MAIN  ,498]Pint 84535Pa
+1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
 ```
 
 Non-hits:
 
 ```text
-1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
 1700000004:[MAIN  ,0007]New pressure offset: 40mbar
 1700000006:[MAIN  ,0007]P +12,T -34,S +56
-1700000000:[MAIN  ,408]internal pressure 78680Pa
+1688207849:[PROFIL,0288]    p_cut_off=2dbar
+1700000000:[MAIN  ,0007]Pext -45mbar
 ```
 
 Overlap / exclusivity: mutually exclusive with other LOG families. Matching
-lines do not also appear in unclassified. `Pext ...`, `internal pressure ...`,
-pressure offset, and `P +12,T -34,S +56` lines do not hit and currently route
+lines do not also appear in unclassified. Pressure offset, profile parameter,
+incomplete `Pext`, and `P +12,T -34,S +56` lines do not hit and currently route
 to unclassified when no other family matches. Hits previously would have been
 ordinary/base operational rows before `log_operational_records` was dissolved.
 
-Known gaps / edge cases: only `P...mbar,T...mdegC` observations are recognized.
-Pressure-only, external-pressure, pascal, offset, and CTD-style `P,T,S` lines
-are intentionally outside this family.
+Known gaps / edge cases: source units are preserved without conversion, so
+`pressure_mbar`, `pressure_dbar`, and `internal_pressure_pa` are distinct fields.
+Offset, configuration/profile parameter, and CTD-style `P,T,S` lines are
+intentionally outside this family.
 
 ## `log_ctd_records.jsonl`
 
@@ -665,8 +679,6 @@ Hits:
 
 ```text
 1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
-1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
-1564269461:[MAIN  ,408]internal pressure 78680Pa
 1700000004:[SURF  ,0071]<WARN>timeout
 1700000004:*** switching to 0100/NEXT.LOG ***
 ```
@@ -675,6 +687,9 @@ Non-hits:
 
 ```text
 1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC
+1535842096:[MRMAID,565]1523dbar, -11degC
+1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
+1564269461:[MAIN  ,408]internal pressure 78680Pa
 1700000003:[MONITR,0461]battery 14685mV,   12688uA
 1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)
 1700000000:<ERR>broken wrapper without subsystem tag

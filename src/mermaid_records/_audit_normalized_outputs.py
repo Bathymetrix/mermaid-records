@@ -20,6 +20,12 @@ from .format_record_filenames import record_family_name
 
 BATTERY_PATTERN = re.compile(r"battery\s+(-?\d+)mV,\s*(-?\d+)uA")
 PRESSURE_TEMPERATURE_PATTERN = re.compile(r"P\s*([+-]?\d+)mbar,T\s*([+-]?\d+)mdegC")
+DBAR_DEGC_PATTERN = re.compile(r"\b([+-]?\d+)dbar,\s*([+-]?\d+)degC\b")
+INTERNAL_PRESSURE_PATTERN = re.compile(r"\binternal pressure\s+([+-]?\d+)Pa\b")
+PINT_PATTERN = re.compile(r"\bPint\s+([+-]?\d+)Pa\b")
+PEXT_PATTERN = re.compile(
+    r"\bPext\s+([+-]?\d+)mbar\s+\(rng\s+([+-]?\d+)mbar\)"
+)
 ACQUISITION_MESSAGES = {
     "acq started": ("started", "transition"),
     "acq stopped": ("stopped", "transition"),
@@ -349,13 +355,43 @@ def _check_log_battery_row(row: dict[str, Any]) -> list[str]:
 def _check_log_pressure_temperature_row(row: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     match = PRESSURE_TEMPERATURE_PATTERN.search(row["raw_line"])
-    if match is None:
-        return ["raw_line does not contain a parseable pressure/temperature pattern"]
-    if int(match.group(1)) != row.get("pressure_mbar"):
-        issues.append("pressure_mbar does not match the preserved raw_line value")
-    if int(match.group(2)) != row.get("temperature_mdegc"):
-        issues.append("temperature_mdegc does not match the preserved raw_line value")
-    return issues
+    if match is not None:
+        if int(match.group(1)) != row.get("pressure_mbar"):
+            issues.append("pressure_mbar does not match the preserved raw_line value")
+        if int(match.group(2)) != row.get("temperature_mdegc"):
+            issues.append("temperature_mdegc does not match the preserved raw_line value")
+        return issues
+
+    match = DBAR_DEGC_PATTERN.search(row["raw_line"])
+    if match is not None:
+        if int(match.group(1)) != row.get("pressure_dbar"):
+            issues.append("pressure_dbar does not match the preserved raw_line value")
+        if int(match.group(2)) != row.get("temperature_degc"):
+            issues.append("temperature_degc does not match the preserved raw_line value")
+        return issues
+
+    for pattern in (INTERNAL_PRESSURE_PATTERN, PINT_PATTERN):
+        match = pattern.search(row["raw_line"])
+        if match is not None:
+            if int(match.group(1)) != row.get("internal_pressure_pa"):
+                issues.append(
+                    "internal_pressure_pa does not match the preserved raw_line value"
+                )
+            return issues
+
+    match = PEXT_PATTERN.search(row["raw_line"])
+    if match is not None:
+        if int(match.group(1)) != row.get("external_pressure_mbar"):
+            issues.append(
+                "external_pressure_mbar does not match the preserved raw_line value"
+            )
+        if int(match.group(2)) != row.get("external_pressure_range_mbar"):
+            issues.append(
+                "external_pressure_range_mbar does not match the preserved raw_line value"
+            )
+        return issues
+
+    return ["raw_line does not contain a parseable pressure/temperature pattern"]
 
 
 def _check_log_acquisition_row(row: dict[str, Any]) -> list[str]:

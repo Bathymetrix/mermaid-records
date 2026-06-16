@@ -198,6 +198,54 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
+def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patterns(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "06_pressure.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[PRESS ,0038]P+20179mbar,T+32767mdegC",
+                "1700000001:[MRMAID,0565]1527dbar, -10degC",
+                "1700000002:[MAIN  ,0408]internal pressure 78680Pa",
+                "1700000003:[MAIN  ,0498]Pint 76872Pa",
+                "1700000004:[MAIN  ,0502]Pext -45mbar (rng 30mbar)",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families([log_path], output_dir)
+    pressure_temperature_records = _read_jsonl(
+        output_dir / "log_pressure_temperature_records.jsonl"
+    )
+    unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
+
+    assert summary.pressure_temperature_records == 5
+    assert summary.unclassified_records == 0
+    assert [record["message"] for record in pressure_temperature_records] == [
+        "P+20179mbar,T+32767mdegC",
+        "1527dbar, -10degC",
+        "internal pressure 78680Pa",
+        "Pint 76872Pa",
+        "Pext -45mbar (rng 30mbar)",
+    ]
+    assert pressure_temperature_records[0]["pressure_mbar"] == 20179
+    assert pressure_temperature_records[0]["temperature_mdegc"] == 32767
+    assert pressure_temperature_records[1]["pressure_dbar"] == 1527
+    assert pressure_temperature_records[1]["temperature_degc"] == -10
+    assert "pressure_mbar" not in pressure_temperature_records[1]
+    assert "temperature_mdegc" not in pressure_temperature_records[1]
+    assert pressure_temperature_records[2]["internal_pressure_pa"] == 78680
+    assert pressure_temperature_records[3]["internal_pressure_pa"] == 76872
+    assert pressure_temperature_records[4]["external_pressure_mbar"] == -45
+    assert pressure_temperature_records[4]["external_pressure_range_mbar"] == 30
+    assert unclassified_records == []
+    _assert_log_source_line_assignments_exact_once(output_dir)
+
+
 def test_write_log_jsonl_families_counts_source_identity_by_path(
     tmp_path: Path,
 ) -> None:
@@ -274,7 +322,7 @@ def test_write_log_jsonl_families_accepts_canonical_instrument_id_override(
     assert unclassified_records[0]["instrument_serial"] == "467.174-T-0100"
 
 
-def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational(
+def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
     tmp_path: Path,
 ) -> None:
     internal_log_path = tmp_path / "0026_5D3CDB8D.LOG"
@@ -303,17 +351,39 @@ def test_write_log_jsonl_families_keeps_raw_unclassified_rows_out_of_operational
         instrument_serial="452.020-P-0026",
     )
 
+    pressure_temperature_records = _read_jsonl(
+        output_dir / "log_pressure_temperature_records.jsonl"
+    )
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.unclassified_records == 4
+    assert summary.pressure_temperature_records == 2
+    assert summary.unclassified_records == 2
     assert not (output_dir / "log_operational_records.jsonl").exists()
+    assert {
+        (record["source_file"], record["message"])
+        for record in pressure_temperature_records
+    } == {
+        ("0026_5D3CDB8D.LOG", "internal pressure 78680Pa"),
+        ("0026_5D48EAB8.LOG", "Pext -45mbar (rng 30mbar)"),
+    }
+    pressure_by_message = {
+        record["message"]: record for record in pressure_temperature_records
+    }
+    assert (
+        pressure_by_message["internal pressure 78680Pa"]["internal_pressure_pa"]
+        == 78680
+    )
+    assert pressure_by_message["Pext -45mbar (rng 30mbar)"][
+        "external_pressure_mbar"
+    ] == -45
+    assert pressure_by_message["Pext -45mbar (rng 30mbar)"][
+        "external_pressure_range_mbar"
+    ] == 30
     assert {
         (record["source_file"], record["message"])
         for record in unclassified_records
     } == {
-        ("0026_5D3CDB8D.LOG", "internal pressure 78680Pa"),
         ("0026_5D48EAB8.LOG", "Vbat 14681mV (min 13967mV)"),
-        ("0026_5D48EAB8.LOG", "Pext -45mbar (rng 30mbar)"),
         ("0026_5D48EAB8.LOG", "7 cmd(s) received"),
     }
     _assert_log_source_line_assignments_exact_once(output_dir)
@@ -697,10 +767,10 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
 
     assert summary.total_records == 3
     assert summary.parameter_records == 1
-    assert summary.unclassified_records == 2
+    assert summary.pressure_temperature_records == 1
+    assert summary.unclassified_records == 1
     assert len(parameter_records) == 1
     assert [record["message"] for record in unclassified_records] == [
-        "internal pressure 85448Pa",
         "turn off bluetooth",
     ]
     assert malformed_log_lines == []
@@ -764,7 +834,8 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
 
     assert summary.total_records == 7
     assert summary.parameter_records == 3
-    assert summary.unclassified_records == 4
+    assert summary.pressure_temperature_records == 1
+    assert summary.unclassified_records == 3
     assert [record["episode_index"] for record in parameter_records] == [0, 1, 2]
     assert [record["line_start_index"] for record in parameter_records] == [2, 5, 8]
     assert [record["line_end_index"] for record in parameter_records] == [3, 6, 9]
@@ -783,12 +854,15 @@ def test_write_log_jsonl_families_stops_parameter_episode_at_explicit_boundaries
         ],
     ]
     assert [record["message"] for record in unclassified_records] == [
-        "internal pressure 85448Pa",
         "<WARN>timeout",
         "*** switching to 0100/NEXT.LOG ***",
         "buoy 467.174-T-0100",
     ]
-    rollover_record = unclassified_records[2]
+    rollover_record = next(
+        record
+        for record in unclassified_records
+        if record["message"] == "*** switching to 0100/NEXT.LOG ***"
+    )
     assert rollover_record["switched_to_log_file"] == "0100_NEXT.LOG"
     assert rollover_record["source_file"] == log_path.name
     _assert_log_source_line_assignments_exact_once(output_dir)

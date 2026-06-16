@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from mermaid_records._audit_normalized_outputs import (
+    FileSample,
     audit_rows,
     discover_nonempty_families,
     inspect_sample_row,
@@ -144,6 +147,61 @@ def test_audit_rows_reports_findings_and_full_coverage(tmp_path: Path) -> None:
     assert report["release_blocking"] is True
     assert report["findings"][0]["family"] == "log_pressure_temperature_records"
     assert "temperature_mdegc does not match the preserved raw_line value" in report["findings"][0]["issues"]
+
+
+@pytest.mark.parametrize(
+    ("row", "expected_issue"),
+    [
+        (
+            {
+                "raw_line": "1700000000:[MRMAID,565]1527dbar, -10degC",
+                "pressure_dbar": 1526,
+                "temperature_degc": -10,
+                "log_epoch_time": "1700000000",
+            },
+            "pressure_dbar does not match the preserved raw_line value",
+        ),
+        (
+            {
+                "raw_line": "1700000000:[MAIN  ,408]internal pressure 78680Pa",
+                "internal_pressure_pa": 78679,
+                "log_epoch_time": "1700000000",
+            },
+            "internal_pressure_pa does not match the preserved raw_line value",
+        ),
+        (
+            {
+                "raw_line": "1700000000:[MAIN  ,498]Pint 76872Pa",
+                "internal_pressure_pa": 76871,
+                "log_epoch_time": "1700000000",
+            },
+            "internal_pressure_pa does not match the preserved raw_line value",
+        ),
+        (
+            {
+                "raw_line": "1700000000:[MAIN  ,507]Pext -45mbar (rng 30mbar)",
+                "external_pressure_mbar": -45,
+                "external_pressure_range_mbar": 29,
+                "log_epoch_time": "1700000000",
+            },
+            "external_pressure_range_mbar does not match the preserved raw_line value",
+        ),
+    ],
+)
+def test_pressure_temperature_audit_checks_extended_patterns(
+    row: dict[str, object],
+    expected_issue: str,
+) -> None:
+    sample = FileSample(
+        family="log_pressure_temperature_records",
+        instrument_dir="452.020-P-0001",
+        path=Path("log_pressure_temperature_records.452.020-P-0001.jsonl"),
+        row_count=1,
+        sample_line_num=1,
+        sample_row=row,
+    )
+
+    assert inspect_sample_row(sample) == [expected_issue]
 
 
 def _write_jsonl_rows(path: Path, rows: list[dict[str, object]]) -> None:

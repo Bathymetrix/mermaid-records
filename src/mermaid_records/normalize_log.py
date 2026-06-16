@@ -110,6 +110,17 @@ _UPLOAD_BATCH_RE = re.compile(r"^Upload data files\.\.\.$", re.IGNORECASE)
 _PRESS_TEMP_RE = re.compile(
     r"\bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b"
 )
+_DBAR_DEGC_RE = re.compile(
+    r"\b(?P<pressure_dbar>[+-]?\d+)dbar,\s*(?P<temperature_degc>[+-]?\d+)degC\b"
+)
+_INTERNAL_PRESSURE_RE = re.compile(
+    r"\binternal pressure\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b"
+)
+_PINT_RE = re.compile(r"\bPint\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b")
+_PEXT_RE = re.compile(
+    r"\bPext\s+(?P<external_pressure_mbar>[+-]?\d+)mbar\s+"
+    r"\(rng\s+(?P<external_pressure_range_mbar>[+-]?\d+)mbar\)"
+)
 _BATTERY_RE = re.compile(r"\bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b", re.IGNORECASE)
 _GPS_POSITION_RE = re.compile(
     r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)"
@@ -1224,16 +1235,47 @@ def _classify_pressure_temperature(
     *,
     instrument_id: str,
 ) -> dict[str, object] | None:
-    match = _PRESS_TEMP_RE.search(entry.message)
-    if match is None:
-        return None
+    common_fields = _common_log_record_fields(entry, instrument_id=instrument_id)
 
-    return {
-        **_common_log_record_fields(entry, instrument_id=instrument_id),
-        "pressure_mbar": int(match.group("pressure_mbar")),
-        "temperature_mdegc": int(match.group("temperature_mdegc")),
-        "raw_line": entry.raw_line,
-    }
+    match = _PRESS_TEMP_RE.search(entry.message)
+    if match is not None:
+        return {
+            **common_fields,
+            "pressure_mbar": int(match.group("pressure_mbar")),
+            "temperature_mdegc": int(match.group("temperature_mdegc")),
+            "raw_line": entry.raw_line,
+        }
+
+    match = _DBAR_DEGC_RE.search(entry.message)
+    if match is not None:
+        return {
+            **common_fields,
+            "pressure_dbar": int(match.group("pressure_dbar")),
+            "temperature_degc": int(match.group("temperature_degc")),
+            "raw_line": entry.raw_line,
+        }
+
+    for pressure_re in (_INTERNAL_PRESSURE_RE, _PINT_RE):
+        match = pressure_re.search(entry.message)
+        if match is not None:
+            return {
+                **common_fields,
+                "internal_pressure_pa": int(match.group("internal_pressure_pa")),
+                "raw_line": entry.raw_line,
+            }
+
+    match = _PEXT_RE.search(entry.message)
+    if match is not None:
+        return {
+            **common_fields,
+            "external_pressure_mbar": int(match.group("external_pressure_mbar")),
+            "external_pressure_range_mbar": int(
+                match.group("external_pressure_range_mbar")
+            ),
+            "raw_line": entry.raw_line,
+        }
+
+    return None
 
 
 def _classify_battery(
