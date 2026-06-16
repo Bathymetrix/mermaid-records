@@ -79,7 +79,7 @@ Typical per-instrument outputs look like:
     log_gps_records.452.020-P-06.jsonl
     log_parameter_records.452.020-P-06.jsonl
     log_pressure_temperature_records.452.020-P-06.jsonl
-    log_sbe_records.452.020-P-06.jsonl
+    log_ctd_records.452.020-P-06.jsonl
     log_testmode_records.452.020-P-06.jsonl
     log_transmission_records.452.020-P-06.jsonl
     log_unclassified_records.452.020-P-06.jsonl

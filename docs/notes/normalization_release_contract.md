@@ -144,7 +144,7 @@ Per instrument:
   log_battery_records.<instrument-serial>.jsonl
   log_parameter_records.<instrument-serial>.jsonl
   log_testmode_records.<instrument-serial>.jsonl
-  log_sbe_records.<instrument-serial>.jsonl
+  log_ctd_records.<instrument-serial>.jsonl
   log_transmission_records.<instrument-serial>.jsonl
   log_unclassified_records.<instrument-serial>.jsonl
   mer_environment_records.<instrument-serial>.jsonl
@@ -195,7 +195,7 @@ LOG families:
 - `log_battery_records.<instrument_serial>.jsonl`
 - `log_parameter_records.<instrument_serial>.jsonl`
 - `log_testmode_records.<instrument_serial>.jsonl`
-- `log_sbe_records.<instrument_serial>.jsonl`
+- `log_ctd_records.<instrument_serial>.jsonl`
 - `log_transmission_records.<instrument_serial>.jsonl`
 - `log_unclassified_records.<instrument_serial>.jsonl`
 
@@ -278,9 +278,10 @@ Shared direct LOG record fields:
 - `end_log_epoch_time`
 - `raw_lines`
 
-`log_sbe_records.<instrument_serial>.jsonl`
+`log_ctd_records.<instrument_serial>.jsonl`
 
-- grouped SBE/profil operational episodes preserved from LOGs
+- grouped CTD/profil operational episodes preserved from LOGs
+- currently classified from legacy SBE/PROFIL/STAGE source tags, but named for the CTD output product rather than one sensor manufacturer
 - `instrument_id`
 - `instrument_serial`
 - `source_file`
@@ -293,6 +294,13 @@ Shared direct LOG record fields:
 - `start_log_epoch_time`
 - `end_log_epoch_time`
 - `raw_lines`
+- `ctd_sample_count`
+- `ctd_samples`
+  - `source_line_number`
+  - `raw_values`
+  - `pressure_cbar_tenths`
+  - `temperature_mdegc_tenths`
+  - `salinity_psu_thousandths`
 
 `log_transmission_records.<instrument_serial>.jsonl`
 

@@ -156,7 +156,7 @@ Normalized record-family direction to keep in mind during cleanup and naming:
 - `ascent_request_records`
 - `parameter_records`
 - `testmode_records`
-- `sbe_records`
+- `ctd_records`
 - `mer_event_blocks`
 - `acquisition_intervals`
 - `pressure_temperature_records`
@@ -180,7 +180,7 @@ For LOG family routing, no parsed ordinary LOG source line should disappear sile
 
 LOG-family routing contract:
 
-- grouped structural LOG routes such as `parameter`, `testmode`, and `sbe` are resolved before ordinary `OperationalLogEntry` family classification
+- grouped structural LOG routes such as `parameter`, `testmode`, and `ctd` are resolved before ordinary `OperationalLogEntry` family classification
 - every ordinary LOG source line has exactly one family assignment
 - specific family matches emit only to that specific family
 - zero specific matches route to `log_unclassified_records`

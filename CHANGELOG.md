@@ -15,3 +15,4 @@ Breaking output contract changes:
 - Kept LOG assignment summary count keys aligned with generated serial-suffixed output filenames.
 - Added a developer reference for LOG record family schemas and classifier hit rules.
 - Added tests that audit documented LOG family hit examples against the normalizer.
+- Renamed `log_sbe_records` to `log_ctd_records` and added parsed CTD sample fields.

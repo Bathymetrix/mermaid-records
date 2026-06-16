@@ -34,7 +34,7 @@ BASE_OUTPUT_FILENAMES = {
     "battery": "log_battery_records.jsonl",
     "parameter": "log_parameter_records.jsonl",
     "testmode": "log_testmode_records.jsonl",
-    "sbe": "log_sbe_records.jsonl",
+    "ctd": "log_ctd_records.jsonl",
     "transmission": "log_transmission_records.jsonl",
     "unclassified": "log_unclassified_records.jsonl",
 }
@@ -118,6 +118,11 @@ _HDOP_RE = re.compile(r"\bhdop\s+(?P<hdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
 _VDOP_RE = re.compile(r"\bvdop\s+(?P<vdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
 _GPSACK_RE = re.compile(r"\$?GPSACK:(?P<payload>[^;]+)")
 _GPSOFF_RE = re.compile(r"\$?GPSOFF:(?P<offset>[+-]?\d+)")
+_CTD_SAMPLE_RE = re.compile(
+    r"\bP\s*(?P<pressure>[+-]?\d+)\s*,\s*"
+    r"T\s*(?P<temperature>[+-]?\d+)\s*,\s*"
+    r"S\s*(?P<salinity>[+-]?\d+)\b"
+)
 
 
 @dataclass(slots=True)
@@ -132,7 +137,7 @@ class LogJsonlSummary:
     battery_records: int
     parameter_records: int
     testmode_records: int
-    sbe_records: int
+    ctd_records: int
     transmission_records: int
     unclassified_records: int
     ordinary_log_lines_examined: int
@@ -150,7 +155,7 @@ class LogJsonlSummary:
     gps_examples: dict[str, dict[str, object]]
     parameter_examples: list[dict[str, object]]
     testmode_examples: list[dict[str, object]]
-    sbe_examples: list[dict[str, object]]
+    ctd_examples: list[dict[str, object]]
     transmission_examples: list[dict[str, object]]
     pressure_temperature_examples: list[dict[str, object]]
     battery_examples: list[dict[str, object]]
@@ -251,7 +256,7 @@ def write_log_jsonl_families(
     gps_count = 0
     parameter_count = 0
     testmode_count = 0
-    sbe_count = 0
+    ctd_count = 0
     transmission_count = 0
     pressure_temperature_count = 0
     battery_count = 0
@@ -269,7 +274,7 @@ def write_log_jsonl_families(
     gps_examples: dict[str, dict[str, object]] = {}
     parameter_examples: list[dict[str, object]] = []
     testmode_examples: list[dict[str, object]] = []
-    sbe_examples: list[dict[str, object]] = []
+    ctd_examples: list[dict[str, object]] = []
     transmission_examples: list[dict[str, object]] = []
     pressure_temperature_examples: list[dict[str, object]] = []
     battery_examples: list[dict[str, object]] = []
@@ -424,16 +429,16 @@ def write_log_jsonl_families(
                         if len(testmode_examples) < 3:
                             testmode_examples.append(episode_record)
                     else:
-                        _write_jsonl_line(handles["sbe"], episode_record)
-                        sbe_count += 1
+                        _write_jsonl_line(handles["ctd"], episode_record)
+                        ctd_count += 1
                         _record_source_line_assignments(
                             assignment_counts,
                             family_source_line_counter,
-                            family="sbe",
+                            family="ctd",
                             source_keys=source_keys,
                         )
-                        if len(sbe_examples) < 3:
-                            sbe_examples.append(episode_record)
+                        if len(ctd_examples) < 3:
+                            ctd_examples.append(episode_record)
             except OSError as exc:
                 if skipped_log_files is None or run_id is None:
                     raise
@@ -498,7 +503,7 @@ def write_log_jsonl_families(
         "battery": battery_count,
         "parameter": parameter_count,
         "testmode": testmode_count,
-        "sbe": sbe_count,
+        "ctd": ctd_count,
         "transmission": transmission_count,
         "unclassified": unclassified_count,
     }
@@ -520,7 +525,7 @@ def write_log_jsonl_families(
         battery_records=battery_count,
         parameter_records=parameter_count,
         testmode_records=testmode_count,
-        sbe_records=sbe_count,
+        ctd_records=ctd_count,
         transmission_records=transmission_count,
         unclassified_records=unclassified_count,
         ordinary_log_lines_examined=len(ordinary_line_keys),
@@ -538,7 +543,7 @@ def write_log_jsonl_families(
         gps_examples=gps_examples,
         parameter_examples=parameter_examples,
         testmode_examples=testmode_examples,
-        sbe_examples=sbe_examples,
+        ctd_examples=ctd_examples,
         transmission_examples=transmission_examples,
         pressure_temperature_examples=pressure_temperature_examples,
         battery_examples=battery_examples,
@@ -554,7 +559,7 @@ def _iter_log_source_units(
 ) -> Iterable[OperationalLogEntry | _GroupedEpisode]:
     _validate_log_path(path)
     current_episode: _GroupedEpisode | None = None
-    episode_indexes = {"parameter": 0, "testmode": 0, "sbe": 0}
+    episode_indexes = {"parameter": 0, "testmode": 0, "ctd": 0}
 
     def _start_episode(family: str) -> None:
         nonlocal current_episode
@@ -620,12 +625,12 @@ def _iter_log_source_units(
                             yield episode
                     continue
 
-                if _is_sbe_start_or_continue_line(tagged_line, active_episode=current_episode):
-                    if current_episode is None or current_episode.family != "sbe":
+                if _is_ctd_start_or_continue_line(tagged_line, active_episode=current_episode):
+                    if current_episode is None or current_episode.family != "ctd":
                         episode = _flush_episode()
                         if episode is not None:
                             yield episode
-                        _start_episode("sbe")
+                        _start_episode("ctd")
                     assert current_episode is not None
                     current_episode.lines.append(
                         _grouped_line(
@@ -758,7 +763,7 @@ def _build_grouped_episode_record(
         raise ValueError(f"{episode.family} episode has no timestamped lines")
     first_line = timestamped_lines[0]
     last_line = timestamped_lines[-1]
-    return {
+    record: dict[str, object] = {
         "instrument_id": instrument_id,
         "source_file": source_file.name,
         "episode_index": episode.episode_index,
@@ -771,6 +776,39 @@ def _build_grouped_episode_record(
         "end_log_epoch_time": last_line.log_epoch_time,
         "raw_lines": [line.raw_line for line in episode.lines],
     }
+    if episode.family == "ctd":
+        ctd_samples = _ctd_samples_for_episode(episode)
+        record["ctd_sample_count"] = len(ctd_samples)
+        record["ctd_samples"] = ctd_samples
+    return record
+
+
+def _ctd_samples_for_episode(episode: _GroupedEpisode) -> list[dict[str, object]]:
+    samples: list[dict[str, object]] = []
+    for line in episode.lines:
+        tagged_line = _parse_tagged_log_line(line.raw_line)
+        if tagged_line is None:
+            continue
+        match = _CTD_SAMPLE_RE.search(tagged_line.message)
+        if match is None:
+            continue
+        pressure = match.group("pressure")
+        temperature = match.group("temperature")
+        salinity = match.group("salinity")
+        samples.append(
+            {
+                "source_line_number": line.line_number,
+                "raw_values": {
+                    "P": pressure,
+                    "T": temperature,
+                    "S": salinity,
+                },
+                "pressure_cbar_tenths": int(pressure),
+                "temperature_mdegc_tenths": int(temperature),
+                "salinity_psu_thousandths": int(salinity),
+            }
+        )
+    return samples
 
 
 def _source_line_keys_for_entry(
@@ -842,7 +880,7 @@ def _is_testmode_exit_line(tagged_line: _ParsedTaggedLogLine) -> bool:
     } or message.startswith("rebooting with code")
 
 
-def _is_sbe_start_or_continue_line(
+def _is_ctd_start_or_continue_line(
     tagged_line: _ParsedTaggedLogLine,
     *,
     active_episode: _GroupedEpisode | None,
@@ -852,7 +890,7 @@ def _is_sbe_start_or_continue_line(
     if tagged_line.subsystem == "STAGE":
         if "SBE41" in tagged_line.message or "SBE61" in tagged_line.message:
             return True
-        return active_episode is not None and active_episode.family == "sbe"
+        return active_episode is not None and active_episode.family == "ctd"
     return False
 
 

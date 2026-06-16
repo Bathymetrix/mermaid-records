@@ -28,7 +28,7 @@ def test_log_record_family_schema_doc_hit_examples_classify_as_documented(
         "log_gps_records.jsonl",
         "log_parameter_records.jsonl",
         "log_pressure_temperature_records.jsonl",
-        "log_sbe_records.jsonl",
+        "log_ctd_records.jsonl",
         "log_testmode_records.jsonl",
         "log_transmission_records.jsonl",
         "log_unclassified_records.jsonl",
@@ -85,7 +85,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert summary.gps_records == 0
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
-    assert summary.sbe_records == 0
+    assert summary.ctd_records == 0
     assert summary.transmission_records == 2
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 0
@@ -106,7 +106,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     battery_records = _read_jsonl(output_dir / "log_battery_records.jsonl")
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
     testmode_records = _read_jsonl(output_dir / "log_testmode_records.jsonl")
-    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
     transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
@@ -118,7 +118,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert battery_records == []
     assert parameter_records == []
     assert testmode_records == []
-    assert sbe_records == []
+    assert ctd_records == []
     assert len(transmission_records) == 2
     assert len(unclassified_records) == 3
 
@@ -385,7 +385,7 @@ def test_write_log_jsonl_families_classifies_legacy_pump_and_outflow_lines(
     assert summary.gps_records == 0
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
-    assert summary.sbe_records == 0
+    assert summary.ctd_records == 0
     assert summary.unclassified_records == 2
     assert pressure_temperature_records == []
     assert battery_records == []
@@ -477,7 +477,7 @@ def test_write_log_jsonl_families_fails_loudly_on_derived_family_multi_match(
         write_log_jsonl_families([log_path], tmp_path / "jsonl")
 
 
-def test_write_log_jsonl_families_keeps_grouped_sbe_routing_outside_operational_exclusivity(
+def test_write_log_jsonl_families_keeps_grouped_ctd_routing_outside_operational_exclusivity(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -494,16 +494,72 @@ def test_write_log_jsonl_families_keeps_grouped_sbe_routing_outside_operational_
     )
 
     def _fail_if_called(*args, **kwargs):
-        raise AssertionError("Operational exclusivity collector should not run for grouped SBE episodes")
+        raise AssertionError("Operational exclusivity collector should not run for grouped CTD episodes")
 
     monkeypatch.setattr(normalize_log_module, "_single_specific_family_match", _fail_if_called)
 
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
-    assert summary.sbe_records == 1
-    assert len(sbe_records) == 1
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
+    assert summary.ctd_records == 1
+    assert len(ctd_records) == 1
+    assert ctd_records[0]["ctd_sample_count"] == 1
+    assert ctd_records[0]["ctd_samples"] == [
+        {
+            "source_line_number": 1,
+            "raw_values": {
+                "P": "+20122",
+                "T": "+19514",
+                "S": "+34584",
+            },
+            "pressure_cbar_tenths": 20122,
+            "temperature_mdegc_tenths": 19514,
+            "salinity_psu_thousandths": 34584,
+        }
+    ]
+
+
+def test_write_log_jsonl_families_parses_ctd_sample_values_from_compact_line(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_ctd.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "2023-04-27T02:15:08:[SBE61 ,0396]P +468,T+150471,S38141",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families(
+        [log_path],
+        output_dir,
+        instrument_id="T0100",
+        instrument_serial="467.174-T-0100",
+    )
+
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
+
+    assert summary.ctd_records == 1
+    assert ctd_records[0]["ctd_sample_count"] == 1
+    assert ctd_records[0]["ctd_samples"] == [
+        {
+            "source_line_number": 1,
+            "raw_values": {
+                "P": "+468",
+                "T": "+150471",
+                "S": "38141",
+            },
+            "pressure_cbar_tenths": 468,
+            "temperature_mdegc_tenths": 150471,
+            "salinity_psu_thousandths": 38141,
+        }
+    ]
+    assert not (output_dir / "log_sbe_records.jsonl").exists()
 
 
 def test_write_log_jsonl_families_emits_acquisition_records(
@@ -536,7 +592,7 @@ def test_write_log_jsonl_families_emits_acquisition_records(
     assert summary.gps_records == 1
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
-    assert summary.sbe_records == 0
+    assert summary.ctd_records == 0
     assert summary.unclassified_records == 0
     assert summary.acquisition_state_counts == {"started": 2, "stopped": 2}
     assert summary.acquisition_evidence_kind_counts == {
@@ -591,7 +647,7 @@ def test_write_log_jsonl_families_emits_ascent_request_records(
     assert summary.gps_records == 1
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
-    assert summary.sbe_records == 0
+    assert summary.ctd_records == 0
     assert summary.ascent_request_state_counts == {
         "accepted": 1,
         "rejected": 1,
@@ -817,11 +873,11 @@ def test_write_log_jsonl_families_groups_testmode_fixture_session_from_0100_exam
     )
 
     testmode_records = _read_jsonl(output_dir / "log_testmode_records.jsonl")
-    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
 
     assert summary.testmode_records == 1
     assert len(testmode_records) == 1
-    assert summary.sbe_records >= 1
+    assert summary.ctd_records >= 1
     assert testmode_records[0]["instrument_id"] == "0100"
     assert testmode_records[0]["source_file"] == log_path.name
     assert testmode_records[0]["episode_index"] == 0
@@ -834,10 +890,10 @@ def test_write_log_jsonl_families_groups_testmode_fixture_session_from_0100_exam
     assert testmode_records[0]["raw_lines"][-1] == "1683036824:[TESTMD,0252]0100>"
     assert all("Command list" not in row["raw_line"] for row in malformed_log_lines)
     assert all("Iridium..." not in row["raw_line"] for row in malformed_log_lines)
-    assert sbe_records[0]["raw_lines"][0].startswith("1683036452:[SBE   ,0391]Mode changed")
+    assert ctd_records[0]["raw_lines"][0].startswith("1683036452:[SBE   ,0391]Mode changed")
 
 
-def test_write_log_jsonl_families_groups_sbe_and_profil_fixture_blocks_from_0100_examples(
+def test_write_log_jsonl_families_groups_ctd_and_profil_fixture_blocks_from_0100_examples(
     tmp_path: Path,
 ) -> None:
     log_path = FIXTURES_ROOT / "0100_6491453E.LOG"
@@ -847,31 +903,31 @@ def test_write_log_jsonl_families_groups_sbe_and_profil_fixture_blocks_from_0100
     summary = write_log_jsonl_families(
         [log_path],
         output_dir,
-        run_id="run-sbe",
+        run_id="run-ctd",
         malformed_log_lines=malformed_log_lines,
     )
 
-    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.sbe_records == 6
-    assert len(sbe_records) == 6
+    assert summary.ctd_records == 6
+    assert len(ctd_records) == 6
     assert summary.parameter_records == 0
     assert parameter_records == []
-    assert sbe_records[0]["instrument_id"] == "0100"
-    assert sbe_records[0]["source_file"] == log_path.name
-    assert sbe_records[0]["episode_index"] == 0
-    assert sbe_records[0]["start_log_epoch_time"] == "1687246390"
-    assert sbe_records[0]["end_log_epoch_time"] == "1687246390"
-    assert sbe_records[0]["raw_lines"][0] == "1687246390:[STAGE ,0091]Stage [1] surfacing 43200s (<93600s) SBE61 "
-    assert sbe_records[0]["raw_lines"][-1] == "1687246390:[PROFIL,0299]    speed_control=10mbar/s"
-    assert any("[PROFIL,0284]" in line for line in sbe_records[0]["raw_lines"])
+    assert ctd_records[0]["instrument_id"] == "0100"
+    assert ctd_records[0]["source_file"] == log_path.name
+    assert ctd_records[0]["episode_index"] == 0
+    assert ctd_records[0]["start_log_epoch_time"] == "1687246390"
+    assert ctd_records[0]["end_log_epoch_time"] == "1687246390"
+    assert ctd_records[0]["raw_lines"][0] == "1687246390:[STAGE ,0091]Stage [1] surfacing 43200s (<93600s) SBE61 "
+    assert ctd_records[0]["raw_lines"][-1] == "1687246390:[PROFIL,0299]    speed_control=10mbar/s"
+    assert any("[PROFIL,0284]" in line for line in ctd_records[0]["raw_lines"])
     assert "turn off bluetooth" in {record["message"] for record in unclassified_records}
     assert all("manual_profil=1" not in row["raw_line"] for row in malformed_log_lines)
 
 
-def test_write_log_jsonl_families_groups_contiguous_sbe61_measurements_from_0100_examples(
+def test_write_log_jsonl_families_groups_contiguous_ctd_measurements_from_0100_examples(
     tmp_path: Path,
 ) -> None:
     log_path = FIXTURES_ROOT / "0100_649FF25E.LOG"
@@ -881,16 +937,16 @@ def test_write_log_jsonl_families_groups_contiguous_sbe61_measurements_from_0100
     summary = write_log_jsonl_families(
         [log_path],
         output_dir,
-        run_id="run-sbe61",
+        run_id="run-ctd",
         malformed_log_lines=malformed_log_lines,
     )
 
-    sbe_records = _read_jsonl(output_dir / "log_sbe_records.jsonl")
+    ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
 
-    assert summary.sbe_records >= 3
+    assert summary.ctd_records >= 3
     measurement_episode = next(
         record
-        for record in sbe_records
+        for record in ctd_records
         if record["raw_lines"][0] == "1688233527:[SBE   ,0391]Mode changed from UPDATE to START"
     )
     assert measurement_episode["raw_lines"][1] == "1688233527:[SBE   ,0385]Start manual acquisitions"

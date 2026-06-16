@@ -210,7 +210,7 @@ def inspect_sample_row(sample: FileSample) -> list[str]:
         issues.extend(_check_log_acquisition_row(row))
     elif family == "log_ascent_request_records":
         issues.extend(_check_log_ascent_request_row(row))
-    elif family in {"log_parameter_records", "log_testmode_records", "log_sbe_records"}:
+    elif family in {"log_parameter_records", "log_testmode_records", "log_ctd_records"}:
         issues.extend(_check_grouped_log_row(row))
     elif family == "log_transmission_records":
         issues.extend(_check_log_transmission_row(row))

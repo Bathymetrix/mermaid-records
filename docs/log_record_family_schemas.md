@@ -30,7 +30,7 @@ nullable `code`. Wrapped severity prefixes are prepended to `message`, so:
 
 becomes message `<ERR>ping error`.
 
-Grouped families (`log_parameter_records.jsonl`, `log_sbe_records.jsonl`, and
+Grouped families (`log_parameter_records.jsonl`, `log_ctd_records.jsonl`, and
 `log_testmode_records.jsonl`) are resolved before ordinary tagged-line
 classification. Other ordinary tagged lines are checked against specific
 families in this order:
@@ -397,39 +397,58 @@ to unclassified when no other family matches. Hits previously would have been
 ordinary/base operational rows before `log_operational_records` was dissolved.
 
 Known gaps / edge cases: only `P...mbar,T...mdegC` observations are recognized.
-Pressure-only, external-pressure, pascal, offset, and SBE-style `P,T,S` lines
+Pressure-only, external-pressure, pascal, offset, and CTD-style `P,T,S` lines
 are intentionally outside this family.
 
-## `log_sbe_records.jsonl`
+## `log_ctd_records.jsonl`
 
-Purpose / scope: grouped SBE/PROFIL/STAGE sensor/profiling episodes. The family
-preserves raw source lines and does not interpret SBE values.
+Purpose / scope: grouped CTD sensor/profiling episodes. The current classifier
+recognizes legacy SBE/PROFIL/STAGE LOG tags, but the output product is named
+for CTD observations rather than a specific sensor manufacturer. The family
+preserves raw source lines and parses literal `P,T,S` CTD sample values when
+present.
 
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_sbe.LOG","episode_index":0,"line_start_index":1,"line_end_index":2,"source_line_numbers":[1,2],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000001","raw_lines":["1700000000:[SBE61 ,0396]P +20122,T +19514,S +34584","1700000001:[PROFIL,0299]    speed_control=10mbar/s"]}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_ctd.LOG","episode_index":0,"line_start_index":1,"line_end_index":2,"source_line_numbers":[1,2],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000001","raw_lines":["1700000000:[SBE61 ,0396]P +468,T+150471,S38141","1700000001:[PROFIL,0299]    speed_control=10mbar/s"],"ctd_sample_count":1,"ctd_samples":[{"source_line_number":1,"raw_values":{"P":"+468","T":"+150471","S":"38141"},"pressure_cbar_tenths":468,"temperature_mdegc_tenths":150471,"salinity_psu_thousandths":38141}]}
 ```
 
-Field table: common grouped-episode fields only.
+Field table: common grouped-episode fields plus:
+
+| Field | Type | Nullable? | Meaning | Units | Source / derivation |
+| --- | --- | --- | --- | --- | --- |
+| `ctd_sample_count` | integer | no | Number of parsed CTD sample lines in the grouped episode. | samples | Length of `ctd_samples`. |
+| `ctd_samples` | array of objects | no | Parsed CTD sample values from any episode line that matches `P,T,S`. Empty when the episode has no sample line. | n/a | CTD sample regex applied to tagged LOG message text. |
+| `ctd_samples[].source_line_number` | integer | no | 1-based source LOG line number for this sample. | lines | Grouped episode source line. |
+| `ctd_samples[].raw_values` | object | no | Source-literal `P`, `T`, and `S` strings. | source literal | CTD sample regex capture groups. |
+| `ctd_samples[].pressure_cbar_tenths` | integer | no | Parsed `P` value in source precision units. | tenths of cbar | `P` capture converted to integer; no scaling conversion. |
+| `ctd_samples[].temperature_mdegc_tenths` | integer | no | Parsed `T` value in source precision units. | tenths of mdegC | `T` capture converted to integer; no scaling conversion. |
+| `ctd_samples[].salinity_psu_thousandths` | integer | no | Parsed `S` value in source precision units. | thousandths of PSU | `S` capture converted to integer; no scaling conversion. |
 
 Classifier hit rules:
 
-A parsed tagged LOG line joins an SBE episode when:
+A parsed tagged LOG line joins a CTD episode when:
 
 ```text
 subsystem in {"SBE", "SBE41", "SBE61", "PROFIL"}
 subsystem == "STAGE" and ("SBE41" in message or "SBE61" in message)
-subsystem == "STAGE" and the currently active grouped episode is already SBE
+subsystem == "STAGE" and the currently active grouped episode is already CTD
 ```
 
-Contiguous SBE lines are grouped until a non-SBE tagged line, parameter line,
+Contiguous CTD lines are grouped until a non-CTD tagged line, parameter line,
 blank line, rollover banner, or malformed line ends the episode.
+
+Within a CTD episode, sample values are parsed from message text with:
+
+```text
+\bP\s*(?P<pressure>[+-]?\d+)\s*,\s*T\s*(?P<temperature>[+-]?\d+)\s*,\s*S\s*(?P<salinity>[+-]?\d+)\b
+```
 
 Hits:
 
 ```text
-1700000000:[SBE61 ,0396]P +20122,T +19514,S +34584
+1700000000:[SBE61 ,0396]P +468,T+150471,S38141
 1700000001:[PROFIL,0299]    speed_control=10mbar/s
 1687246390:[STAGE ,0091]Stage [1] surfacing 43200s (<93600s) SBE61 
 ```
@@ -438,7 +457,7 @@ Non-hits:
 
 ```text
 1700000000:[PRESS ,0038]P+20179mbar,T+32767mdegC
-1700000001:[STAGE ,0091]Stage [1] surfacing 43200s      # when no SBE episode is active
+1700000001:[STAGE ,0091]Stage [1] surfacing 43200s      # when no CTD episode is active
 1700000002:[MAIN  ,0007]P +12,T -34,S +56
 ```
 
@@ -447,9 +466,9 @@ exclusive by source line. Matching lines do not also appear in unclassified.
 These lines previously would have been part of broad operational preservation
 before `log_operational_records` was dissolved.
 
-Known gaps / edge cases: SBE-style measurements are preserved only as raw
-episode lines. The normalizer does not parse `P`, `T`, `S`, salinity,
-profiling speed, or stage semantics.
+Known gaps / edge cases: CTD samples are parsed only from grouped CTD episode
+lines. The normalizer does not scale source-precision values to decimal cbar,
+mdegC, or PSU, and does not interpret profiling speed or stage semantics.
 
 ## `log_testmode_records.jsonl`
 
@@ -631,7 +650,7 @@ Unclassified is the fallback when:
 
 ```text
 line parses as an ordinary tagged LOG entry or rollover banner
-line is not consumed by parameter, testmode, or SBE grouping
+line is not consumed by parameter, testmode, or CTD grouping
 line has zero matches among acquisition, ascent_request, gps, transmission, pressure_temperature, battery
 ```
 
