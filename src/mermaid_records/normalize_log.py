@@ -237,9 +237,10 @@ def write_log_jsonl_families(
         sorted_paths,
         instrument_serial=instrument_serial,
     )
+    rendered_output_filenames = output_filenames(output_instrument_serial)
     output_paths = {
         name: output_dir / filename
-        for name, filename in output_filenames(output_instrument_serial).items()
+        for name, filename in rendered_output_filenames.items()
     }
 
     total_records = 0
@@ -487,21 +488,25 @@ def write_log_jsonl_families(
             f"duplicates={duplicate_assignments} missing={missing_assignments}"
             f"{examples_text}"
         )
+    family_record_counts_by_family = {
+        "acquisition": acquisition_count,
+        "ascent_request": ascent_request_count,
+        "gps": gps_count,
+        "pressure_temperature": pressure_temperature_count,
+        "battery": battery_count,
+        "parameter": parameter_count,
+        "testmode": testmode_count,
+        "sbe": sbe_count,
+        "transmission": transmission_count,
+        "unclassified": unclassified_count,
+    }
     family_record_counts = {
-        "log_acquisition_records.jsonl": acquisition_count,
-        "log_ascent_request_records.jsonl": ascent_request_count,
-        "log_gps_records.jsonl": gps_count,
-        "log_pressure_temperature_records.jsonl": pressure_temperature_count,
-        "log_battery_records.jsonl": battery_count,
-        "log_parameter_records.jsonl": parameter_count,
-        "log_testmode_records.jsonl": testmode_count,
-        "log_sbe_records.jsonl": sbe_count,
-        "log_transmission_records.jsonl": transmission_count,
-        "log_unclassified_records.jsonl": unclassified_count,
+        rendered_output_filenames[family]: count
+        for family, count in family_record_counts_by_family.items()
     }
     family_source_line_counts = {
-        filename: family_source_line_counter[family]
-        for family, filename in BASE_OUTPUT_FILENAMES.items()
+        rendered_output_filenames[family]: family_source_line_counter[family]
+        for family in BASE_OUTPUT_FILENAMES
     }
 
     return LogJsonlSummary(

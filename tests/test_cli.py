@@ -95,7 +95,7 @@ def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) 
     assert "Normalizing LOG for instrument T0100" in captured.err
     assert "Normalizing MER for instrument T0100" in captured.err
     assert "Family" in captured.out
-    assert "log_unclassified_records.jsonl" in captured.out
+    assert "log_unclassified_records.467.174-T-0100.jsonl" in captured.out
     assert "Ordinary LOG lines" in captured.out
     assert "Difference" in captured.out
     assert _record_path(output_dir / "467.174-T-0100", "log_unclassified_records.jsonl").exists()
@@ -161,7 +161,7 @@ def test_normalize_cli_reports_writer_assignment_counts_without_rereading_output
     captured = capsys.readouterr()
 
     assert result == 0
-    assert "log_unclassified_records.jsonl" in captured.out
+    assert "log_unclassified_records.0100.jsonl" in captured.out
     assert _summary_count(captured.out, "TOTAL") == "2"
     assert _summary_count(captured.out, "Ordinary LOG lines") == "2"
     assert _summary_count(captured.out, "Difference") == "0"
