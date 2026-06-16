@@ -22,6 +22,8 @@ from .format_record_filenames import (
 from .models import OperationalLogEntry
 from .parse_instrument_name import maybe_parse_instrument_name
 
+type _SourceLineKey = tuple[int, int]
+
 BASE_OUTPUT_FILENAMES = {
     "acquisition": "log_acquisition_records.jsonl",
     "ascent_request": "log_ascent_request_records.jsonl",
@@ -251,8 +253,9 @@ def write_log_jsonl_families(
     pressure_temperature_count = 0
     battery_count = 0
     unclassified_count = 0
-    ordinary_line_keys: set[tuple[str, int, str]] = set()
-    assignment_counts: Counter[tuple[str, int, str]] = Counter()
+    source_file_indexes = {path: index for index, path in enumerate(sorted_paths)}
+    ordinary_line_keys: set[_SourceLineKey] = set()
+    assignment_counts: Counter[_SourceLineKey] = Counter()
     family_source_line_counter: Counter[str] = Counter()
     acquisition_state_counter: Counter[str] = Counter()
     acquisition_evidence_kind_counter: Counter[str] = Counter()
@@ -305,7 +308,10 @@ def write_log_jsonl_families(
                     if isinstance(item, OperationalLogEntry):
                         total_records += 1
                         entry = item
-                        source_keys = _source_line_keys_for_entry(entry)
+                        source_keys = _source_line_keys_for_entry(
+                            entry,
+                            source_file_indexes=source_file_indexes,
+                        )
                         ordinary_line_keys.update(source_keys)
                         assignment = _classify_log_line(
                             entry,
@@ -377,7 +383,11 @@ def write_log_jsonl_families(
                         continue
 
                     total_records += 1
-                    source_keys = _source_line_keys_for_episode(item, source_file=path)
+                    source_keys = _source_line_keys_for_episode(
+                        item,
+                        source_file=path,
+                        source_file_indexes=source_file_indexes,
+                    )
                     ordinary_line_keys.update(source_keys)
                     episode_record = _build_grouped_episode_record(
                         item,
@@ -455,14 +465,14 @@ def write_log_jsonl_families(
     )
     if duplicate_assignments or missing_assignments:
         duplicate_examples = [
-            f"{source_path}:{line_number} {raw_line!r} -> {count}"
-            for (source_path, line_number, raw_line), count in assignment_counts.items()
+            f"{_source_line_key_example(source_key, source_paths=sorted_paths)} -> {count}"
+            for source_key, count in assignment_counts.items()
             if count > 1
         ][:3]
         missing_examples = [
-            f"{source_path}:{line_number} {raw_line!r}"
-            for source_path, line_number, raw_line in ordinary_line_keys
-            if assignment_counts.get((source_path, line_number, raw_line), 0) == 0
+            _source_line_key_example(source_key, source_paths=sorted_paths)
+            for source_key in ordinary_line_keys
+            if assignment_counts.get(source_key, 0) == 0
         ][:3]
         example_parts = []
         if duplicate_examples:
@@ -756,34 +766,58 @@ def _build_grouped_episode_record(
     }
 
 
-def _source_line_keys_for_entry(entry: OperationalLogEntry) -> set[tuple[str, int, str]]:
+def _source_line_keys_for_entry(
+    entry: OperationalLogEntry,
+    *,
+    source_file_indexes: dict[Path, int],
+) -> set[_SourceLineKey]:
     if entry.line_number is None:
         raise ValueError(f"Parsed LOG entry is missing source line number: {entry.raw_line!r}")
-    return {(entry.source_file.as_posix(), entry.line_number, entry.raw_line)}
+    return {(source_file_indexes[entry.source_file], entry.line_number)}
 
 
 def _source_line_keys_for_episode(
     episode: _GroupedEpisode,
     *,
     source_file: Path,
-) -> set[tuple[str, int, str]]:
+    source_file_indexes: dict[Path, int],
+) -> set[_SourceLineKey]:
     return {
-        (source_file.as_posix(), line.line_number, line.raw_line)
+        (source_file_indexes[source_file], line.line_number)
         for line in episode.lines
         if line.raw_line.strip()
     }
 
 
 def _record_source_line_assignments(
-    assignment_counts: Counter[tuple[str, int, str]],
+    assignment_counts: Counter[_SourceLineKey],
     family_source_line_counter: Counter[str],
     *,
     family: str,
-    source_keys: set[tuple[str, int, str]],
+    source_keys: set[_SourceLineKey],
 ) -> None:
     for source_key in source_keys:
         assignment_counts[source_key] += 1
         family_source_line_counter[family] += 1
+
+
+def _source_line_key_example(
+    source_key: _SourceLineKey,
+    *,
+    source_paths: list[Path],
+) -> str:
+    source_file_index, line_number = source_key
+    source_path = source_paths[source_file_index]
+    raw_line = _read_source_line(source_path, line_number)
+    return f"{source_path.as_posix()}:{line_number} {raw_line!r}"
+
+
+def _read_source_line(source_path: Path, line_number: int) -> str:
+    with source_path.open("r", encoding="utf-8", errors="replace") as handle:
+        for current_line_number, raw_line in enumerate(handle, start=1):
+            if current_line_number == line_number:
+                return raw_line.rstrip("\r\n")
+    return "<line unavailable>"
 
 
 def _is_testmode_start_line(tagged_line: _ParsedTaggedLogLine) -> bool:

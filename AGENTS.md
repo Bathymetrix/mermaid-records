@@ -313,6 +313,7 @@ Avoid:
 - JSONL outputs use deterministic processing order, not time-order.
 - Normalized JSONL outputs should use basename-only `source_file`; richer full-path provenance belongs in manifests and other run-side artifacts.
 - LOG source-line assignment accounting must use full source paths internally so same-named source files in different locations do not collapse into false duplicates; emitted JSONL `source_file` remains basename-only.
+- CLI LOG assignment status reports should accumulate the `write_log_jsonl_families` summary produced during writing; do not reread generated LOG JSONL solely to rebuild assignment counts.
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.
 - `--force-rewrite` must remove package-owned generated artifacts for each targeted instrument before regeneration: all top-level `log_*.jsonl`, all top-level `mer_*.jsonl`, and package-owned bookkeeping under `manifests/` and `state/`. Do not delete unknown files or the whole instrument directory.
 - `preflight_status.json` is run-scoped bookkeeping: clear stale root artifacts before each real run, and include `preflight_status` in `manifests/latest.json` only when the current run produced that artifact. When no preflight runs, omit the field rather than storing `null`.

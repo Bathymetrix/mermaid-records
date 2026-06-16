@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-import json
 from pathlib import Path
 import re
 import shutil
@@ -27,6 +26,7 @@ from .manifest import (
     record_pruned_sources,
 )
 from .normalize_log import output_filenames as log_output_filenames
+from .normalize_log import LogJsonlSummary
 from .normalize_log import write_log_jsonl_families
 from .normalize_mer import output_filenames as mer_output_filenames
 from .normalize_mer import write_mer_jsonl_families
@@ -130,6 +130,7 @@ class RunMetrics:
     bin_files_decoded: int = 0
     preflight_mode: str | None = None
     log_family_source_line_counts: dict[str, int] = field(default_factory=dict)
+    log_ordinary_lines_examined: int = 0
     log_source_line_assignments: int = 0
     log_duplicate_assignments: int = 0
     log_missing_assignments: int = 0
@@ -330,7 +331,7 @@ def _run_stateful(
 
         error: BaseException | None = None
         try:
-            _execute_log_family(
+            log_summary = _execute_log_family(
                 instrument_output_dir=plan.instrument_output_dir,
                 action=summary.log_action,
                 log_paths=log_paths,
@@ -385,11 +386,11 @@ def _run_stateful(
         metrics.bin_files_decoded += len(bin_paths) if summary.log_action != "noop" else 0
         _accumulate_output_metrics(
             metrics,
-            instrument_output_dir=plan.instrument_output_dir,
             previous_outputs=previous_outputs,
             current_outputs=build_outputs_manifest(plan.instrument_output_dir),
             log_action=summary.log_action,
             mer_action=summary.mer_action,
+            log_summary=log_summary,
         )
         processed_instruments.append(summary)
 
@@ -516,7 +517,7 @@ def _run_stateless(
         log_paths = _selected_paths(current_sources, {"log"})
         bin_paths = _selected_paths(current_sources, {"bin"})
         mer_paths = _selected_paths(current_sources, {"mer"})
-        _execute_log_family(
+        log_summary = _execute_log_family(
             instrument_output_dir=instrument_output_dir,
             action=summary.log_action,
             log_paths=log_paths,
@@ -555,11 +556,11 @@ def _run_stateless(
         metrics.bin_files_decoded += len(bin_paths)
         _accumulate_output_metrics(
             metrics,
-            instrument_output_dir=instrument_output_dir,
             previous_outputs=None,
             current_outputs=build_outputs_manifest(instrument_output_dir),
             log_action=summary.log_action,
             mer_action=summary.mer_action,
+            log_summary=log_summary,
         )
         processed_instruments.append(summary)
 
@@ -597,16 +598,16 @@ def _execute_log_family(
     run_id: str | None,
     malformed_log_lines: list[dict[str, object]] | None,
     skipped_log_files: list[dict[str, object]] | None,
-) -> None:
+) -> LogJsonlSummary | None:
     output_filenames = log_output_filenames(instrument_serial)
     destinations = [instrument_output_dir / filename for filename in output_filenames.values()]
     if action == "noop":
-        return
+        return None
     if action == "rewrite" and not log_paths and not bin_paths:
         _remove_paths(destinations)
-        return
+        return None
     if not log_paths and not bin_paths:
-        return
+        return None
     if bin_paths and config is None:
         raise ValueError("decoder config is required when BIN inputs are present")
 
@@ -636,7 +637,7 @@ def _execute_log_family(
                 raise ValueError(
                     f"Error while decoding BIN source(s) {paths_text}: {exc}"
                 ) from exc
-        write_log_jsonl_families(
+        log_summary = write_log_jsonl_families(
             rendered_paths,
             temp_dir,
             instrument_id=instrument_id,
@@ -657,6 +658,7 @@ def _execute_log_family(
                 destination_dir=instrument_output_dir,
                 filenames=list(output_filenames.values()),
             )
+        return log_summary
 
 
 def _execute_mer_family(
@@ -1171,11 +1173,11 @@ def _accumulate_issue_metrics(
 def _accumulate_output_metrics(
     metrics: RunMetrics,
     *,
-    instrument_output_dir: Path,
     previous_outputs: dict[str, object] | None,
     current_outputs: dict[str, object],
     log_action: str,
     mer_action: str,
+    log_summary: LogJsonlSummary | None,
 ) -> None:
     previous_counts = previous_outputs.get("counts", {}) if previous_outputs is not None else {}
     current_counts = current_outputs.get("counts", {})
@@ -1198,7 +1200,7 @@ def _accumulate_output_metrics(
         metrics.mer_records_written += _sum_counts(current_counts, "mer_")
         metrics.mer_records_removed += _sum_counts(previous_counts, "mer_")
 
-    _accumulate_log_assignment_metrics(metrics, instrument_output_dir)
+    _accumulate_log_assignment_metrics(metrics, log_summary)
 
 
 def _sum_counts(counts: dict[str, object], prefix: str) -> int:
@@ -1207,60 +1209,18 @@ def _sum_counts(counts: dict[str, object], prefix: str) -> int:
 
 def _accumulate_log_assignment_metrics(
     metrics: RunMetrics,
-    output_dir: Path,
+    log_summary: LogJsonlSummary | None,
 ) -> None:
-    counts, duplicate_assignments = _log_source_line_assignment_counts(output_dir)
-    for family, count in counts.items():
+    if log_summary is None:
+        return
+    for family, count in log_summary.family_source_line_counts.items():
         metrics.log_family_source_line_counts[family] = (
             metrics.log_family_source_line_counts.get(family, 0) + count
         )
-        metrics.log_source_line_assignments += count
-    metrics.log_duplicate_assignments += duplicate_assignments
-
-
-def _log_source_line_assignment_counts(output_dir: Path) -> tuple[dict[str, int], int]:
-    counts: dict[str, int] = {}
-    assignments: dict[tuple[str, int, str], list[str]] = {}
-    for path in sorted(output_dir.glob("log_*.jsonl")):
-        family_count = 0
-        with path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                if not line.strip():
-                    continue
-                record = json.loads(line)
-                for source_key in _source_line_keys_from_log_record(record):
-                    family_count += 1
-                    assignments.setdefault(source_key, []).append(path.name)
-        counts[path.name] = family_count
-    duplicate_assignments = sum(
-        len(families) - 1 for families in assignments.values() if len(families) > 1
-    )
-    return counts, duplicate_assignments
-
-
-def _source_line_keys_from_log_record(
-    record: dict[str, object],
-) -> list[tuple[str, int, str]]:
-    source_file = str(record.get("source_file", ""))
-    if "raw_line" in record and "source_line_number" in record:
-        return [
-            (
-                source_file,
-                int(record["source_line_number"]),
-                str(record["raw_line"]),
-            )
-        ]
-    if "raw_lines" not in record or "source_line_numbers" not in record:
-        return []
-    return [
-        (source_file, int(line_number), str(raw_line))
-        for line_number, raw_line in zip(
-            record["source_line_numbers"],
-            record["raw_lines"],
-            strict=True,
-        )
-        if str(raw_line).strip()
-    ]
+    metrics.log_ordinary_lines_examined += log_summary.ordinary_log_lines_examined
+    metrics.log_source_line_assignments += log_summary.source_line_assignments
+    metrics.log_duplicate_assignments += log_summary.duplicate_assignments
+    metrics.log_missing_assignments += log_summary.missing_assignments
 
 
 def _overall_instrument_action(summary: InstrumentRunSummary) -> str:

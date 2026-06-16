@@ -95,7 +95,7 @@ def test_normalize_cli_writes_log_and_mer_jsonl_outputs(tmp_path: Path, capsys) 
     assert "Normalizing LOG for instrument T0100" in captured.err
     assert "Normalizing MER for instrument T0100" in captured.err
     assert "Family" in captured.out
-    assert "log_unclassified_records.467.174-T-0100.jsonl" in captured.out
+    assert "log_unclassified_records.jsonl" in captured.out
     assert "Ordinary LOG lines" in captured.out
     assert "Difference" in captured.out
     assert _record_path(output_dir / "467.174-T-0100", "log_unclassified_records.jsonl").exists()
@@ -132,6 +132,39 @@ def test_normalize_cli_accepts_comma_and_space_separated_input_files(tmp_path: P
     assert "raw files processed: 3" in captured.out
     assert _record_path(output_dir / "467.174-T-0100", "log_unclassified_records.jsonl").exists()
     assert not _record_path(output_dir / "467.174-T-0100", "log_operational_records.jsonl").exists()
+
+
+def test_normalize_cli_reports_writer_assignment_counts_without_rereading_outputs(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    first_log = tmp_path / "first" / "0100_same.LOG"
+    second_log = tmp_path / "second" / "0100_same.LOG"
+    first_log.parent.mkdir()
+    second_log.parent.mkdir()
+    raw_line = "1700000000:[MAIN  ,0007]same source text"
+    first_log.write_text(f"{raw_line}\n", encoding="utf-8")
+    second_log.write_text(f"{raw_line}\n", encoding="utf-8")
+
+    output_dir = tmp_path / "output"
+    result = main(
+        [
+            "normalize",
+            "--input-file",
+            str(first_log),
+            str(second_log),
+            "-o",
+            str(output_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert "log_unclassified_records.jsonl" in captured.out
+    assert _summary_count(captured.out, "TOTAL") == "2"
+    assert _summary_count(captured.out, "Ordinary LOG lines") == "2"
+    assert _summary_count(captured.out, "Difference") == "0"
 
 
 def test_normalize_cli_dry_run_human_output_is_side_effect_free(tmp_path: Path, capsys) -> None:
@@ -569,6 +602,11 @@ def _jsonl_lines(path: Path) -> list[dict[str, object]]:
     path = _record_path(path.parent, path.name)
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
+
+
+def _summary_count(output: str, label: str) -> str:
+    line = next(line for line in output.splitlines() if line.startswith(label))
+    return line.split()[-1]
 
 
 def _record_path(instrument_dir: Path, base_filename: str) -> Path:

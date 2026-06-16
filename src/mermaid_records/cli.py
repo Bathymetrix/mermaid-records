@@ -364,6 +364,7 @@ def _format_run_summary(
 def _format_log_family_assignment_table(metrics) -> list[str]:
     if not metrics.log_family_source_line_counts:
         return []
+    difference = metrics.log_source_line_assignments - metrics.log_ordinary_lines_examined
     family_width = max(
         len("Family"),
         *(len(family) for family in metrics.log_family_source_line_counts),
@@ -373,6 +374,8 @@ def _format_log_family_assignment_table(metrics) -> list[str]:
         len("Records"),
         *(len(f"{count:,}") for count in metrics.log_family_source_line_counts.values()),
         len(f"{metrics.log_source_line_assignments:,}"),
+        len(f"{metrics.log_ordinary_lines_examined:,}"),
+        len(f"{difference:,}"),
     )
     separator = "-" * (family_width + 2 + count_width)
     lines = [
@@ -387,8 +390,8 @@ def _format_log_family_assignment_table(metrics) -> list[str]:
             separator,
             f"{'TOTAL':<{family_width}}  {metrics.log_source_line_assignments:>{count_width},}",
             "",
-            f"{'Ordinary LOG lines':<{family_width}}  {metrics.log_source_line_assignments:>{count_width},}",
-            f"{'Difference':<{family_width}}  {metrics.log_missing_assignments + metrics.log_duplicate_assignments:>{count_width},}",
+            f"{'Ordinary LOG lines':<{family_width}}  {metrics.log_ordinary_lines_examined:>{count_width},}",
+            f"{'Difference':<{family_width}}  {difference:>{count_width},}",
         ]
     )
     return lines
