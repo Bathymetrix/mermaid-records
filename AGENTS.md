@@ -4,7 +4,6 @@
 
 - “prototype” terminology in normalization code/docs refers to earlier development-phase design work; for v1, normalization families and rules are treated as stable.
 - Code-level naming should therefore prefer “families” for active normalization entrypoints, while historical references may remain when context matters.
-
 - Never mix parsing and interpretation.
 - Keep record interfaces stable.
 - Always preserve unknown MER record types.
@@ -15,6 +14,7 @@
 - Do not suggest `type: message` commit subjects by default; prefer clear, simple, project-specific commit messages.
 - Any time you suggest a commit message also bump version (`major`, `minor`, or `patch`) and alert user.
 - Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.
+- Update `docs/log_record_family_schemas.md` with any source-code change that alters LOG record-family JSONL fields, filenames, grouping, classifier hit rules, or exclusivity behavior.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.
 - Never delete source raw files from their original path. This includes `.BIN`, `.LOG`, `.MER`, and future raw formats such as `.vit`. If an external decoder is destructive, it must run only on copied files in a temporary workspace.
@@ -27,6 +27,8 @@
 - Use `Bathymetrix™` only in approved file headers and rare top-level visible branding. Do not use the trademark marker in identifiers, module names, imports, docstrings, or inline comments.
 - Package authorship/licensing metadata must live in exactly one location: `src/mermaid_records/__init__.py` via `__author__`, `__license__`, and `__copyright__`.
 - `CYCLE` / `CYCLE.h` are out of scope for `mermaid-records` and must not be reintroduced unless the user explicitly requests it.
+- When the thread has accumulated enough context that a fresh thread would be cleaner, especially for token or context-window reasons, tell the user it is a good new-thread point.
+- When recommending a new thread, provide a compact context handoff that summarizes the goal, current state, changed files, verification results, and next steps.
 
 ## Versioning Rule
 

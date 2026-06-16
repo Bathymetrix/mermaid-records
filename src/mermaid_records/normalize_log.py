@@ -24,6 +24,8 @@ from .parse_instrument_name import maybe_parse_instrument_name
 
 type _SourceLineKey = tuple[int, int]
 
+# Keep docs/log_record_family_schemas.md in sync when LOG family
+# filenames, fields, grouping, classifier rules, or exclusivity change.
 BASE_OUTPUT_FILENAMES = {
     "acquisition": "log_acquisition_records.jsonl",
     "ascent_request": "log_ascent_request_records.jsonl",
