@@ -18,7 +18,7 @@ existing family or a narrowly scoped new family.
 | 76,746 | `internal pressure 78680Pa` | Routed to `log_pressure_temperature_records` |
 | 23,125 | `Pext -45mbar (rng 30mbar)` | Routed to `log_pressure_temperature_records` |
 | 17,821 | `Pint 76872Pa` | Routed to `log_pressure_temperature_records` |
-| 23,124 | `Vbat 14681mV (min 13967mV)` | Extend `log_battery_records` |
+| 23,124 | `Vbat 14681mV (min 13967mV)` | Routed to `log_battery_records` |
 | 88,580 | `$MEASFS,263069,6574.446777,40.013861;` | Extend `log_acquisition_records` |
 | 22,476 | `Mermaid $MEASFS,...` | Same as above |
 | 16,642 | `$TRIG:4,2;` | Acquisition/detection family |
@@ -126,10 +126,9 @@ understood sufficiently to propose a stable schema.
 
 ## Recommended Immediate Actions
 
-1. Extend `log_battery_records` for `Vbat`.
-2. Extend acquisition, transmission, GPS, and parameter families for the
+1. Extend acquisition, transmission, GPS, and parameter families for the
    structured `$...` and parameter-dump records.
-3. Decide whether buoyancy-engine telemetry warrants a dedicated
+2. Decide whether buoyancy-engine telemetry warrants a dedicated
    `log_buoyancy_records` family.
 
 Everything else can remain in `log_unclassified_records.jsonl` until there is a
@@ -139,4 +138,5 @@ clear downstream use case and schema definition.
 
 | Count | Example | Decision |
 |--------:|----------|----------|
+| 23,124 | `Vbat 14681mV (min 13967mV)` | Routed to `log_battery_records` as `vbat_summary` with `voltage_mv` and `minimum_voltage_mv`. |
 | 41,432 | `P+151590mbar` | Routed to `log_pressure_temperature_records` as generic `pressure_mbar`. |

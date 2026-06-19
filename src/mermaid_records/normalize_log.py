@@ -122,7 +122,14 @@ _PEXT_RE = re.compile(
     r"\bPext\s+(?P<external_pressure_mbar>[+-]?\d+)mbar\s+"
     r"\(rng\s+(?P<external_pressure_range_mbar>[+-]?\d+)mbar\)"
 )
-_BATTERY_RE = re.compile(r"\bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b", re.IGNORECASE)
+_BATTERY_RE = re.compile(
+    r"\bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b",
+    re.IGNORECASE,
+)
+_VBAT_RE = re.compile(
+    r"\bVbat\s+(?P<mv>[+-]?\d+)mV\s+\(min\s+(?P<minimum_mv>[+-]?\d+)mV\)",
+    re.IGNORECASE,
+)
 _GPS_POSITION_RE = re.compile(
     r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)"
 )
@@ -1293,15 +1300,28 @@ def _classify_battery(
     instrument_id: str,
 ) -> dict[str, object] | None:
     match = _BATTERY_RE.search(entry.message)
-    if match is None:
-        return None
+    if match is not None:
+        return {
+            **_common_log_record_fields(entry, instrument_id=instrument_id),
+            "battery_record_kind": "voltage_current",
+            "voltage_mv": int(match.group("mv")),
+            "current_ua": int(match.group("ua")),
+            "minimum_voltage_mv": None,
+            "raw_line": entry.raw_line,
+        }
 
-    return {
-        **_common_log_record_fields(entry, instrument_id=instrument_id),
-        "voltage_mv": int(match.group("mv")),
-        "current_ua": int(match.group("ua")),
-        "raw_line": entry.raw_line,
-    }
+    match = _VBAT_RE.search(entry.message)
+    if match is not None:
+        return {
+            **_common_log_record_fields(entry, instrument_id=instrument_id),
+            "battery_record_kind": "vbat_summary",
+            "voltage_mv": int(match.group("mv")),
+            "current_ua": None,
+            "minimum_voltage_mv": int(match.group("minimum_mv")),
+            "raw_line": entry.raw_line,
+        }
+
+    return None
 
 
 def _fallback_instrument_id(path: Path) -> str:

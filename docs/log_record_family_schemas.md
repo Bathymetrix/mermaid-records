@@ -184,27 +184,32 @@ ascent-related lines.
 
 ## `log_battery_records.jsonl`
 
-Purpose / scope: literal battery telemetry lines with voltage and current.
+Purpose / scope: literal battery telemetry lines with voltage/current or
+VIT-like voltage/minimum-voltage summaries.
 
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_battery.LOG","source_container":"log","record_time":"2023-11-14T22:13:23.000000Z","log_epoch_time":"1700000003","subsystem":"MONITR","code":"0461","message":"battery 14685mV,   12688uA","source_line_number":4,"voltage_mv":14685,"current_ua":12688,"raw_line":"1700000003:[MONITR,0461]battery 14685mV,   12688uA"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_battery.LOG","source_container":"log","record_time":"2023-11-14T22:13:23.000000Z","log_epoch_time":"1700000003","subsystem":"MONITR","code":"0461","message":"battery 14685mV,   12688uA","source_line_number":4,"battery_record_kind":"voltage_current","voltage_mv":14685,"current_ua":12688,"minimum_voltage_mv":null,"raw_line":"1700000003:[MONITR,0461]battery 14685mV,   12688uA"}
+{"instrument_id":"P0026","instrument_serial":"452.020-P-0026","source_file":"0026_5D48EAB8.LOG","source_container":"log","record_time":"2019-08-07T02:57:30.000000Z","log_epoch_time":"1565146650","subsystem":"MAIN","code":"498","message":"Vbat 14681mV (min 13967mV)","source_line_number":1,"battery_record_kind":"vbat_summary","voltage_mv":14681,"current_ua":null,"minimum_voltage_mv":13967,"raw_line":"1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)"}
 ```
 
 Field table: common single-line fields plus:
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
+| `battery_record_kind` | string | no | Source shape discriminator: `voltage_current` or `vbat_summary`. | none | Classifier branch. |
 | `voltage_mv` | integer | no | Battery voltage. | mV | Regex group `mv`. |
-| `current_ua` | integer | no | Battery current. | uA | Regex group `ua`. |
+| `current_ua` | integer | yes | Battery current when present. | uA | Regex group `ua` for `voltage_current`; otherwise `null`. |
+| `minimum_voltage_mv` | integer | yes | Minimum battery voltage when present. | mV | Regex group `minimum_mv` for `vbat_summary`; otherwise `null`. |
 
 Classifier hit rules:
 
-Regex, case-insensitive, searched anywhere in `message`:
+Regexes, case-insensitive, searched anywhere in `message`:
 
 ```text
 \bbattery\s+(?P<mv>[+-]?\d+)mV,\s+(?P<ua>[+-]?\d+)uA\b
+\bVbat\s+(?P<mv>[+-]?\d+)mV\s+\(min\s+(?P<minimum_mv>[+-]?\d+)mV\)
 ```
 
 Hits:
@@ -212,25 +217,25 @@ Hits:
 ```text
 1700000003:[MONITR,0461]battery 14685mV,   12688uA
 1700000003:[MONITR,0461]Battery -1mV, +2uA
+1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
 ```
 
 Non-hits:
 
 ```text
-1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
 1700000003:[MONITR,0461]battery 14685mV
 1700000003:[MONITR,0461]bat 14685mV, 12688uA
+1565146650:[MAIN  ,498]Vbat 14681mV
 ```
 
 Overlap / exclusivity: mutually exclusive with other LOG families. Matching
-lines do not also appear in unclassified. `Vbat ...` lines do not hit this
-family and currently route to unclassified if no other family matches. Battery
-hits previously would have been ordinary/base operational rows before
-`log_operational_records` was dissolved.
+lines do not also appear in unclassified. Battery hits previously would have
+been ordinary/base operational rows before `log_operational_records` was
+dissolved.
 
-Known gaps / edge cases: only the literal word `battery` plus `mV, uA` shape is
-recognized; `Vbat`, minimum-voltage summaries, and voltage-only lines are not
-classified as battery records.
+Known gaps / edge cases: voltage-only `battery ...mV` or `Vbat ...mV` lines
+without the paired `min ...mV` source value are not classified as battery
+records.
 
 ## `log_gps_records.jsonl`
 
@@ -684,7 +689,7 @@ non-tagged line has content matching:
 Hits:
 
 ```text
-1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
+1565060029:[SURF  ,328]7 cmd(s) received
 1700000004:[SURF  ,0071]<WARN>timeout
 1700000004:*** switching to 0100/NEXT.LOG ***
 ```
@@ -698,6 +703,7 @@ Non-hits:
 1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
 1564269461:[MAIN  ,408]internal pressure 78680Pa
 1700000003:[MONITR,0461]battery 14685mV,   12688uA
+1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
 1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)
 1700000000:<ERR>broken wrapper without subsystem tag
 not even timestamped

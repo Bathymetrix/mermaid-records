@@ -125,6 +125,29 @@ def test_inspect_sample_row_reports_battery_mismatch(tmp_path: Path) -> None:
     assert inspect_sample_row(sample) == ["voltage_mv does not match the preserved raw_line value"]
 
 
+def test_inspect_sample_row_checks_vbat_summary(tmp_path: Path) -> None:
+    _write_jsonl_rows(
+        tmp_path / "452.020-P-0001" / "log_battery_records.452.020-P-0001.jsonl",
+        [
+            {
+                "raw_line": "1700000000:[MAIN  ,0498]Vbat 14740mV (min 11951mV)",
+                "message": "Vbat 14740mV (min 11951mV)",
+                "battery_record_kind": "vbat_summary",
+                "voltage_mv": 14740,
+                "current_ua": None,
+                "minimum_voltage_mv": 11950,
+                "log_epoch_time": "1700000000",
+            }
+        ],
+    )
+
+    sample = sample_family_rows(tmp_path, sample_per_family=1, seed=1)[0]
+
+    assert inspect_sample_row(sample) == [
+        "minimum_voltage_mv does not match the preserved raw_line value"
+    ]
+
+
 def test_audit_rows_reports_findings_and_full_coverage(tmp_path: Path) -> None:
     _write_jsonl_rows(
         tmp_path / "452.020-P-0001" / "log_pressure_temperature_records.452.020-P-0001.jsonl",

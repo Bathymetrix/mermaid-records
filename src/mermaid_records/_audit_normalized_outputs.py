@@ -18,7 +18,11 @@ from .format_datetime import format_source_datetime
 from .format_record_filenames import record_family_name
 
 
-BATTERY_PATTERN = re.compile(r"battery\s+(-?\d+)mV,\s*(-?\d+)uA")
+BATTERY_PATTERN = re.compile(r"battery\s+(-?\d+)mV,\s*(-?\d+)uA", re.IGNORECASE)
+VBAT_PATTERN = re.compile(
+    r"\bVbat\s+(-?\d+)mV\s+\(min\s+(-?\d+)mV\)",
+    re.IGNORECASE,
+)
 PRESSURE_TEMPERATURE_PATTERN = re.compile(r"P\s*([+-]?\d+)mbar,T\s*([+-]?\d+)mdegC")
 STANDALONE_PRESSURE_MBAR_PATTERN = re.compile(r"(?:\]|^)P\s*([+-]?\d+)mbar$")
 DBAR_DEGC_PATTERN = re.compile(r"\b([+-]?\d+)dbar,\s*([+-]?\d+)degC\b")
@@ -344,13 +348,34 @@ def _is_stanford_mer_example(sample: FileSample) -> bool:
 def _check_log_battery_row(row: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     match = BATTERY_PATTERN.search(row["raw_line"])
-    if match is None:
-        return ["raw_line does not contain a parseable battery voltage/current pattern"]
-    if int(match.group(1)) != row.get("voltage_mv"):
-        issues.append("voltage_mv does not match the preserved raw_line value")
-    if int(match.group(2)) != row.get("current_ua"):
-        issues.append("current_ua does not match the preserved raw_line value")
-    return issues
+    if match is not None:
+        if row.get("battery_record_kind") not in (None, "voltage_current"):
+            issues.append(
+                "battery_record_kind does not match the preserved raw_line shape"
+            )
+        if int(match.group(1)) != row.get("voltage_mv"):
+            issues.append("voltage_mv does not match the preserved raw_line value")
+        if int(match.group(2)) != row.get("current_ua"):
+            issues.append("current_ua does not match the preserved raw_line value")
+        return issues
+
+    match = VBAT_PATTERN.search(row["raw_line"])
+    if match is not None:
+        if row.get("battery_record_kind") not in (None, "vbat_summary"):
+            issues.append(
+                "battery_record_kind does not match the preserved raw_line shape"
+            )
+        if int(match.group(1)) != row.get("voltage_mv"):
+            issues.append("voltage_mv does not match the preserved raw_line value")
+        if int(match.group(2)) != row.get("minimum_voltage_mv"):
+            issues.append(
+                "minimum_voltage_mv does not match the preserved raw_line value"
+            )
+        return issues
+
+    if "Vbat" in row["raw_line"]:
+        return ["raw_line does not contain a parseable Vbat summary pattern"]
+    return ["raw_line does not contain a parseable battery voltage/current pattern"]
 
 
 def _check_log_pressure_temperature_row(row: dict[str, Any]) -> list[str]:
@@ -538,6 +563,7 @@ def _finding_row_detail(row: dict[str, Any]) -> dict[str, Any]:
         "temperature_mdegc",
         "voltage_mv",
         "current_ua",
+        "minimum_voltage_mv",
     ):
         if key in row and row[key] is not None:
             detail[key] = row[key]

@@ -10,7 +10,8 @@
 - Prefer generators for file parsing where practical.
 - Add or update tests with any real logic change.
 - Prefer small, coherent commits and always tell the user when the current state is a good time to commit.
-- Any time suggesting a commit, also suggest a matching commit message.
+- Any time suggesting a commit, also suggest a matching commit message with a
+  clear subject line and a short body listing the important changes as bullets.
 - Do not suggest `type: message` commit subjects by default; prefer clear, simple, project-specific commit messages.
 - Any time you suggest a commit message also bump version (`major`, `minor`, or `patch`) and alert user.
 - Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.

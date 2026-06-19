@@ -363,10 +363,12 @@ def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
     pressure_temperature_records = _read_jsonl(
         output_dir / "log_pressure_temperature_records.jsonl"
     )
+    battery_records = _read_jsonl(output_dir / "log_battery_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.pressure_temperature_records == 2
-    assert summary.unclassified_records == 2
+    assert summary.battery_records == 1
+    assert summary.unclassified_records == 1
     assert not (output_dir / "log_operational_records.jsonl").exists()
     assert {
         (record["source_file"], record["message"])
@@ -388,11 +390,29 @@ def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
     assert pressure_by_message["Pext -45mbar (rng 30mbar)"][
         "external_pressure_range_mbar"
     ] == 30
+    assert battery_records == [
+        {
+            "instrument_id": "P0026",
+            "instrument_serial": "452.020-P-0026",
+            "source_file": "0026_5D48EAB8.LOG",
+            "source_container": "log",
+            "record_time": "2019-08-07T02:57:30.000000Z",
+            "log_epoch_time": "1565146650",
+            "subsystem": "MAIN",
+            "code": "498",
+            "message": "Vbat 14681mV (min 13967mV)",
+            "source_line_number": 1,
+            "battery_record_kind": "vbat_summary",
+            "voltage_mv": 14681,
+            "current_ua": None,
+            "minimum_voltage_mv": 13967,
+            "raw_line": "1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)",
+        }
+    ]
     assert {
         (record["source_file"], record["message"])
         for record in unclassified_records
     } == {
-        ("0026_5D48EAB8.LOG", "Vbat 14681mV (min 13967mV)"),
         ("0026_5D48EAB8.LOG", "7 cmd(s) received"),
     }
     _assert_log_source_line_assignments_exact_once(output_dir)

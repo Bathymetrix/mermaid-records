@@ -328,8 +328,10 @@ Shared direct LOG record fields:
 `log_battery_records.<instrument_serial>.jsonl`
 
 - all operational provenance/source fields
+- `battery_record_kind`
 - `voltage_mv`
 - `current_ua`
+- `minimum_voltage_mv`
 
 `log_unclassified_records.<instrument_serial>.jsonl`
 
