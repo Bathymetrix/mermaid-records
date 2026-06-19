@@ -30,13 +30,13 @@ nullable `code`. Wrapped severity prefixes are prepended to `message`, so:
 
 becomes message `<ERR>ping error`.
 
-Grouped families (`log_parameter_records.jsonl`, `log_ctd_records.jsonl`, and
-`log_testmode_records.jsonl`) are resolved before ordinary tagged-line
-classification. Other ordinary tagged lines are checked against specific
-families in this order:
+Grouped families (`log_parameter_records.jsonl`, `log_ctd_records.jsonl`,
+`log_testmode_records.jsonl`, and `log_iridium_records.jsonl`) are resolved
+before ordinary tagged-line classification. Other ordinary tagged lines are
+checked against specific single-line families in this order:
 
 ```text
-acquisition, ascent_request, gps, transmission, pressure_temperature, battery
+acquisition, ascent_request, gps, pressure_temperature, battery
 ```
 
 Zero specific matches routes the line to `log_unclassified_records.jsonl`. Two
@@ -63,9 +63,10 @@ These fields appear on every single-line family:
 
 ## Common Grouped-Episode Fields
 
-These fields appear on grouped episode families. Grouped episode records do not
-currently include `source_container`, `subsystem`, `code`, `message`, or
-`raw_line`.
+These fields appear on grouped episode families. Most grouped episode records
+do not currently include `source_container`, `subsystem`, `code`, `message`, or
+`raw_line`; `log_iridium_records.jsonl` includes `source_container` and nested
+per-line event objects.
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
@@ -556,31 +557,68 @@ Blank lines inside testmode are emitted in `raw_lines` and have corresponding
 entries in `source_line_numbers`; assignment accounting ignores only blank raw
 lines when checking exact once-per-source-line family assignment.
 
-## `log_transmission_records.jsonl`
+## `log_iridium_records.jsonl`
 
-Purpose / scope: upload/transmission workflow lines with conservative parsed
-artifact, byte, and session fields.
+Purpose / scope: explicit Iridium two-way communication sessions and
+mid-session Iridium/upload event sequences. One record represents one contiguous
+session-like source chunk, preserving every consumed raw LOG line.
 
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_upload.LOG","source_container":"log","record_time":"2023-11-14T22:13:21.000000Z","log_epoch_time":"1700000001","subsystem":"UPLOAD","code":"0231","message":"\"0100/AAAA0001.MER\" uploaded at 83bytes/s","source_line_number":2,"referenced_artifact":"0100_AAAA0001.MER","rate_bytes_per_s":83,"byte_count":null,"byte_offset":null,"artifact_size_bytes":null,"uploaded_file_count":null,"disconnect_duration_s":null,"raw_line":"1700000001:[UPLOAD,0231]\"0100/AAAA0001.MER\" uploaded at 83bytes/s","transmission_kind":"upload_artifact"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_iridium.LOG","source_container":"log","session_index":0,"session_kind":"explicit_session","line_start_index":1,"line_end_index":7,"source_line_numbers":[1,2,3,4,5,6,7],"start_record_time":"2024-10-29T11:44:16.000000Z","end_record_time":"2024-10-29T11:54:29.000000Z","start_log_epoch_time":"1730202256","end_log_epoch_time":"1730202869","iridium_event_count":7,"iridium_events":[{"source_line_number":1,"record_time":"2024-10-29T11:44:16.000000Z","log_epoch_time":"1730202256","subsystem":"SURF","code":"260","message":"Iridium...","iridium_event_kind":"session_start","raw_line":"1730202256:[SURF  ,260]Iridium..."},{"source_line_number":2,"record_time":"2024-10-29T11:44:53.000000Z","log_epoch_time":"1730202293","subsystem":"SURF","code":"311","message":"connected in 37s, signal quality 5","iridium_event_kind":"connection","connection_duration_s":37,"signal_quality":5,"raw_line":"1730202293:[SURF  ,311]connected in 37s, signal quality 5"},{"source_line_number":3,"record_time":"2024-10-29T11:45:40.000000Z","log_epoch_time":"1730202340","subsystem":"MRMAID","code":"664","message":"$TRIG:3,1;","iridium_event_kind":"command","command_name":"TRIG","command_payload":"3,1","raw_line":"1730202340:[MRMAID,664]$TRIG:3,1;"},{"source_line_number":4,"record_time":"2024-10-29T11:45:42.000000Z","log_epoch_time":"1730202342","subsystem":"MRMAID","code":"664","message":"$UPLOAD_MAX:150;","iridium_event_kind":"command","command_name":"UPLOAD_MAX","command_payload":"150","raw_line":"1730202342:[MRMAID,664]$UPLOAD_MAX:150;"},{"source_line_number":5,"record_time":"2024-10-29T11:45:52.000000Z","log_epoch_time":"1730202352","subsystem":"SURF","code":"328","message":"10 cmd(s) received","iridium_event_kind":"command_summary","received_command_count":10,"raw_line":"1730202352:[SURF  ,328]10 cmd(s) received"},{"source_line_number":6,"record_time":"2024-10-29T11:53:57.000000Z","log_epoch_time":"1730202837","subsystem":"SURF","code":"345","message":"2 file(s) uploaded","iridium_event_kind":"upload_session_summary","uploaded_file_count":2,"raw_line":"1730202837:[SURF  ,345]2 file(s) uploaded"},{"source_line_number":7,"record_time":"2024-10-29T11:54:29.000000Z","log_epoch_time":"1730202869","subsystem":"SURF","code":"366","message":"disconnected after 613s","iridium_event_kind":"disconnect","disconnect_duration_s":613,"raw_line":"1730202869:[SURF  ,366]disconnected after 613s"}],"raw_lines":["1730202256:[SURF  ,260]Iridium...","1730202293:[SURF  ,311]connected in 37s, signal quality 5","1730202340:[MRMAID,664]$TRIG:3,1;","1730202342:[MRMAID,664]$UPLOAD_MAX:150;","1730202352:[SURF  ,328]10 cmd(s) received","1730202837:[SURF  ,345]2 file(s) uploaded","1730202869:[SURF  ,366]disconnected after 613s"]}
 ```
 
-Field table: common single-line fields plus:
+Field table: common grouped timing/source fields adapted for sessions plus:
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
-| `referenced_artifact` | string or null | yes | Parsed artifact reference with `/` normalized to `_`. | n/a | Regex group `artifact`, when present. |
-| `rate_bytes_per_s` | integer or null | yes | Upload rate. | bytes/s | Upload-artifact regex group `rate`. |
-| `byte_count` | integer or null | yes | Uploaded/progress byte count. | bytes | Progress regex group `byte_count`. |
-| `byte_offset` | integer or null | yes | Resume byte offset. | bytes | Resume regex group `byte_offset`. |
-| `artifact_size_bytes` | integer or null | yes | Resume artifact size when present. | bytes | Optional resume regex group. |
-| `uploaded_file_count` | integer or null | yes | Count in session summary. | files | Session-summary regex group. |
-| `disconnect_duration_s` | integer or null | yes | Disconnect duration. | seconds | Disconnect regex group. |
-| `transmission_kind` | string | no | One of the upload/transmission kind values below. | n/a | First matching transmission predicate. |
+| `source_container` | string | no | Source container kind. Always `log`. | n/a | Constant. |
+| `session_index` | integer | no | Zero-based Iridium session number within the source LOG file. | n/a | Incremented by grouped parser. |
+| `session_kind` | string | no | `explicit_session` for chunks beginning with `Iridium...`; `event_sequence` for upload/command fragments that start mid-session. | n/a | Grouping start rule. |
+| `iridium_event_count` | integer | no | Count of parsed nested event objects. | events | Length of `iridium_events`. |
+| `iridium_events` | array of objects | no | One nested object per tagged LOG line in the session. | n/a | Parsed from each grouped tagged line. |
+| `raw_lines` | array of strings | no | Complete raw source LOG lines consumed by the session. | n/a | Source lines. |
 
-Classifier hit rules:
+Nested `iridium_events` use common single-line provenance/time/tag fields
+without `instrument_id`, `instrument_serial`, or `source_file`, plus
+`iridium_event_kind`, `raw_line`, and any directly parsed fields listed below.
+
+| Event field | Type | Nullable? | Meaning | Units | Source / derivation |
+| --- | --- | --- | --- | --- | --- |
+| `iridium_event_kind` | string | no | Event kind listed below. | n/a | First matching event predicate. |
+| `connection_duration_s` | integer | no | Connection delay or terminal no-connection duration. Present only on `connection` and `no_connection`. | seconds | Connection/no-connection regex group. |
+| `signal_quality` | integer | no | Reported signal quality. Present only on `connection` and `connection_failure`. | source units | Connection regex group. |
+| `connect_attempt` | integer | no | Failed connection attempt number. Present only on `connection_failure`. | attempts | Connection-failure regex group. |
+| `failure_code` | integer | no | Failed connection code. Present only on `connection_failure`. | source units | Connection-failure regex group. |
+| `network` | integer | no | Failed connection network field. Present only on `connection_failure`. | source units | Connection-failure regex group. |
+| `dial_attempt` | integer | no | Failed connection dial field. Present only on `connection_failure`. | source units | Connection-failure regex group. |
+| `command_name` | string | no | MERMAID command name without `$`. Present only on `command`. | n/a | Command regex group. |
+| `command_payload` | string or null | yes | Command payload between `:` and `;`. Present only on `command`. | n/a | Command regex group. |
+| `received_command_count` | integer | no | Count in command summary. Present only on `command_summary`. | commands | Command-summary regex group. |
+| `referenced_artifact` | string | no | Parsed artifact reference with `/` normalized to `_`. Present only on artifact events. | n/a | Regex group `artifact`. |
+| `rate_bytes_per_s` | integer | no | Upload rate. Present only on `upload_artifact`. | bytes/s | Upload-artifact regex group `rate`. |
+| `byte_count` | integer | no | Uploaded/progress byte count. Present only on `upload_progress_artifact`. | bytes | Progress regex group `byte_count`. |
+| `byte_offset` | integer | no | Resume byte offset. Present only on `upload_resume`. | bytes | Resume regex group `byte_offset`. |
+| `artifact_size_bytes` | integer or null | yes | Resume artifact size when present. Present only on `upload_resume`. | bytes | Optional resume regex group. |
+| `uploaded_file_count` | integer | no | Count in upload session summary. Present only on `upload_session_summary`. | files | Upload-summary regex group. |
+| `disconnect_duration_s` | integer | no | Disconnect duration. Present only on `disconnect`. | seconds | Disconnect regex group. |
+
+Grouping and classifier hit rules:
+
+An explicit session starts on:
+
+```text
+^Iridium\.\.\.$
+```
+
+Once an explicit session is open, tagged LOG lines are included until a line
+matching `disconnected after (?P<disconnect_duration_s>\d+)s` or
+`no connection after (?P<connection_duration_s>\d+)s` is consumed, a new
+`Iridium...` starts, a blank/non-tagged line flushes the session, or EOF is
+reached. Event-sequence fallback starts on any Iridium event predicate below
+when no explicit session is open, and keeps consuming contiguous Iridium event
+lines until the first non-event line, disconnect, or terminal no-connection.
 
 Artifact subpattern:
 
@@ -588,14 +626,22 @@ Artifact subpattern:
 (?P<artifact>\d{2,4}/[A-Za-z0-9]+\.(?:MER|LOG|BIN))
 ```
 
-Transmission predicates are checked in this order:
+Iridium event predicates are checked in this order:
 
 ```text
+^Iridium\.\.\.$                                                       # case-insensitive
+connected in (?P<connection_duration_s>\d+)s, signal quality (?P<signal_quality>[+-]?\d+)  # case-insensitive
+failed to connect #(?P<connect_attempt>\d+), code (?P<failure_code>[+-]?\d+), net (?P<network>[+-]?\d+), qual (?P<signal_quality>[+-]?\d+), dial (?P<dial_attempt>[+-]?\d+)  # case-insensitive
+no connection after (?P<connection_duration_s>\d+)s                    # case-insensitive
+^\$(?P<command_name>[A-Za-z0-9_]+)(?::(?P<command_payload>[^;]*))?;$
+(?P<received_command_count>\d+) cmd(?:\(s\)|s)? received              # case-insensitive
+prompt received,\s*remote cmd end                                      # case-insensitive
 "{artifact}" uploaded at (?P<rate>\d+)bytes/s                         # case-insensitive
 peer ask to resume {artifact}(?: \((?P<artifact_size_bytes>\d+)bytes\))? from byte (?P<byte_offset>\d+)  # case-insensitive
 (?P<byte_count>\d+) bytes in {artifact}                                # case-insensitive
 <ERR>\s*upload\b.*?{artifact}                                          # case-insensitive
 transfer interrupted\s*,?\s*retry(?: now)?                             # case-insensitive
+<ERR>\s*uploading failed                                               # case-insensitive
 (?P<uploaded_file_count>\d+) file(?:\(s\)|s)? uploaded                  # case-insensitive
 disconnected after (?P<disconnect_duration_s>\d+)s                     # case-insensitive
 ^Upload data files\.\.\.$                                              # case-insensitive
@@ -604,45 +650,61 @@ disconnected after (?P<disconnect_duration_s>\d+)s                     # case-in
 Kind mapping:
 
 ```text
+session_start
+connection
+connection_failure
+no_connection
+command
+command_summary
+remote_command_end
 upload_artifact
 upload_resume
 upload_progress_artifact
 upload_error_artifact
 upload_retry
+upload_failed
 upload_session_summary
-upload_disconnect
+disconnect
 upload_batch
+session_line
 ```
+
+`session_line` is used only for otherwise unclassified tagged lines inside an
+already-open explicit Iridium session.
+
+The generic `$COMMAND...;` predicate intentionally excludes `$GPSACK` and
+`$GPSOFF` because those lines are already owned by `log_gps_records.jsonl` when
+they occur outside an open Iridium session.
 
 Hits:
 
 ```text
-1700000000:[UPLOAD,0248]Upload data files...
-1700000001:[UPLOAD,0231]"0070/60B742A0.MER" uploaded at 137bytes/s
-1700000002:[MRMAID,0604]1373 bytes in 0026/5D3CDEA0.MER
-1700000003:[ZTX   ,486]peer ask to resume 07/5B6A9B02.LOG from byte 1024
-1700000004:<ERR>[ZTX   ,472]peer ask to resume 0048/607503A2.MER (118847bytes) from byte 4294967294
-1700000006:[SURF  ,0069]transfer interrupted , retry
-1700000008:[SURF  ,0014]disconnected after 288s
+1730202256:[SURF  ,260]Iridium...
+1730202293:[SURF  ,311]connected in 37s, signal quality 5
+1730202340:[MRMAID,664]$TRIG:3,1;
+1730202342:[MRMAID,664]$UPLOAD_MAX:150;
+1730202352:[SURF  ,328]10 cmd(s) received
+1730202837:[SURF  ,345]2 file(s) uploaded
+1730202869:[SURF  ,366]disconnected after 613s
 ```
 
 Non-hits:
 
 ```text
-1700000009:[SURF  ,0025]Iridium...
 1700000010:[SURF  ,0226]Go dive (Minimum surface delay expired and no more file to upload)
 1700000011:[SURF  ,0056]<WARN>peer mute
-1700000013:[SURF  ,0023]failed to connect #1, code -8, net 1, qual 5, dial 1
+1700000013:[MAIN  ,0007]raw unmatched after session
 ```
 
-Overlap / exclusivity: mutually exclusive with other LOG families. Matching
-lines do not also appear in unclassified. These lines previously would have
-been ordinary/base operational rows before `log_operational_records` was
-dissolved.
+Overlap / exclusivity: Iridium grouping is resolved before ordinary
+single-line family classification and is mutually exclusive by source line.
+Consumed lines do not also appear in unclassified or the GPS/battery/pressure
+families.
 
-Known gaps / edge cases: this is upload-focused and corpus-driven. It does not
-classify generic modem, Iridium, connection-failure, go-dive, or peer-warning
-lines unless they match one of the exact predicates above.
+Known gaps / edge cases: this stays literal and session-shaped. It does not
+infer commands from the command count, infer upload success beyond explicit
+summary lines, group nearby GPS fixes into the Iridium record, or derive
+positions/timing values.
 
 ## `log_unclassified_records.jsonl`
 
@@ -675,8 +737,8 @@ Unclassified is the fallback when:
 
 ```text
 line parses as an ordinary tagged LOG entry or rollover banner
-line is not consumed by parameter, testmode, or CTD grouping
-line has zero matches among acquisition, ascent_request, gps, transmission, pressure_temperature, battery
+line is not consumed by parameter, testmode, CTD, or Iridium grouping
+line has zero matches among acquisition, ascent_request, gps, pressure_temperature, battery
 ```
 
 Rollover banners parse as ordinary unclassified records when a timestamped
@@ -689,8 +751,8 @@ non-tagged line has content matching:
 Hits:
 
 ```text
-1565060029:[SURF  ,328]7 cmd(s) received
 1700000004:[SURF  ,0071]<WARN>timeout
+1700000005:[MAIN  ,0007]raw unmatched line
 1700000004:*** switching to 0100/NEXT.LOG ***
 ```
 
@@ -704,6 +766,7 @@ Non-hits:
 1564269461:[MAIN  ,408]internal pressure 78680Pa
 1700000003:[MONITR,0461]battery 14685mV,   12688uA
 1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)
+1565060029:[SURF  ,328]7 cmd(s) received
 1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)
 1700000000:<ERR>broken wrapper without subsystem tag
 not even timestamped

@@ -81,7 +81,7 @@ Typical per-instrument outputs look like:
     log_pressure_temperature_records.452.020-P-06.jsonl
     log_ctd_records.452.020-P-06.jsonl
     log_testmode_records.452.020-P-06.jsonl
-    log_transmission_records.452.020-P-06.jsonl
+    log_iridium_records.452.020-P-06.jsonl
     log_unclassified_records.452.020-P-06.jsonl
     mer_environment_records.452.020-P-06.jsonl
     mer_event_records.452.020-P-06.jsonl

@@ -35,7 +35,7 @@ BASE_OUTPUT_FILENAMES = {
     "parameter": "log_parameter_records.jsonl",
     "testmode": "log_testmode_records.jsonl",
     "ctd": "log_ctd_records.jsonl",
-    "transmission": "log_transmission_records.jsonl",
+    "iridium": "log_iridium_records.jsonl",
     "unclassified": "log_unclassified_records.jsonl",
 }
 OUTPUT_FILENAMES = BASE_OUTPUT_FILENAMES
@@ -107,6 +107,36 @@ _UPLOAD_DISCONNECT_RE = re.compile(
     re.IGNORECASE,
 )
 _UPLOAD_BATCH_RE = re.compile(r"^Upload data files\.\.\.$", re.IGNORECASE)
+_IRIDIUM_START_RE = re.compile(r"^Iridium\.\.\.$", re.IGNORECASE)
+_IRIDIUM_CONNECT_RE = re.compile(
+    r"connected in (?P<connection_duration_s>\d+)s,\s*"
+    r"signal quality (?P<signal_quality>[+-]?\d+)",
+    re.IGNORECASE,
+)
+_IRIDIUM_CONNECT_FAILURE_RE = re.compile(
+    r"failed to connect #(?P<connect_attempt>\d+),\s*"
+    r"code (?P<failure_code>[+-]?\d+),\s*"
+    r"net (?P<network>[+-]?\d+),\s*"
+    r"qual (?P<signal_quality>[+-]?\d+),\s*"
+    r"dial (?P<dial_attempt>[+-]?\d+)",
+    re.IGNORECASE,
+)
+_IRIDIUM_NO_CONNECTION_RE = re.compile(
+    r"no connection after (?P<connection_duration_s>\d+)s",
+    re.IGNORECASE,
+)
+_IRIDIUM_COMMAND_RE = re.compile(
+    r"^\$(?P<command_name>[A-Za-z0-9_]+)(?::(?P<command_payload>[^;]*))?;$"
+)
+_IRIDIUM_COMMAND_SUMMARY_RE = re.compile(
+    r"(?P<received_command_count>\d+) cmd(?:\(s\)|s)? received",
+    re.IGNORECASE,
+)
+_IRIDIUM_REMOTE_COMMAND_END_RE = re.compile(
+    r"prompt received,\s*remote cmd end",
+    re.IGNORECASE,
+)
+_UPLOAD_FAILED_RE = re.compile(r"<ERR>\s*uploading failed", re.IGNORECASE)
 _PRESS_TEMP_RE = re.compile(
     r"\bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b"
 )
@@ -157,7 +187,7 @@ class LogJsonlSummary:
     parameter_records: int
     testmode_records: int
     ctd_records: int
-    transmission_records: int
+    iridium_records: int
     unclassified_records: int
     ordinary_log_lines_examined: int
     source_line_assignments: int
@@ -175,11 +205,23 @@ class LogJsonlSummary:
     parameter_examples: list[dict[str, object]]
     testmode_examples: list[dict[str, object]]
     ctd_examples: list[dict[str, object]]
-    transmission_examples: list[dict[str, object]]
+    iridium_examples: list[dict[str, object]]
     pressure_temperature_examples: list[dict[str, object]]
     battery_examples: list[dict[str, object]]
     unclassified_examples: list[dict[str, object]]
     common_unclassified_patterns: list[dict[str, object]]
+
+    @property
+    def transmission_records(self) -> int:
+        """Backward-compatible alias for the renamed Iridium family count."""
+
+        return self.iridium_records
+
+    @property
+    def transmission_examples(self) -> list[dict[str, object]]:
+        """Backward-compatible alias for the renamed Iridium family examples."""
+
+        return self.iridium_examples
 
 
 @dataclass(slots=True)
@@ -195,6 +237,7 @@ class _GroupedEpisode:
     family: str
     episode_index: int
     lines: list[_GroupedEpisodeLine]
+    group_kind: str | None = None
 
 
 @dataclass(slots=True)
@@ -276,7 +319,7 @@ def write_log_jsonl_families(
     parameter_count = 0
     testmode_count = 0
     ctd_count = 0
-    transmission_count = 0
+    iridium_count = 0
     pressure_temperature_count = 0
     battery_count = 0
     unclassified_count = 0
@@ -294,7 +337,7 @@ def write_log_jsonl_families(
     parameter_examples: list[dict[str, object]] = []
     testmode_examples: list[dict[str, object]] = []
     ctd_examples: list[dict[str, object]] = []
-    transmission_examples: list[dict[str, object]] = []
+    iridium_examples: list[dict[str, object]] = []
     pressure_temperature_examples: list[dict[str, object]] = []
     battery_examples: list[dict[str, object]] = []
     unclassified_examples: list[dict[str, object]] = []
@@ -385,10 +428,10 @@ def write_log_jsonl_families(
                             gps_record_kind_counter[record["gps_record_kind"]] += 1
                             gps_examples.setdefault(record["gps_record_kind"], record)
 
-                        elif assignment.family == "transmission":
-                            transmission_count += 1
-                            if len(transmission_examples) < 3:
-                                transmission_examples.append(record)
+                        elif assignment.family == "iridium":
+                            iridium_count += 1
+                            if len(iridium_examples) < 3:
+                                iridium_examples.append(record)
 
                         elif assignment.family == "pressure_temperature":
                             pressure_temperature_count += 1
@@ -447,7 +490,7 @@ def write_log_jsonl_families(
                         )
                         if len(testmode_examples) < 3:
                             testmode_examples.append(episode_record)
-                    else:
+                    elif item.family == "ctd":
                         _write_jsonl_line(handles["ctd"], episode_record)
                         ctd_count += 1
                         _record_source_line_assignments(
@@ -458,6 +501,17 @@ def write_log_jsonl_families(
                         )
                         if len(ctd_examples) < 3:
                             ctd_examples.append(episode_record)
+                    else:
+                        _write_jsonl_line(handles["iridium"], episode_record)
+                        iridium_count += 1
+                        _record_source_line_assignments(
+                            assignment_counts,
+                            family_source_line_counter,
+                            family="iridium",
+                            source_keys=source_keys,
+                        )
+                        if len(iridium_examples) < 3:
+                            iridium_examples.append(episode_record)
             except OSError as exc:
                 if skipped_log_files is None or run_id is None:
                     raise
@@ -523,7 +577,7 @@ def write_log_jsonl_families(
         "parameter": parameter_count,
         "testmode": testmode_count,
         "ctd": ctd_count,
-        "transmission": transmission_count,
+        "iridium": iridium_count,
         "unclassified": unclassified_count,
     }
     family_record_counts = {
@@ -545,7 +599,7 @@ def write_log_jsonl_families(
         parameter_records=parameter_count,
         testmode_records=testmode_count,
         ctd_records=ctd_count,
-        transmission_records=transmission_count,
+        iridium_records=iridium_count,
         unclassified_records=unclassified_count,
         ordinary_log_lines_examined=len(ordinary_line_keys),
         source_line_assignments=sum(assignment_counts.values()),
@@ -563,7 +617,7 @@ def write_log_jsonl_families(
         parameter_examples=parameter_examples,
         testmode_examples=testmode_examples,
         ctd_examples=ctd_examples,
-        transmission_examples=transmission_examples,
+        iridium_examples=iridium_examples,
         pressure_temperature_examples=pressure_temperature_examples,
         battery_examples=battery_examples,
         unclassified_examples=unclassified_examples,
@@ -578,14 +632,15 @@ def _iter_log_source_units(
 ) -> Iterable[OperationalLogEntry | _GroupedEpisode]:
     _validate_log_path(path)
     current_episode: _GroupedEpisode | None = None
-    episode_indexes = {"parameter": 0, "testmode": 0, "ctd": 0}
+    episode_indexes = {"parameter": 0, "testmode": 0, "ctd": 0, "iridium": 0}
 
-    def _start_episode(family: str) -> None:
+    def _start_episode(family: str, *, group_kind: str | None = None) -> None:
         nonlocal current_episode
         current_episode = _GroupedEpisode(
             family=family,
             episode_index=episode_indexes[family],
             lines=[],
+            group_kind=group_kind,
         )
         episode_indexes[family] += 1
 
@@ -625,6 +680,41 @@ def _iter_log_source_units(
                 continue
 
             if tagged_line is not None:
+                if current_episode is not None and current_episode.family == "iridium":
+                    if _is_iridium_start_line(tagged_line):
+                        episode = _flush_episode()
+                        if episode is not None:
+                            yield episode
+                        _start_episode("iridium", group_kind="explicit_session")
+                        assert current_episode is not None
+                        current_episode.lines.append(
+                            _grouped_line(
+                                line_number=line_number,
+                                raw_line=line,
+                                tagged_line=tagged_line,
+                            )
+                        )
+                        continue
+                    if (
+                        current_episode.group_kind == "explicit_session"
+                        or _is_iridium_event_line(tagged_line)
+                    ):
+                        current_episode.lines.append(
+                            _grouped_line(
+                                line_number=line_number,
+                                raw_line=line,
+                                tagged_line=tagged_line,
+                            )
+                        )
+                        if _is_iridium_end_line(tagged_line):
+                            episode = _flush_episode()
+                            if episode is not None:
+                                yield episode
+                        continue
+                    episode = _flush_episode()
+                    if episode is not None:
+                        yield episode
+
                 if _is_testmode_start_line(tagged_line):
                     episode = _flush_episode()
                     if episode is not None:
@@ -658,6 +748,40 @@ def _iter_log_source_units(
                             tagged_line=tagged_line,
                         )
                     )
+                    continue
+
+                if _is_iridium_start_line(tagged_line):
+                    episode = _flush_episode()
+                    if episode is not None:
+                        yield episode
+                    _start_episode("iridium", group_kind="explicit_session")
+                    assert current_episode is not None
+                    current_episode.lines.append(
+                        _grouped_line(
+                            line_number=line_number,
+                            raw_line=line,
+                            tagged_line=tagged_line,
+                        )
+                    )
+                    continue
+
+                if _is_iridium_event_line(tagged_line):
+                    episode = _flush_episode()
+                    if episode is not None:
+                        yield episode
+                    _start_episode("iridium", group_kind="event_sequence")
+                    assert current_episode is not None
+                    current_episode.lines.append(
+                        _grouped_line(
+                            line_number=line_number,
+                            raw_line=line,
+                            tagged_line=tagged_line,
+                        )
+                    )
+                    if _is_iridium_end_line(tagged_line):
+                        episode = _flush_episode()
+                        if episode is not None:
+                            yield episode
                     continue
 
                 episode = _flush_episode()
@@ -777,6 +901,13 @@ def _build_grouped_episode_record(
     instrument_id: str,
     source_file: Path,
 ) -> dict[str, object]:
+    if episode.family == "iridium":
+        return _build_iridium_session_record(
+            episode,
+            instrument_id=instrument_id,
+            source_file=source_file,
+        )
+
     timestamped_lines = [line for line in episode.lines if line.time is not None and line.log_epoch_time is not None]
     if not timestamped_lines:
         raise ValueError(f"{episode.family} episode has no timestamped lines")
@@ -800,6 +931,63 @@ def _build_grouped_episode_record(
         record["ctd_sample_count"] = len(ctd_samples)
         record["ctd_samples"] = ctd_samples
     return record
+
+
+def _build_iridium_session_record(
+    episode: _GroupedEpisode,
+    *,
+    instrument_id: str,
+    source_file: Path,
+) -> dict[str, object]:
+    timestamped_lines = [
+        line
+        for line in episode.lines
+        if line.time is not None and line.log_epoch_time is not None
+    ]
+    if not timestamped_lines:
+        raise ValueError("iridium episode has no timestamped lines")
+    first_line = timestamped_lines[0]
+    last_line = timestamped_lines[-1]
+    events = _iridium_events_for_episode(episode)
+    return {
+        "instrument_id": instrument_id,
+        "source_file": source_file.name,
+        "source_container": "log",
+        "session_index": episode.episode_index,
+        "session_kind": episode.group_kind or "event_sequence",
+        "line_start_index": first_line.line_number,
+        "line_end_index": last_line.line_number,
+        "source_line_numbers": [line.line_number for line in episode.lines],
+        "start_record_time": format_utc_datetime(first_line.time),
+        "end_record_time": format_utc_datetime(last_line.time),
+        "start_log_epoch_time": first_line.log_epoch_time,
+        "end_log_epoch_time": last_line.log_epoch_time,
+        "iridium_event_count": len(events),
+        "iridium_events": events,
+        "raw_lines": [line.raw_line for line in episode.lines],
+    }
+
+
+def _iridium_events_for_episode(episode: _GroupedEpisode) -> list[dict[str, object]]:
+    events: list[dict[str, object]] = []
+    for line in episode.lines:
+        tagged_line = _parse_tagged_log_line(line.raw_line)
+        if tagged_line is None:
+            continue
+        event: dict[str, object] = {
+            "source_line_number": line.line_number,
+            "record_time": (
+                format_utc_datetime(line.time) if line.time is not None else None
+            ),
+            "log_epoch_time": line.log_epoch_time,
+            "subsystem": tagged_line.subsystem,
+            "code": tagged_line.code,
+            "message": tagged_line.message,
+            **_iridium_event_payload(tagged_line.message),
+            "raw_line": line.raw_line,
+        }
+        events.append(event)
+    return events
 
 
 def _ctd_samples_for_episode(episode: _GroupedEpisode) -> list[dict[str, object]]:
@@ -1012,7 +1200,6 @@ def _collect_specific_family_matches(
         ("acquisition", _classify_acquisition(entry, instrument_id=instrument_id)),
         ("ascent_request", _classify_ascent_request(entry, instrument_id=instrument_id)),
         ("gps", _classify_gps(entry, instrument_id=instrument_id)),
-        ("transmission", _classify_transmission(entry, instrument_id=instrument_id)),
         (
             "pressure_temperature",
             _classify_pressure_temperature(entry, instrument_id=instrument_id),
@@ -1131,18 +1318,86 @@ def _classify_gps(entry: OperationalLogEntry, *, instrument_id: str) -> dict[str
     }
 
 
-def _classify_transmission(
-    entry: OperationalLogEntry,
-    *,
-    instrument_id: str,
-) -> dict[str, object] | None:
-    message = entry.message.strip()
+def _is_iridium_start_line(tagged_line: _ParsedTaggedLogLine) -> bool:
+    return _IRIDIUM_START_RE.search(tagged_line.message.strip()) is not None
+
+
+def _is_iridium_end_line(tagged_line: _ParsedTaggedLogLine) -> bool:
+    message = tagged_line.message.strip()
+    return (
+        _UPLOAD_DISCONNECT_RE.search(message) is not None
+        or _IRIDIUM_NO_CONNECTION_RE.search(message) is not None
+    )
+
+
+def _is_iridium_event_line(tagged_line: _ParsedTaggedLogLine) -> bool:
+    return (
+        _iridium_event_payload(tagged_line.message)["iridium_event_kind"]
+        != "session_line"
+    )
+
+
+def _iridium_event_payload(message: str) -> dict[str, object]:
+    message = message.strip()
+
+    if _IRIDIUM_START_RE.search(message):
+        return {"iridium_event_kind": "session_start"}
+
+    connect_match = _IRIDIUM_CONNECT_RE.search(message)
+    if connect_match is not None:
+        return {
+            "iridium_event_kind": "connection",
+            "connection_duration_s": int(connect_match.group("connection_duration_s")),
+            "signal_quality": int(connect_match.group("signal_quality")),
+        }
+
+    connection_failure_match = _IRIDIUM_CONNECT_FAILURE_RE.search(message)
+    if connection_failure_match is not None:
+        return {
+            "iridium_event_kind": "connection_failure",
+            "connect_attempt": int(connection_failure_match.group("connect_attempt")),
+            "failure_code": int(connection_failure_match.group("failure_code")),
+            "network": int(connection_failure_match.group("network")),
+            "signal_quality": int(connection_failure_match.group("signal_quality")),
+            "dial_attempt": int(connection_failure_match.group("dial_attempt")),
+        }
+
+    no_connection_match = _IRIDIUM_NO_CONNECTION_RE.search(message)
+    if no_connection_match is not None:
+        return {
+            "iridium_event_kind": "no_connection",
+            "connection_duration_s": int(
+                no_connection_match.group("connection_duration_s")
+            ),
+        }
+
+    command_match = _IRIDIUM_COMMAND_RE.search(message)
+    if command_match is not None:
+        command_name = command_match.group("command_name")
+        if command_name.upper() in {"GPSACK", "GPSOFF"}:
+            return {"iridium_event_kind": "session_line"}
+        return {
+            "iridium_event_kind": "command",
+            "command_name": command_name,
+            "command_payload": command_match.group("command_payload"),
+        }
+
+    command_summary_match = _IRIDIUM_COMMAND_SUMMARY_RE.search(message)
+    if command_summary_match is not None:
+        return {
+            "iridium_event_kind": "command_summary",
+            "received_command_count": int(
+                command_summary_match.group("received_command_count")
+            ),
+        }
+
+    if _IRIDIUM_REMOTE_COMMAND_END_RE.search(message):
+        return {"iridium_event_kind": "remote_command_end"}
 
     uploaded_match = _UPLOADED_ARTIFACT_RE.search(message)
     if uploaded_match is not None:
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_artifact",
+            "iridium_event_kind": "upload_artifact",
             "referenced_artifact": _normalize_parsed_artifact_reference(
                 uploaded_match.group("artifact")
             ),
@@ -1153,8 +1408,7 @@ def _classify_transmission(
     if resume_match is not None:
         artifact_size_bytes = resume_match.group("artifact_size_bytes")
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_resume",
+            "iridium_event_kind": "upload_resume",
             "referenced_artifact": _normalize_parsed_artifact_reference(
                 resume_match.group("artifact")
             ),
@@ -1167,8 +1421,7 @@ def _classify_transmission(
     progress_match = _UPLOAD_PROGRESS_ARTIFACT_RE.search(message)
     if progress_match is not None:
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_progress_artifact",
+            "iridium_event_kind": "upload_progress_artifact",
             "referenced_artifact": _normalize_parsed_artifact_reference(
                 progress_match.group("artifact")
             ),
@@ -1178,8 +1431,7 @@ def _classify_transmission(
     error_match = _UPLOAD_ERROR_ARTIFACT_RE.search(message)
     if error_match is not None:
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_error_artifact",
+            "iridium_event_kind": "upload_error_artifact",
             "referenced_artifact": _normalize_parsed_artifact_reference(
                 error_match.group("artifact")
             ),
@@ -1187,15 +1439,18 @@ def _classify_transmission(
 
     if _UPLOAD_RETRY_RE.search(message):
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_retry",
+            "iridium_event_kind": "upload_retry",
+        }
+
+    if _UPLOAD_FAILED_RE.search(message):
+        return {
+            "iridium_event_kind": "upload_failed",
         }
 
     session_summary_match = _UPLOAD_SESSION_SUMMARY_RE.search(message)
     if session_summary_match is not None:
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_session_summary",
+            "iridium_event_kind": "upload_session_summary",
             "uploaded_file_count": int(
                 session_summary_match.group("uploaded_file_count")
             ),
@@ -1204,8 +1459,7 @@ def _classify_transmission(
     disconnect_match = _UPLOAD_DISCONNECT_RE.search(message)
     if disconnect_match is not None:
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_disconnect",
+            "iridium_event_kind": "disconnect",
             "disconnect_duration_s": int(
                 disconnect_match.group("disconnect_duration_s")
             ),
@@ -1213,29 +1467,10 @@ def _classify_transmission(
 
     if _UPLOAD_BATCH_RE.search(message):
         return {
-            **_base_transmission_record(entry, instrument_id=instrument_id),
-            "transmission_kind": "upload_batch",
+            "iridium_event_kind": "upload_batch",
         }
 
-    return None
-
-
-def _base_transmission_record(
-    entry: OperationalLogEntry,
-    *,
-    instrument_id: str,
-) -> dict[str, object]:
-    return {
-        **_common_log_record_fields(entry, instrument_id=instrument_id),
-        "referenced_artifact": None,
-        "rate_bytes_per_s": None,
-        "byte_count": None,
-        "byte_offset": None,
-        "artifact_size_bytes": None,
-        "uploaded_file_count": None,
-        "disconnect_duration_s": None,
-        "raw_line": entry.raw_line,
-    }
+    return {"iridium_event_kind": "session_line"}
 
 
 def _classify_pressure_temperature(

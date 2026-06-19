@@ -929,7 +929,7 @@ def test_stateful_run_materializes_canonical_output_file_set(tmp_path: Path) -> 
         f"log_parameter_records.{serial}.jsonl",
         f"log_testmode_records.{serial}.jsonl",
         f"log_ctd_records.{serial}.jsonl",
-        f"log_transmission_records.{serial}.jsonl",
+        f"log_iridium_records.{serial}.jsonl",
         f"log_unclassified_records.{serial}.jsonl",
         f"mer_environment_records.{serial}.jsonl",
         f"mer_parameter_records.{serial}.jsonl",

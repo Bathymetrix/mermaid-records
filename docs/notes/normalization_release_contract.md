@@ -145,7 +145,7 @@ Per instrument:
   log_parameter_records.<instrument-serial>.jsonl
   log_testmode_records.<instrument-serial>.jsonl
   log_ctd_records.<instrument-serial>.jsonl
-  log_transmission_records.<instrument-serial>.jsonl
+  log_iridium_records.<instrument-serial>.jsonl
   log_unclassified_records.<instrument-serial>.jsonl
   mer_environment_records.<instrument-serial>.jsonl
   mer_parameter_records.<instrument-serial>.jsonl
@@ -196,7 +196,7 @@ LOG families:
 - `log_parameter_records.<instrument_serial>.jsonl`
 - `log_testmode_records.<instrument_serial>.jsonl`
 - `log_ctd_records.<instrument_serial>.jsonl`
-- `log_transmission_records.<instrument_serial>.jsonl`
+- `log_iridium_records.<instrument_serial>.jsonl`
 - `log_unclassified_records.<instrument_serial>.jsonl`
 
 MER families:
@@ -302,16 +302,14 @@ Shared direct LOG record fields:
   - `temperature_mdegc_tenths`
   - `salinity_psu_thousandths`
 
-`log_transmission_records.<instrument_serial>.jsonl`
+`log_iridium_records.<instrument_serial>.jsonl`
 
-- all operational provenance/source fields
-- `transmission_kind`
-- `referenced_artifact` (`/` normalized to `_` when the LOG text is parsed as a LOG/MER filename reference)
-- `rate_bytes_per_s`
-- `byte_count`
-- `byte_offset`
-- `artifact_size_bytes`
-- `uploaded_file_count`
+- grouped session provenance/source fields
+- `session_kind`
+- `iridium_event_count`
+- `iridium_events`
+- nested `iridium_event_kind`
+- nested upload fields such as `referenced_artifact`, `rate_bytes_per_s`, `byte_count`, `byte_offset`, `artifact_size_bytes`, and `uploaded_file_count`
 - `disconnect_duration_s`
 
 `log_pressure_temperature_records.<instrument_serial>.jsonl`

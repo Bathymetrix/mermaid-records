@@ -22,8 +22,8 @@ existing family or a narrowly scoped new family.
 | 88,580 | `$MEASFS,263069,6574.446777,40.013861;` | Extend `log_acquisition_records` |
 | 22,476 | `Mermaid $MEASFS,...` | Same as above |
 | 16,642 | `$TRIG:4,2;` | Acquisition/detection family |
-| 13,770 | `$UPLOAD_MAX:150;` | Extend `log_transmission_records` |
-| 5,107 | `$REQUEST:2022-01-15T04_34_53,1800,5;` | Request/transmission family |
+| 13,770 | `$UPLOAD_MAX:150;` | Extend `log_iridium_records` |
+| 5,107 | `$REQUEST:2022-01-15T04_34_53,1800,5;` | Request/Iridium family |
 | 5,384 | `p2t37: dp 50mbar, dt 5000mdegC` | Extend `log_parameter_records` |
 | 5,384 | `coeff`, `delay`, `surface`, `ascent`, etc. parameter dump lines | Extend `log_parameter_records` |
 | 16,524 | `fix 3D, 8 satellites` | Extend `log_gps_records` |
@@ -55,11 +55,11 @@ telemetry.
 
 | Count | Example | Proposed Action |
 |--------:|----------|----------------|
-| 54,843 | `connected in 143s, signal quality 5` | Extend `log_transmission_records` |
+| 54,843 | `connected in 143s, signal quality 5` | Extend `log_iridium_records` |
 | 50,707 | `7 cmd(s) received` | Candidate `log_command_records` |
-| 10,456 | `prompt received, remote cmd end` | Command/transmission family |
+| 10,456 | `prompt received, remote cmd end` | Command/Iridium family |
 | 8,210 | `emergency call` | Communication state |
-| 7,027 | `<ERR>uploading failed` | Extend `log_transmission_records` |
+| 7,027 | `<ERR>uploading failed` | Extend `log_iridium_records` |
 | 5,387 | `<WARN>GPRMC ms=370 #1` | Extend `log_gps_records` |
 
 ## Maybe No
@@ -126,7 +126,7 @@ understood sufficiently to propose a stable schema.
 
 ## Recommended Immediate Actions
 
-1. Extend acquisition, transmission, GPS, and parameter families for the
+1. Extend acquisition, Iridium, GPS, and parameter families for the
    structured `$...` and parameter-dump records.
 2. Decide whether buoyancy-engine telemetry warrants a dedicated
    `log_buoyancy_records` family.

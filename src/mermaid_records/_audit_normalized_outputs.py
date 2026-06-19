@@ -221,10 +221,15 @@ def inspect_sample_row(sample: FileSample) -> list[str]:
         issues.extend(_check_log_acquisition_row(row))
     elif family == "log_ascent_request_records":
         issues.extend(_check_log_ascent_request_row(row))
-    elif family in {"log_parameter_records", "log_testmode_records", "log_ctd_records"}:
+    elif family in {
+        "log_parameter_records",
+        "log_testmode_records",
+        "log_ctd_records",
+        "log_iridium_records",
+    }:
         issues.extend(_check_grouped_log_row(row))
-    elif family == "log_transmission_records":
-        issues.extend(_check_log_transmission_row(row))
+        if family == "log_iridium_records":
+            issues.extend(_check_log_iridium_row(row))
     elif family == "mer_environment_records":
         issues.extend(_check_mer_environment_row(row))
     elif family == "mer_parameter_records":
@@ -461,18 +466,33 @@ def _check_grouped_log_row(row: dict[str, Any]) -> list[str]:
     return issues
 
 
-def _check_log_transmission_row(row: dict[str, Any]) -> list[str]:
+def _check_log_iridium_row(row: dict[str, Any]) -> list[str]:
     issues: list[str] = []
-    referenced_artifact = row.get("referenced_artifact")
-    if referenced_artifact is not None:
-        if "/" in referenced_artifact:
+    events = row.get("iridium_events") or []
+    if not events:
+        issues.append("iridium session row is missing iridium_events")
+        return issues
+    if row.get("iridium_event_count") != len(events):
+        issues.append("iridium_event_count does not match iridium_events length")
+    raw_lines = row.get("raw_lines") or []
+    for event in events:
+        if not isinstance(event, dict):
+            issues.append("iridium_events contains a non-object item")
+            continue
+        raw_line = event.get("raw_line", "")
+        if raw_line and raw_line not in raw_lines:
+            issues.append("iridium event raw_line is not preserved in row raw_lines")
+        if event.get("iridium_event_kind") == "disconnect" and event.get("disconnect_duration_s") is None:
+            issues.append("disconnect event is missing disconnect_duration_s")
+        referenced_artifact = event.get("referenced_artifact")
+        if referenced_artifact is None:
+            continue
+        referenced_artifact_text = str(referenced_artifact)
+        if "/" in referenced_artifact_text:
             issues.append("referenced_artifact is not canonicalized to a basename-style artifact name")
-        raw_line = row.get("raw_line", "")
-        raw_artifact = referenced_artifact.replace("_", "/", 1)
-        if raw_artifact not in raw_line and referenced_artifact not in raw_line:
-            issues.append("referenced_artifact cannot be reconciled with the preserved raw_line")
-    if row.get("transmission_kind") == "upload_disconnect" and row.get("disconnect_duration_s") is None:
-        issues.append("upload_disconnect row is missing disconnect_duration_s")
+        raw_artifact = referenced_artifact_text.replace("_", "/", 1)
+        if raw_artifact not in raw_line and referenced_artifact_text not in raw_line:
+            issues.append("referenced_artifact cannot be reconciled with the preserved event raw_line")
     return issues
 
 

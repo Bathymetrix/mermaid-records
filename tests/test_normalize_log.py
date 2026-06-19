@@ -30,7 +30,7 @@ def test_log_record_family_schema_doc_hit_examples_classify_as_documented(
         "log_pressure_temperature_records.jsonl",
         "log_ctd_records.jsonl",
         "log_testmode_records.jsonl",
-        "log_transmission_records.jsonl",
+        "log_iridium_records.jsonl",
         "log_unclassified_records.jsonl",
     }
 
@@ -79,14 +79,14 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    assert summary.total_records == 6
+    assert summary.total_records == 5
     assert summary.acquisition_records == 0
     assert summary.ascent_request_records == 0
     assert summary.gps_records == 0
     assert summary.parameter_records == 0
     assert summary.testmode_records == 0
     assert summary.ctd_records == 0
-    assert summary.transmission_records == 2
+    assert summary.iridium_records == 1
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 0
     assert summary.unclassified_records == 3
@@ -107,7 +107,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     parameter_records = _read_jsonl(output_dir / "log_parameter_records.jsonl")
     testmode_records = _read_jsonl(output_dir / "log_testmode_records.jsonl")
     ctd_records = _read_jsonl(output_dir / "log_ctd_records.jsonl")
-    transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
+    iridium_records = _read_jsonl(output_dir / "log_iridium_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert not (output_dir / "log_operational_records.jsonl").exists()
@@ -119,37 +119,36 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert parameter_records == []
     assert testmode_records == []
     assert ctd_records == []
-    assert len(transmission_records) == 2
+    assert len(iridium_records) == 1
     assert len(unclassified_records) == 3
 
-    assert list(transmission_records[0]) == [
+    assert list(iridium_records[0]) == [
         "instrument_id",
         "instrument_serial",
         "source_file",
         "source_container",
-        "record_time",
-        "log_epoch_time",
-        "subsystem",
-        "code",
-        "message",
-        "source_line_number",
-        "referenced_artifact",
-        "rate_bytes_per_s",
-        "byte_count",
-        "byte_offset",
-        "artifact_size_bytes",
-        "uploaded_file_count",
-        "disconnect_duration_s",
-        "raw_line",
-        "transmission_kind",
+        "session_index",
+        "session_kind",
+        "line_start_index",
+        "line_end_index",
+        "source_line_numbers",
+        "start_record_time",
+        "end_record_time",
+        "start_log_epoch_time",
+        "end_log_epoch_time",
+        "iridium_event_count",
+        "iridium_events",
+        "raw_lines",
     ]
-    assert transmission_records[0]["record_time"] == "2023-11-14T22:13:20.000000Z"
-    assert transmission_records[0]["log_epoch_time"] == "1700000000"
-    assert transmission_records[0]["source_file"] == log_path.name
-    assert transmission_records[0]["instrument_serial"] == "0100"
-    assert transmission_records[0]["source_line_number"] == 1
-    assert (output_dir / "log_transmission_records.0100.jsonl").exists()
-    assert "time" not in transmission_records[0]
+    assert iridium_records[0]["start_record_time"] == "2023-11-14T22:13:20.000000Z"
+    assert iridium_records[0]["end_record_time"] == "2023-11-14T22:13:21.000000Z"
+    assert iridium_records[0]["start_log_epoch_time"] == "1700000000"
+    assert iridium_records[0]["end_log_epoch_time"] == "1700000001"
+    assert iridium_records[0]["source_file"] == log_path.name
+    assert iridium_records[0]["instrument_serial"] == "0100"
+    assert iridium_records[0]["source_line_numbers"] == [1, 2]
+    assert (output_dir / "log_iridium_records.0100.jsonl").exists()
+    assert "time" not in iridium_records[0]
 
     assert list(unclassified_records[0]) == [
         "instrument_id",
@@ -167,12 +166,16 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         "raw_line",
     ]
 
-    assert transmission_records[1]["referenced_artifact"] == "0100_AAAA0001.MER"
-    assert transmission_records[1]["rate_bytes_per_s"] == 83
-    assert transmission_records[1]["record_time"] == "2023-11-14T22:13:21.000000Z"
-    assert transmission_records[1]["log_epoch_time"] == "1700000001"
-    assert transmission_records[1]["source_file"] == log_path.name
-    assert "time" not in transmission_records[1]
+    iridium_events = iridium_records[0]["iridium_events"]
+    assert [event["iridium_event_kind"] for event in iridium_events] == [
+        "upload_batch",
+        "upload_artifact",
+    ]
+    assert iridium_events[1]["referenced_artifact"] == "0100_AAAA0001.MER"
+    assert iridium_events[1]["rate_bytes_per_s"] == 83
+    assert iridium_events[1]["record_time"] == "2023-11-14T22:13:21.000000Z"
+    assert iridium_events[1]["log_epoch_time"] == "1700000001"
+    assert "time" not in iridium_events[1]
 
     assert pressure_temperature_records[0]["pressure_mbar"] == 20179
     assert pressure_temperature_records[0]["temperature_mdegc"] == 32767
@@ -193,8 +196,8 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
         "<WARN>timeout",
         "buoy 467.174-T-0100"
     ]
-    assert all(record["instrument_id"] == "0100" for record in transmission_records)
-    assert all(record["instrument_serial"] == "0100" for record in transmission_records)
+    assert all(record["instrument_id"] == "0100" for record in iridium_records)
+    assert all(record["instrument_serial"] == "0100" for record in iridium_records)
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
@@ -364,11 +367,13 @@ def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
         output_dir / "log_pressure_temperature_records.jsonl"
     )
     battery_records = _read_jsonl(output_dir / "log_battery_records.jsonl")
+    iridium_records = _read_jsonl(output_dir / "log_iridium_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.pressure_temperature_records == 2
     assert summary.battery_records == 1
-    assert summary.unclassified_records == 1
+    assert summary.iridium_records == 1
+    assert summary.unclassified_records == 0
     assert not (output_dir / "log_operational_records.jsonl").exists()
     assert {
         (record["source_file"], record["message"])
@@ -409,12 +414,11 @@ def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
             "raw_line": "1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)",
         }
     ]
-    assert {
-        (record["source_file"], record["message"])
-        for record in unclassified_records
-    } == {
-        ("0026_5D48EAB8.LOG", "7 cmd(s) received"),
-    }
+    assert iridium_records[0]["source_file"] == "0026_5D48EAB8.LOG"
+    assert iridium_records[0]["session_kind"] == "event_sequence"
+    assert iridium_records[0]["iridium_events"][0]["message"] == "7 cmd(s) received"
+    assert iridium_records[0]["iridium_events"][0]["received_command_count"] == 7
+    assert unclassified_records == []
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
@@ -445,7 +449,7 @@ def test_write_log_jsonl_families_keeps_unclassified_disjoint_from_all_log_famil
     summary = write_log_jsonl_families([log_path], output_dir)
 
     assert summary.unclassified_records == 3
-    assert summary.transmission_records == 2
+    assert summary.iridium_records == 1
     assert summary.pressure_temperature_records == 1
     assert summary.battery_records == 1
     assert summary.acquisition_records == 1
@@ -550,7 +554,7 @@ def test_write_log_jsonl_families_fails_loudly_on_derived_family_multi_match(
 ) -> None:
     log_path = tmp_path / "0100_ambiguous.LOG"
     log_path.write_text(
-        '1700000000:[UPLOAD,0231]"0100/AAAA0001.MER" uploaded at 83bytes/s\n',
+        "1700000000:[SURF  ,0022]GPS fix...\n",
         encoding="utf-8",
     )
 
@@ -571,7 +575,7 @@ def test_write_log_jsonl_families_fails_loudly_on_derived_family_multi_match(
 
     with pytest.raises(
         ValueError,
-        match="Operational derived-family multi-match: transmission, battery",
+        match="Operational derived-family multi-match: gps, battery",
     ):
         write_log_jsonl_families([log_path], tmp_path / "jsonl")
 
@@ -1060,27 +1064,30 @@ def test_write_log_jsonl_families_groups_contiguous_ctd_measurements_from_0100_e
     assert all("[SBE61 ,0396]" not in row["raw_line"] for row in malformed_log_lines)
 
 
-def test_write_log_jsonl_families_broadens_transmission_classification_conservatively(
+def test_write_log_jsonl_families_groups_iridium_session_events_conservatively(
     tmp_path: Path,
 ) -> None:
-    log_path = tmp_path / "0700_transmission.LOG"
+    log_path = tmp_path / "0700_iridium.LOG"
     log_path.write_text(
         "\n".join(
             [
-                "1700000000:[UPLOAD,0248]Upload data files...",
-                '1700000001:[UPLOAD,0231]"0070/60B742A0.MER" uploaded at 137bytes/s',
-                "1700000002:[MRMAID,0604]1373 bytes in 0026/5D3CDEA0.MER",
-                "1700000003:[ZTX   ,486]peer ask to resume 07/5B6A9B02.LOG from byte 1024",
-                "1700000004:[ZTX   ,472]<ERR>peer ask to resume 0048/607503A2.MER (118847bytes) from byte 4294967294",
-                '1700000005:[UPLOAD,9999]<ERR>upload "0026","0026/5DC0FCFC.MER"',
-                "1700000006:[SURF  ,0069]transfer interrupted , retry",
-                "1700000007:[MAIN  ,0013]2 file(s) uploaded",
-                "1700000008:[SURF  ,0014]disconnected after 288s",
-                "1700000009:[SURF  ,0025]Iridium...",
-                "1700000010:[SURF  ,0226]Go dive (Minimum surface delay expired and no more file to upload)",
-                "1700000011:[SURF  ,0056]<WARN>peer mute",
-                "1700000012:[SURF  ,0071]<WARN>timeout",
-                "1700000013:[SURF  ,0023]failed to connect #1, code -8, net 1, qual 5, dial 1",
+                "1700000000:[SURF  ,0025]Iridium...",
+                "1700000001:[SURF  ,0311]connected in 37s, signal quality 5",
+                "1700000002:[MRMAID,0664]$TRIG:3,1;",
+                "1700000003:[MRMAID,0664]$UPLOAD_MAX:150;",
+                "1700000004:[SURF  ,0328]10 cmd(s) received",
+                "1700000005:[UPLOAD,0248]Upload data files...",
+                '1700000006:[UPLOAD,0231]"0070/60B742A0.MER" uploaded at 137bytes/s',
+                "1700000007:[MRMAID,0604]1373 bytes in 0026/5D3CDEA0.MER",
+                "1700000008:[ZTX   ,0486]peer ask to resume 07/5B6A9B02.LOG from byte 1024",
+                "1700000009:[ZTX   ,0472]<ERR>peer ask to resume 0048/607503A2.MER (118847bytes) from byte 4294967294",
+                '1700000010:[UPLOAD,9999]<ERR>upload "0026","0026/5DC0FCFC.MER"',
+                "1700000011:[SURF  ,0069]transfer interrupted , retry",
+                "1700000012:[MAIN  ,0013]2 file(s) uploaded",
+                "1700000013:[SURF  ,0366]disconnected after 613s",
+                "1700000014:[SURF  ,0226]Go dive (Minimum surface delay expired and no more file to upload)",
+                "1700000015:[SURF  ,0056]<WARN>peer mute",
+                "1700000016:[MAIN  ,0007]raw unmatched after session",
                 "",
             ]
         ),
@@ -1090,11 +1097,20 @@ def test_write_log_jsonl_families_broadens_transmission_classification_conservat
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
+    iridium_records = _read_jsonl(output_dir / "log_iridium_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.transmission_records == 9
-    assert [record["transmission_kind"] for record in transmission_records] == [
+    assert summary.iridium_records == 1
+    assert len(iridium_records) == 1
+    assert iridium_records[0]["session_kind"] == "explicit_session"
+    assert iridium_records[0]["source_line_numbers"] == list(range(1, 15))
+    events = iridium_records[0]["iridium_events"]
+    assert [record["iridium_event_kind"] for record in events] == [
+        "session_start",
+        "connection",
+        "command",
+        "command",
+        "command_summary",
         "upload_batch",
         "upload_artifact",
         "upload_progress_artifact",
@@ -1103,53 +1119,59 @@ def test_write_log_jsonl_families_broadens_transmission_classification_conservat
         "upload_error_artifact",
         "upload_retry",
         "upload_session_summary",
-        "upload_disconnect",
+        "disconnect",
     ]
-    assert transmission_records[0]["transmission_kind"] == "upload_batch"
-    assert transmission_records[0]["referenced_artifact"] is None
-    assert transmission_records[0]["byte_count"] is None
+    assert events[1]["connection_duration_s"] == 37
+    assert events[1]["signal_quality"] == 5
+    assert events[2]["command_name"] == "TRIG"
+    assert events[2]["command_payload"] == "3,1"
+    assert events[3]["command_name"] == "UPLOAD_MAX"
+    assert events[3]["command_payload"] == "150"
+    assert events[4]["received_command_count"] == 10
+    assert events[5]["iridium_event_kind"] == "upload_batch"
+    assert "referenced_artifact" not in events[5]
+    assert "byte_count" not in events[5]
 
-    assert transmission_records[1]["transmission_kind"] == "upload_artifact"
-    assert transmission_records[1]["referenced_artifact"] == "0070_60B742A0.MER"
-    assert transmission_records[1]["rate_bytes_per_s"] == 137
+    assert events[6]["iridium_event_kind"] == "upload_artifact"
+    assert events[6]["referenced_artifact"] == "0070_60B742A0.MER"
+    assert events[6]["rate_bytes_per_s"] == 137
 
-    assert transmission_records[2]["transmission_kind"] == "upload_progress_artifact"
-    assert transmission_records[2]["referenced_artifact"] == "0026_5D3CDEA0.MER"
-    assert transmission_records[2]["byte_count"] == 1373
-    assert transmission_records[2]["rate_bytes_per_s"] is None
+    assert events[7]["iridium_event_kind"] == "upload_progress_artifact"
+    assert events[7]["referenced_artifact"] == "0026_5D3CDEA0.MER"
+    assert events[7]["byte_count"] == 1373
+    assert "rate_bytes_per_s" not in events[7]
 
-    assert transmission_records[3]["transmission_kind"] == "upload_resume"
-    assert transmission_records[3]["referenced_artifact"] == "07_5B6A9B02.LOG"
-    assert transmission_records[3]["byte_offset"] == 1024
-    assert transmission_records[3]["artifact_size_bytes"] is None
+    assert events[8]["iridium_event_kind"] == "upload_resume"
+    assert events[8]["referenced_artifact"] == "07_5B6A9B02.LOG"
+    assert events[8]["byte_offset"] == 1024
+    assert events[8]["artifact_size_bytes"] is None
 
-    assert transmission_records[4]["transmission_kind"] == "upload_resume"
-    assert transmission_records[4]["referenced_artifact"] == "0048_607503A2.MER"
-    assert transmission_records[4]["byte_offset"] == 4294967294
-    assert transmission_records[4]["artifact_size_bytes"] == 118847
-    assert transmission_records[4]["message"].startswith("<ERR>peer ask to resume")
+    assert events[9]["iridium_event_kind"] == "upload_resume"
+    assert events[9]["referenced_artifact"] == "0048_607503A2.MER"
+    assert events[9]["byte_offset"] == 4294967294
+    assert events[9]["artifact_size_bytes"] == 118847
+    assert events[9]["message"].startswith("<ERR>peer ask to resume")
 
-    assert transmission_records[5]["transmission_kind"] == "upload_error_artifact"
-    assert transmission_records[5]["referenced_artifact"] == "0026_5DC0FCFC.MER"
+    assert events[10]["iridium_event_kind"] == "upload_error_artifact"
+    assert events[10]["referenced_artifact"] == "0026_5DC0FCFC.MER"
 
-    assert transmission_records[6]["transmission_kind"] == "upload_retry"
-    assert transmission_records[6]["referenced_artifact"] is None
+    assert events[11]["iridium_event_kind"] == "upload_retry"
+    assert "referenced_artifact" not in events[11]
 
-    assert transmission_records[7]["transmission_kind"] == "upload_session_summary"
-    assert transmission_records[7]["uploaded_file_count"] == 2
+    assert events[12]["iridium_event_kind"] == "upload_session_summary"
+    assert events[12]["uploaded_file_count"] == 2
 
-    assert transmission_records[8]["transmission_kind"] == "upload_disconnect"
-    assert transmission_records[8]["disconnect_duration_s"] == 288
+    assert events[13]["iridium_event_kind"] == "disconnect"
+    assert events[13]["disconnect_duration_s"] == 613
 
     assert {record["message"] for record in unclassified_records} >= {
-        "Iridium...",
         "Go dive (Minimum surface delay expired and no more file to upload)",
         "<WARN>peer mute",
-        "failed to connect #1, code -8, net 1, qual 5, dial 1",
+        "raw unmatched after session",
     }
 
 
-def test_write_log_jsonl_families_classifies_wrapped_tagged_transmission_lines(
+def test_write_log_jsonl_families_groups_wrapped_tagged_iridium_event_lines(
     tmp_path: Path,
 ) -> None:
     log_path = tmp_path / "0700_wrapped.LOG"
@@ -1167,18 +1189,21 @@ def test_write_log_jsonl_families_classifies_wrapped_tagged_transmission_lines(
     output_dir = tmp_path / "jsonl"
     summary = write_log_jsonl_families([log_path], output_dir)
 
-    transmission_records = _read_jsonl(output_dir / "log_transmission_records.jsonl")
+    iridium_records = _read_jsonl(output_dir / "log_iridium_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.transmission_records == 2
+    assert summary.iridium_records == 1
     assert summary.unclassified_records == 0
-    assert [record["transmission_kind"] for record in transmission_records] == [
+    assert len(iridium_records) == 1
+    assert iridium_records[0]["session_kind"] == "event_sequence"
+    events = iridium_records[0]["iridium_events"]
+    assert [record["iridium_event_kind"] for record in events] == [
         "upload_resume",
         "upload_retry",
     ]
-    assert transmission_records[0]["referenced_artifact"] == "0048_607503A2.MER"
-    assert transmission_records[0]["artifact_size_bytes"] == 118847
-    assert transmission_records[0]["byte_offset"] == 4294967294
+    assert events[0]["referenced_artifact"] == "0048_607503A2.MER"
+    assert events[0]["artifact_size_bytes"] == 118847
+    assert events[0]["byte_offset"] == 4294967294
     assert unclassified_records == []
     _assert_log_source_line_assignments_exact_once(output_dir)
 
@@ -1211,7 +1236,7 @@ def test_write_log_jsonl_families_routes_wrapped_nonfamily_lines_to_unclassified
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
     assert summary.unclassified_records == 3
-    assert summary.transmission_records == 0
+    assert summary.iridium_records == 0
     assert malformed_log_lines == []
     assert [record["message"] for record in unclassified_records] == [
         "<ERR>ping error",

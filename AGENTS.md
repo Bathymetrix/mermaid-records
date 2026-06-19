@@ -152,7 +152,7 @@ Preserve source identity via `source_kind = "log"`.
 Normalized record-family direction to keep in mind during cleanup and naming:
 
 - `location_records`
-- `transmission_records`
+- `iridium_records`
 - `acquisition_records`
 - `ascent_request_records`
 - `parameter_records`
@@ -181,7 +181,7 @@ For LOG family routing, no parsed ordinary LOG source line should disappear sile
 
 LOG-family routing contract:
 
-- grouped structural LOG routes such as `parameter`, `testmode`, and `ctd` are resolved before ordinary `OperationalLogEntry` family classification
+- grouped structural LOG routes such as `parameter`, `testmode`, `ctd`, and `iridium` are resolved before ordinary `OperationalLogEntry` family classification
 - every ordinary LOG source line has exactly one family assignment
 - specific family matches emit only to that specific family
 - zero specific matches route to `log_unclassified_records`
@@ -198,6 +198,8 @@ Do not infer intervals from assertion lines in the normalization layer.
 For ascent-request prototypes, classify only explicit request outcomes such as `ascent request accepted` and `ascent request rejected`. Do not infer ascent-request state from other ascent-related lines.
 
 For GPS prototypes, emit one record per clearly GPS-related LOG line such as `GPS fix...`, raw latitude/longitude lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. Do not group lines into fixes or compute derived position/timing values in the normalization layer.
+
+For Iridium LOG records, emit one `log_iridium_records` row per explicit `Iridium...` session or contiguous mid-session Iridium event sequence. Preserve all consumed session lines in `raw_lines`, expose literal per-line `iridium_events`, and do not infer commands, upload success, positions, or timing values beyond explicit LOG text.
 
 For rollover banner lines like `timestamp:*** switching to 0026/5D4A3E75 ***`, preserve them as operational LOG records instead of malformed lines and emit `switched_to_log_file` with canonical filename normalization.
 
