@@ -154,6 +154,14 @@ def test_audit_rows_reports_findings_and_full_coverage(tmp_path: Path) -> None:
     [
         (
             {
+                "raw_line": "1700000000:[BUOY  ,656]P+151590mbar",
+                "pressure_mbar": 151589,
+                "log_epoch_time": "1700000000",
+            },
+            "pressure_mbar does not match the preserved raw_line value",
+        ),
+        (
+            {
                 "raw_line": "1700000000:[MRMAID,565]1527dbar, -10degC",
                 "pressure_dbar": 1526,
                 "temperature_degc": -10,

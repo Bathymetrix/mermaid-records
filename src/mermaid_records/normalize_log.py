@@ -110,6 +110,7 @@ _UPLOAD_BATCH_RE = re.compile(r"^Upload data files\.\.\.$", re.IGNORECASE)
 _PRESS_TEMP_RE = re.compile(
     r"\bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b"
 )
+_STANDALONE_PRESSURE_MBAR_RE = re.compile(r"^P\s*(?P<pressure_mbar>[+-]?\d+)mbar$")
 _DBAR_DEGC_RE = re.compile(
     r"\b(?P<pressure_dbar>[+-]?\d+)dbar,\s*(?P<temperature_degc>[+-]?\d+)degC\b"
 )
@@ -1243,6 +1244,14 @@ def _classify_pressure_temperature(
             **common_fields,
             "pressure_mbar": int(match.group("pressure_mbar")),
             "temperature_mdegc": int(match.group("temperature_mdegc")),
+            "raw_line": entry.raw_line,
+        }
+
+    match = _STANDALONE_PRESSURE_MBAR_RE.search(entry.message)
+    if match is not None:
+        return {
+            **common_fields,
+            "pressure_mbar": int(match.group("pressure_mbar")),
             "raw_line": entry.raw_line,
         }
 

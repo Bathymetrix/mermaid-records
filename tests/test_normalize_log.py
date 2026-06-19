@@ -210,6 +210,8 @@ def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patte
                 "1700000002:[MAIN  ,0408]internal pressure 78680Pa",
                 "1700000003:[MAIN  ,0498]Pint 76872Pa",
                 "1700000004:[MAIN  ,0502]Pext -45mbar (rng 30mbar)",
+                "1700000005:[BUOY  ,0656]P+151590mbar",
+                "1700000006:[VALVE ,0234]battery 15073mV,  502152uA, P  +8921mbar",
                 "",
             ]
         ),
@@ -221,9 +223,11 @@ def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patte
     pressure_temperature_records = _read_jsonl(
         output_dir / "log_pressure_temperature_records.jsonl"
     )
+    battery_records = _read_jsonl(output_dir / "log_battery_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.pressure_temperature_records == 5
+    assert summary.pressure_temperature_records == 6
+    assert summary.battery_records == 1
     assert summary.unclassified_records == 0
     assert [record["message"] for record in pressure_temperature_records] == [
         "P+20179mbar,T+32767mdegC",
@@ -231,6 +235,7 @@ def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patte
         "internal pressure 78680Pa",
         "Pint 76872Pa",
         "Pext -45mbar (rng 30mbar)",
+        "P+151590mbar",
     ]
     assert pressure_temperature_records[0]["pressure_mbar"] == 20179
     assert pressure_temperature_records[0]["temperature_mdegc"] == 32767
@@ -242,6 +247,10 @@ def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patte
     assert pressure_temperature_records[3]["internal_pressure_pa"] == 76872
     assert pressure_temperature_records[4]["external_pressure_mbar"] == -45
     assert pressure_temperature_records[4]["external_pressure_range_mbar"] == 30
+    assert pressure_temperature_records[5]["pressure_mbar"] == 151590
+    assert [record["message"] for record in battery_records] == [
+        "battery 15073mV,  502152uA, P  +8921mbar"
+    ]
     assert unclassified_records == []
     _assert_log_source_line_assignments_exact_once(output_dir)
 

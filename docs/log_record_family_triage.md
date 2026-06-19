@@ -118,7 +118,6 @@ understood sufficiently to propose a stable schema.
 | Count | Example | Notes |
 |--------:|----------|-------|
 | 150,384 | `from +2mbar/s to +4mbar/s` | Buoyancy-control rates? |
-| 41,432 | `P+151590mbar` | Pressure shorthand? |
 | 33,425 | `Outflow calculated : 2823` | Units unknown |
 | 23,010 | `630mbar reached (+13mbar/s), 7 bypass done` | Mixed control/state message |
 | 13,340 | `<ERR>acq not started` | Acquisition diagnostic |
@@ -135,3 +134,9 @@ understood sufficiently to propose a stable schema.
 
 Everything else can remain in `log_unclassified_records.jsonl` until there is a
 clear downstream use case and schema definition.
+
+## Completed Routing Decisions
+
+| Count | Example | Decision |
+|--------:|----------|----------|
+| 41,432 | `P+151590mbar` | Routed to `log_pressure_temperature_records` as generic `pressure_mbar`. |

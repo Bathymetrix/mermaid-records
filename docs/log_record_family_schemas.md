@@ -363,7 +363,7 @@ Field table: common single-line fields plus:
 
 | Field | Type | Nullable? | Meaning | Units | Source / derivation |
 | --- | --- | --- | --- | --- | --- |
-| `pressure_mbar` | integer | yes | Pressure value for `P...mbar,T...mdegC` observations. | mbar | Regex group `pressure_mbar`; emitted only for matching source lines. |
+| `pressure_mbar` | integer | yes | Generic source-literal pressure value for `P...mbar,T...mdegC` and standalone `P...mbar` observations. | mbar | Regex group `pressure_mbar`; emitted only for matching source lines. |
 | `temperature_mdegc` | integer | yes | Temperature value for `P...mbar,T...mdegC` observations. | mdegC | Regex group `temperature_mdegc`; emitted only for matching source lines. |
 | `pressure_dbar` | integer | yes | Pressure value for `...dbar, ...degC` observations. | dbar | Regex group `pressure_dbar`; emitted only for matching source lines. |
 | `temperature_degc` | integer | yes | Temperature value for `...dbar, ...degC` observations. | degC | Regex group `temperature_degc`; emitted only for matching source lines. |
@@ -377,10 +377,11 @@ Regexes, case-sensitive, searched anywhere in `message`:
 
 ```text
 \bP\s*(?P<pressure_mbar>[+-]?\d+)mbar,\s*T\s*(?P<temperature_mdegc>[+-]?\d+)mdegC\b
+^P\s*(?P<pressure_mbar>[+-]?\d+)mbar$
 \b(?P<pressure_dbar>[+-]?\d+)dbar,\s*(?P<temperature_degc>[+-]?\d+)degC\b
 \binternal pressure\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b
 \bPint\s+(?P<internal_pressure_pa>[+-]?\d+)Pa\b
-\bPext\s+(?P<external_pressure_mbar>[+-]?\d+)mbar\s+\(rng\s+(?P<external_pressure_range_mbar>[+-]?\d+)mbar\)\b
+\bPext\s+(?P<external_pressure_mbar>[+-]?\d+)mbar\s+\(rng\s+(?P<external_pressure_range_mbar>[+-]?\d+)mbar\)
 ```
 
 Hits:
@@ -388,6 +389,7 @@ Hits:
 ```text
 1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC
 1700000000:[PRESS ,0081]P    +0mbar,T-10881mdegC
+1700000000:[BUOY  ,0656]P+151590mbar
 1535842096:[MRMAID,565]1523dbar, -11degC
 1564269461:[MAIN  ,408]internal pressure 78680Pa
 1696784664:[MAIN  ,498]Pint 84535Pa
@@ -400,19 +402,23 @@ Non-hits:
 1700000004:[MAIN  ,0007]New pressure offset: 40mbar
 1700000006:[MAIN  ,0007]P +12,T -34,S +56
 1688207849:[PROFIL,0288]    p_cut_off=2dbar
+1700000000:[VALVE ,0234]battery 15073mV,  502152uA, P  +8921mbar
 1700000000:[MAIN  ,0007]Pext -45mbar
 ```
 
 Overlap / exclusivity: mutually exclusive with other LOG families. Matching
-lines do not also appear in unclassified. Pressure offset, profile parameter,
+lines do not also appear in unclassified. Standalone `P...mbar` hits are
+anchored to the whole `message`, so embedded pressure snippets in battery
+telemetry do not also hit this family. Pressure offset, profile parameter,
 incomplete `Pext`, and `P +12,T -34,S +56` lines do not hit and currently route
 to unclassified when no other family matches. Hits previously would have been
 ordinary/base operational rows before `log_operational_records` was dissolved.
 
 Known gaps / edge cases: source units are preserved without conversion, so
 `pressure_mbar`, `pressure_dbar`, and `internal_pressure_pa` are distinct fields.
-Offset, configuration/profile parameter, and CTD-style `P,T,S` lines are
-intentionally outside this family.
+Standalone `P...mbar` rows do not assert internal or external pressure. Offset,
+configuration/profile parameter, and CTD-style `P,T,S` lines are intentionally
+outside this family.
 
 ## `log_ctd_records.jsonl`
 
@@ -687,6 +693,7 @@ Non-hits:
 
 ```text
 1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC
+1700000000:[BUOY  ,0656]P+151590mbar
 1535842096:[MRMAID,565]1523dbar, -11degC
 1565146653:[MAIN  ,507]Pext -45mbar (rng 30mbar)
 1564269461:[MAIN  ,408]internal pressure 78680Pa

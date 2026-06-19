@@ -20,6 +20,7 @@ from .format_record_filenames import record_family_name
 
 BATTERY_PATTERN = re.compile(r"battery\s+(-?\d+)mV,\s*(-?\d+)uA")
 PRESSURE_TEMPERATURE_PATTERN = re.compile(r"P\s*([+-]?\d+)mbar,T\s*([+-]?\d+)mdegC")
+STANDALONE_PRESSURE_MBAR_PATTERN = re.compile(r"(?:\]|^)P\s*([+-]?\d+)mbar$")
 DBAR_DEGC_PATTERN = re.compile(r"\b([+-]?\d+)dbar,\s*([+-]?\d+)degC\b")
 INTERNAL_PRESSURE_PATTERN = re.compile(r"\binternal pressure\s+([+-]?\d+)Pa\b")
 PINT_PATTERN = re.compile(r"\bPint\s+([+-]?\d+)Pa\b")
@@ -360,6 +361,12 @@ def _check_log_pressure_temperature_row(row: dict[str, Any]) -> list[str]:
             issues.append("pressure_mbar does not match the preserved raw_line value")
         if int(match.group(2)) != row.get("temperature_mdegc"):
             issues.append("temperature_mdegc does not match the preserved raw_line value")
+        return issues
+
+    match = STANDALONE_PRESSURE_MBAR_PATTERN.search(row["raw_line"])
+    if match is not None:
+        if int(match.group(1)) != row.get("pressure_mbar"):
+            issues.append("pressure_mbar does not match the preserved raw_line value")
         return issues
 
     match = DBAR_DEGC_PATTERN.search(row["raw_line"])
