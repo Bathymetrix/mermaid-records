@@ -262,7 +262,7 @@ The stripped message is checked in this order:
 
 ```text
 "GPS fix..." substring -> gps_record_kind=fix_attempt, raw_values=null
-(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)
+(?:Latitude\s*:\s*)?(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?:Longitude\s*:\s*)?(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)  # case-insensitive
 \bhdop\s+(?P<hdop>[+-]?\d+(?:\.\d+)?)       # case-insensitive
 \bvdop\s+(?P<vdop>[+-]?\d+(?:\.\d+)?)       # case-insensitive
 \$?GPSACK:(?P<payload>[^;]+)
@@ -277,9 +277,10 @@ Hits:
 ```text
 1700000000:[SURF  ,0022]GPS fix...
 1700000001:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn
-1700000002:[SURF  ,0084]hdop 0.820, vdop 1.180
-1700000003:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
-1700000004:[MRMAID,0052]$GPSOFF:3686327;
+1700000002:[SURF  ,0082]Latitude : N43deg40.956mn, Longitude :E007deg19.175mn
+1700000003:[SURF  ,0084]hdop 0.820, vdop 1.180
+1700000004:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;
+1700000005:[MRMAID,0052]$GPSOFF:3686327;
 ```
 
 Non-hits:

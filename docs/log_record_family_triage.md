@@ -29,6 +29,7 @@ normalization code.
 | 7,027 | `<ERR>uploading failed` | `log_iridium_records` event |
 | 5,384 | `p2t37: dp 50mbar, dt 5000mdegC` | `log_parameter_records` grouped parameter episode |
 | 5,384 | `coeff`, `delay`, `surface`, `ascent`, etc. parameter dump lines | `log_parameter_records` grouped parameter episode |
+| 7,659 | `Latitude : N43deg40.956mn, Longitude :E007deg19.175mn` | `log_gps_records` as `fix_position` |
 
 ## Strong Candidates
 
@@ -37,14 +38,13 @@ and avoids interpretation.
 
 ### GPS / Time-Sync Extensions
 
-Current `log_gps_records` covers `GPS fix...`, compact latitude/longitude
-lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. These remaining examples look
-GPS-adjacent but use different text shapes.
+Current `log_gps_records` covers `GPS fix...`, compact and verbose
+latitude/longitude lines, `hdop`/`vdop`, `GPSACK`, and `GPSOFF`. These
+remaining examples look GPS-adjacent but use different text shapes.
 
 | Count | Example | Possible action |
 |--------:|----------|-----------------|
 | 16,524 | `fix 3D, 8 satellites` | Add a GPS status/fix-detail kind with literal satellite count. |
-| 7,659 | `Latitude : N43deg40.956mn, Longitude :E007deg19.175mn` | Add an alternate GPS position parser preserving raw coordinate strings. |
 | 5,387 | `<WARN>GPRMC ms=370 #1` | Add a GPS diagnostic kind if examples are consistent. |
 | 3,736 | `last almanac : 6954` | Possible GPS/almanac diagnostic, but units and meaning need confirmation. |
 | 27,494 | `+0s diff` | Possible time-sync record; needs surrounding-line context before routing. |

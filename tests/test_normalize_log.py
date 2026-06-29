@@ -921,10 +921,11 @@ def test_write_log_jsonl_families_emits_gps_records(
             [
                 "1700000000:[SURF  ,0022]GPS fix...",
                 "1700000001:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn",
-                "1700000002:[SURF  ,0084]hdop 0.820, vdop 1.180",
-                "1700000003:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;",
-                "1700000004:[MRMAID,0052]$GPSOFF:3686327;",
-                "1700000005:[MAIN  ,0007]buoy 467.174-T-0100",
+                "1700000002:[SURF  ,0082]Latitude : N43deg40.956mn, Longitude :E007deg19.175mn",
+                "1700000003:[SURF  ,0084]hdop 0.820, vdop 1.180",
+                "1700000004:[MRMAID,0052]$GPSACK:+0,+0,+0,+0,+0,+0,-30;",
+                "1700000005:[MRMAID,0052]$GPSOFF:3686327;",
+                "1700000006:[MAIN  ,0007]buoy 467.174-T-0100",
                 "",
             ]
         ),
@@ -936,29 +937,34 @@ def test_write_log_jsonl_families_emits_gps_records(
     gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
     unclassified_records = _read_jsonl(output_dir / "log_unclassified_records.jsonl")
 
-    assert summary.total_records == 6
-    assert summary.gps_records == 5
+    assert summary.total_records == 7
+    assert summary.gps_records == 6
     assert summary.gps_record_kind_counts == {
         "dop": 1,
         "fix_attempt": 1,
-        "fix_position": 1,
+        "fix_position": 2,
         "gps_ack": 1,
         "gps_off": 1,
     }
     assert summary.unclassified_records == 1
-    assert len(gps_records) == 5
+    assert len(gps_records) == 6
     assert gps_records[0]["gps_record_kind"] == "fix_attempt"
     assert gps_records[0]["raw_values"] is None
     assert gps_records[1]["raw_values"] == {
         "latitude": "N35deg19.262mn",
         "longitude": "E139deg39.043mn",
     }
-    assert gps_records[2]["raw_values"] == {"hdop": "0.820", "vdop": "1.180"}
-    assert gps_records[3]["raw_values"] == {"gpsack": "+0,+0,+0,+0,+0,+0,-30"}
-    assert gps_records[4]["raw_values"] == {"gpsoff": "3686327"}
-    assert gps_records[2]["record_time"] == "2023-11-14T22:13:22.000000Z"
-    assert gps_records[2]["log_epoch_time"] == "1700000002"
-    assert "time" not in gps_records[2]
+    assert gps_records[2]["gps_record_kind"] == "fix_position"
+    assert gps_records[2]["raw_values"] == {
+        "latitude": "N43deg40.956mn",
+        "longitude": "E007deg19.175mn",
+    }
+    assert gps_records[3]["raw_values"] == {"hdop": "0.820", "vdop": "1.180"}
+    assert gps_records[4]["raw_values"] == {"gpsack": "+0,+0,+0,+0,+0,+0,-30"}
+    assert gps_records[5]["raw_values"] == {"gpsoff": "3686327"}
+    assert gps_records[3]["record_time"] == "2023-11-14T22:13:23.000000Z"
+    assert gps_records[3]["log_epoch_time"] == "1700000003"
+    assert "time" not in gps_records[3]
     assert [record["message"] for record in unclassified_records] == [
         "buoy 467.174-T-0100"
     ]

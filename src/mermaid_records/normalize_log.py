@@ -161,7 +161,11 @@ _VBAT_RE = re.compile(
     re.IGNORECASE,
 )
 _GPS_POSITION_RE = re.compile(
-    r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)"
+    r"(?:Latitude\s*:\s*)?"
+    r"(?P<latitude>[NS]\d+deg\d+(?:\.\d+)?mn)\s*,\s*"
+    r"(?:Longitude\s*:\s*)?"
+    r"(?P<longitude>[EW]\d+deg\d+(?:\.\d+)?mn)",
+    re.IGNORECASE,
 )
 _HDOP_RE = re.compile(r"\bhdop\s+(?P<hdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
 _VDOP_RE = re.compile(r"\bvdop\s+(?P<vdop>[+-]?\d+(?:\.\d+)?)", re.IGNORECASE)
