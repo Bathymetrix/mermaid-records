@@ -185,6 +185,11 @@ def _run_stateful(
     grouped_sources = _group_paths(
         [*sorted(iter_bin_files(input_root)), *sorted(iter_log_files(input_root)), *sorted(iter_mer_files(input_root))]
     )
+    if not grouped_sources:
+        _emit_progress(
+            progress,
+            f"WARNING: no expected source files found under {input_root} (expected .BIN, .LOG, or .MER)",
+        )
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
     previous_outputs = _previous_outputs_by_instrument_id(output_dir) if output_dir.exists() else {}

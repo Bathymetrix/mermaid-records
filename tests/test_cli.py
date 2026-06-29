@@ -134,6 +134,28 @@ def test_normalize_cli_accepts_comma_and_space_separated_input_files(tmp_path: P
     assert not _record_path(output_dir / "467.174-T-0100", "log_operational_records.jsonl").exists()
 
 
+def test_normalize_cli_warns_when_input_root_has_no_expected_sources(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "0100_sample.S61").write_bytes(b"not in scope")
+
+    output_dir = tmp_path / "output"
+    result = main(["normalize", "-i", str(input_root), "-o", str(output_dir)])
+
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert "NORMALIZATION SUMMARY" in captured.out
+    assert "raw files processed: 0" in captured.out
+    assert (
+        f"WARNING: no expected source files found under {input_root} "
+        "(expected .BIN, .LOG, or .MER)"
+    ) in captured.err
+
+
 def test_normalize_cli_reports_writer_assignment_counts_without_rereading_outputs(
     tmp_path: Path,
     capsys,
@@ -199,6 +221,38 @@ def test_normalize_cli_dry_run_human_output_is_side_effect_free(tmp_path: Path, 
     assert "INSTRUMENT 467.174-T-0100" in captured.out
     assert "log: append" in captured.out
     assert "0100_sample.LOG (0 B -> " in captured.out
+    assert not output_dir.exists()
+
+
+def test_normalize_cli_dry_run_warns_when_input_root_has_no_expected_sources(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    (input_root / "notes.txt").write_text("not a raw source\n", encoding="utf-8")
+
+    output_dir = tmp_path / "output"
+    result = main(
+        [
+            "normalize",
+            "-i",
+            str(input_root),
+            "-o",
+            str(output_dir),
+            "--dry-run",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert "DRY RUN SUMMARY" in captured.out
+    assert "raw files processed: 0" in captured.out
+    assert (
+        f"WARNING: no expected source files found under {input_root} "
+        "(expected .BIN, .LOG, or .MER)"
+    ) in captured.err
     assert not output_dir.exists()
 
 
