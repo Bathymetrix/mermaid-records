@@ -315,13 +315,13 @@ Avoid:
   - append only when the only change is newly added raw source files
   - rewrite when any previously seen raw source changes or is removed
   - decoder-state changes invalidate only BIN-derived outputs for BIN-dependent floats
-  - explicit force-rewrite mode may override incremental append/noop decisions and force targeted family rewrites
+  - explicit force mode may override incremental append/noop decisions and force targeted family rewrites
 - JSONL outputs use deterministic processing order, not time-order.
 - Normalized JSONL outputs should use basename-only `source_file`; richer full-path provenance belongs in manifests and other run-side artifacts.
 - LOG source-line assignment accounting must use full source paths internally so same-named source files in different locations do not collapse into false duplicates; emitted JSONL `source_file` remains basename-only.
 - CLI LOG assignment status reports should accumulate the `write_log_jsonl_families` summary produced during writing; do not reread generated LOG JSONL solely to rebuild assignment counts.
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.
-- `--force-rewrite` must remove package-owned generated artifacts for each targeted instrument before regeneration: all top-level `log_*.jsonl`, all top-level `mer_*.jsonl`, and package-owned bookkeeping under `manifests/` and `state/`. Do not delete unknown files or the whole instrument directory.
+- `-f` / `--force` must remove package-owned generated artifacts for each targeted instrument before regeneration: all top-level `log_*.jsonl`, all top-level `mer_*.jsonl`, and package-owned bookkeeping under `manifests/` and `state/`. Do not delete unknown files or the whole instrument directory.
 - `preflight_status.json` is run-scoped bookkeeping: clear stale root artifacts before each real run, and include `preflight_status` in `manifests/latest.json` only when the current run produced that artifact. When no preflight runs, omit the field rather than storing `null`.
 - Every per-instrument output directory must materialize the canonical serial-suffixed output file set even when some families are empty. At minimum this means all top-level LOG and MER JSONL family files named `<family>.<instrument_serial>.jsonl` must exist as empty files when they have no records; in `stateful` mode also keep the state/manifest scaffold present for that instrument, while `stateless` mode still must not create manifests.
 - Future dry-run/report behavior must be completely side-effect free, including no file writes of any kind.

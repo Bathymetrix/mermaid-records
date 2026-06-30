@@ -685,7 +685,7 @@ def compose_command(
     if dry_run:
         command.append("--dry-run")
     if force_rewrite:
-        command.append("--force-rewrite")
+        command.append("--force")
     if json_output:
         command.append("--json")
     if verbose:

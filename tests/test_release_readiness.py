@@ -53,6 +53,7 @@ def test_readme_documents_release_cli_contract_and_python_support() -> None:
     assert "--input-root" in readme
     assert "--input-file" in readme
     assert "--dry-run" in readme
+    assert "`-f`, `--force`" in readme
     assert "--json" in readme
     assert "--preflight-mode {strict,cached}" in readme
     assert "stateful mode" in readme
@@ -89,6 +90,7 @@ def test_cli_docs_capture_current_mode_and_flag_contract() -> None:
     cli_doc = (REPO_ROOT / "docs/cli.md").read_text(encoding="utf-8")
 
     assert "--json requires --dry-run" in cli_doc
+    assert "`-f`, `--force`" in cli_doc
     assert "--preflight-mode {strict,cached}" in cli_doc
     assert "manifests/" in cli_doc
     assert "state/" in cli_doc

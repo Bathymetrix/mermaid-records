@@ -84,7 +84,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Compute the normalization plan and file-level diffs without writing files.",
     )
     normalize.add_argument(
-        "--force-rewrite",
+        "-f",
+        "--force",
+        dest="force_rewrite",
         action="store_true",
         help="Rewrite all targeted instrument outputs instead of using append/noop incremental decisions.",
     )

@@ -4,6 +4,10 @@ All notable changes from this point forward should be recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Changed `normalize --force-rewrite` to `normalize -f, --force` for targeted family rewrites.
+
 ### Added
 
 - Warn during stateful CLI normalization when an input root contains no `.BIN`, `.LOG`, or `.MER` source files.

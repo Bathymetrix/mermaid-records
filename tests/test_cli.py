@@ -319,9 +319,11 @@ def test_normalize_cli_json_requires_dry_run(tmp_path: Path, capsys) -> None:
     assert not output_dir.exists()
 
 
-def test_normalize_cli_force_rewrite_reports_rewrite_in_dry_run_json(
+@pytest.mark.parametrize("force_flag", ["-f", "--force"])
+def test_normalize_cli_force_reports_rewrite_in_dry_run_json(
     tmp_path: Path,
     capsys,
+    force_flag: str,
 ) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()
@@ -341,7 +343,7 @@ def test_normalize_cli_force_rewrite_reports_rewrite_in_dry_run_json(
             str(output_dir),
             "--dry-run",
             "--json",
-            "--force-rewrite",
+            force_flag,
         ]
     )
 

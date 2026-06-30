@@ -54,7 +54,7 @@ Supported raw input types are `BIN`, `LOG`, and `MER`.
   - prints structured dry-run output instead of the human-readable summary
   - dry-run only
   - the CLI rejects `--json` without `--dry-run` with `--json requires --dry-run`
-- `--force-rewrite`
+- `-f`, `--force`
   - forces targeted family rewrites instead of append/noop incremental decisions
   - removes package-owned generated artifacts for each targeted instrument before regeneration
 - `-v`, `--verbose`
@@ -92,7 +92,7 @@ Behavior:
 
 That rewrite-only `stateless` contract is the safety mechanism that prevents silent duplication on reruns. If you rerun the same explicit file list, the targeted family outputs are regenerated rather than appended to.
 
-`--force-rewrite` does not change the fundamental stateless contract. It still does not enable manifests or incremental state; it only keeps cleanup behavior explicit for targeted package-owned outputs.
+`--force` does not change the fundamental stateless contract. It still does not enable manifests or incremental state; it only keeps cleanup behavior explicit for targeted package-owned outputs.
 
 ## Manifest and preflight artifacts
 

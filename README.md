@@ -47,7 +47,7 @@ Quick usage flags:
 - Output: `--output-dir`; if omitted, the CLI uses `$MERMAID/records` when `MERMAID` is set
 - BIN decoder and preflight: `--decoder-python` and `--decoder-script` (used together), plus `--preflight-mode {strict,cached}`
 - Planning and reporting: `--dry-run`, `--json` (dry-run only), and `--verbose` / `-v`
-- Rewrite control: `--force-rewrite` to force targeted family rewrites instead of append/noop incremental decisions
+- Rewrite control: `-f`, `--force` to force targeted family rewrites instead of append/noop incremental decisions
 
 See [docs/cli.md](docs/cli.md) for the full CLI reference.
 
