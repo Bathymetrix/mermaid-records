@@ -971,6 +971,75 @@ def test_write_log_jsonl_families_emits_gps_records(
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
+def test_write_log_jsonl_families_preserves_negative_epoch_iridium_session(
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "0100_negative_epoch_iridium.LOG"
+    log_path.write_text(
+        "\n".join(
+            [
+                "-1993752871:[SURF  ,0025]Iridium...",
+                "-1993752681:[MRMAID,0645]$GPSACK:-19,-8,+16,+0,+0,+1,-999633;",
+                "-1993752671:[MRMAID,0650]$GPSOFF:3686330;",
+                "-1993752661:[SURF  ,0366]disconnected after 210s",
+                "1681899427:[SURF  ,0394]S23deg29.970mn, W132deg30.444mn",
+                '1681899430:[UPLOAD,0231]"0025/1234ABCD.MER" uploaded at 137bytes/s',
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output_dir = tmp_path / "jsonl"
+    summary = write_log_jsonl_families([log_path], output_dir)
+
+    iridium_records = _read_jsonl(output_dir / "log_iridium_records.jsonl")
+    gps_records = _read_jsonl(output_dir / "log_gps_records.jsonl")
+
+    assert summary.iridium_records == 2
+    assert summary.gps_records == 1
+    assert len(iridium_records) == 2
+
+    negative_session = iridium_records[0]
+    assert negative_session["session_kind"] == "explicit_session"
+    assert negative_session["source_line_numbers"] == [1, 2, 3, 4]
+    assert negative_session["start_log_epoch_time"] == "-1993752871"
+    assert negative_session["end_log_epoch_time"] == "-1993752661"
+    assert negative_session["start_record_time"] == "1906-10-28T03:45:29.000000Z"
+    assert negative_session["end_record_time"] == "1906-10-28T03:48:59.000000Z"
+    assert [event["log_epoch_time"] for event in negative_session["iridium_events"]] == [
+        "-1993752871",
+        "-1993752681",
+        "-1993752671",
+        "-1993752661",
+    ]
+    assert [event["record_time"] for event in negative_session["iridium_events"]] == [
+        "1906-10-28T03:45:29.000000Z",
+        "1906-10-28T03:48:39.000000Z",
+        "1906-10-28T03:48:49.000000Z",
+        "1906-10-28T03:48:59.000000Z",
+    ]
+    assert negative_session["iridium_events"][1]["message"] == (
+        "$GPSACK:-19,-8,+16,+0,+0,+1,-999633;"
+    )
+    assert negative_session["iridium_events"][2]["message"] == "$GPSOFF:3686330;"
+
+    positive_upload_session = iridium_records[1]
+    assert positive_upload_session["session_kind"] == "event_sequence"
+    assert positive_upload_session["start_log_epoch_time"] == "1681899430"
+    assert positive_upload_session["iridium_events"][0]["referenced_artifact"] == (
+        "0025_1234ABCD.MER"
+    )
+
+    assert gps_records[0]["log_epoch_time"] == "1681899427"
+    assert gps_records[0]["record_time"] == "2023-04-19T10:17:07.000000Z"
+    assert gps_records[0]["raw_values"] == {
+        "latitude": "S23deg29.970mn",
+        "longitude": "W132deg30.444mn",
+    }
+    _assert_log_source_line_assignments_exact_once(output_dir)
+
+
 def test_write_log_jsonl_families_groups_testmode_fixture_session_from_0100_examples(
     tmp_path: Path,
 ) -> None:

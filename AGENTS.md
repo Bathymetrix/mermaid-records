@@ -15,6 +15,7 @@
 - Do not suggest `type: message` commit subjects by default; prefer clear, simple, project-specific commit messages.
 - Any time you suggest a commit message also bump version (`major`, `minor`, or `patch`) and alert user.
 - Treat this file as the persistent handoff document for future Codex sessions and update it when assumptions, boundaries, fixtures, or workflow rules change.
+- Keep `CHANGELOG.md` up to date with user-visible changes, contract changes, notable fixes, and release-preparation work.
 - Update `docs/log_record_family_schemas.md` with any source-code change that alters LOG record-family JSONL fields, filenames, grouping, classifier hit rules, or exclusivity behavior.
 - Add the exact Bathymetrix header only to `src/mermaid_records/__init__.py` and `src/mermaid_records/cli.py`.
 - Do not add the Bathymetrix header to `README.md`, tests, or internal implementation modules unless the user explicitly asks.

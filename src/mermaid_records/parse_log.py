@@ -15,6 +15,7 @@ from .models import OperationalLogEntry
 _LOG_LINE_RE = re.compile(
     r"^(?P<time>.+?):\[(?P<tag>[^\]]+)\](?P<message>.*)$"
 )
+_EPOCH_SECONDS_RE = re.compile(r"^[+-]?\d+$")
 
 type MalformedLogLineCallback = Callable[[int, str, str], None]
 
@@ -82,7 +83,7 @@ def _validate_log_path(path: Path) -> None:
 def _parse_time_text(text: str) -> datetime:
     """Parse either an epoch-seconds prefix or an ISO timestamp."""
 
-    if text.isdigit():
+    if _EPOCH_SECONDS_RE.fullmatch(text) is not None:
         return datetime.fromtimestamp(int(text), tz=timezone.utc)
     return parse_source_datetime(text)
 

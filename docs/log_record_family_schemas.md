@@ -564,6 +564,10 @@ Purpose / scope: explicit Iridium two-way communication sessions and
 mid-session Iridium/upload event sequences. One record represents one contiguous
 session-like source chunk, preserving every consumed raw LOG line.
 
+Signed negative epoch prefixes are source timestamps. They remain literal in
+`*_log_epoch_time` fields and, when the platform timestamp conversion supports
+them, render as pre-1970 UTC values in derived datetime fields.
+
 Representative object:
 
 ```json

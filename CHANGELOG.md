@@ -1,5 +1,18 @@
 # Changelog
 
+All notable changes from this point forward should be recorded here.
+
+## Unreleased
+
+### Added
+
+- Warn during stateful CLI normalization when an input root contains no `.BIN`, `.LOG`, or `.MER` source files.
+- Initialized this changelog for forward-looking release notes.
+
+### Fixed
+
+- Preserve signed negative LOG epoch timestamps as source timestamps, including in grouped Iridium session timing.
+
 ## 2.0.0
 
 Breaking output contract changes:

@@ -41,6 +41,7 @@ BASE_OUTPUT_FILENAMES = {
 OUTPUT_FILENAMES = BASE_OUTPUT_FILENAMES
 
 _LOG_LINE_RE = re.compile(r"^(?P<time>.+?):\[(?P<tag>[^\]]+)\](?P<message>.*)$")
+_EPOCH_SECONDS_RE = re.compile(r"^[+-]?\d+$")
 # Shared structurally parsed LOG line family for wrapped source-literal
 # severity prefixes such as timestamp:<WARN>[TAG]... and timestamp:<ERR>[TAG]...
 # Keep this narrow and corpus-driven rather than treating arbitrary <PREFIX>
@@ -1149,7 +1150,7 @@ def _validate_log_path(path: Path) -> None:
 
 
 def _parse_time_text(text: str) -> datetime:
-    if text.isdigit():
+    if _EPOCH_SECONDS_RE.fullmatch(text) is not None:
         return datetime.fromtimestamp(int(text), tz=timezone.utc)
     return parse_source_datetime(text)
 

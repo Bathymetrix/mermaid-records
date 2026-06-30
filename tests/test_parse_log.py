@@ -29,6 +29,18 @@ def test_iter_operational_log_entries_replaces_invalid_utf8_bytes(
     assert first_entry.source_kind == "log"
 
 
+def test_iter_operational_log_entries_parses_negative_epoch_timestamp(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "sample.LOG"
+    path.write_text("-1993752871:[MAIN  ,0356]board 452.020-P-25\n", encoding="utf-8")
+
+    first_entry = next(iter_operational_log_entries(path))
+
+    assert first_entry.time.isoformat() == "1906-10-28T03:45:29+00:00"
+    assert first_entry.raw_line == "-1993752871:[MAIN  ,0356]board 452.020-P-25"
+
+
 def test_iter_operational_log_entries_rejects_non_log_files(tmp_path: Path) -> None:
     path = tmp_path / "sample.MER"
     path.write_text(
