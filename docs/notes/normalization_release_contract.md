@@ -7,6 +7,10 @@ It describes the behavior that downstream callers, fixture audits, and future ha
 
 Version 2.0.0 deliberately breaks the post-v1 output contract by adding `instrument_serial` to normalized rows, suffixing JSONL family filenames with that serial, and using separator-rich UTC run IDs.
 
+Every normalized LOG and MER JSONL row includes top-level
+`mermaid_records_version`, populated from the canonical package
+`mermaid_records.__version__`.
+
 ## Scope
 
 `mermaid-records` is scoped strictly to canonical normalization of raw MERMAID data:
@@ -230,6 +234,7 @@ Shared direct LOG record fields:
 - `log_epoch_time`
 - `instrument_id`
 - `instrument_serial`
+- `mermaid_records_version`
 - `source_container`
 - `source_file`
 - `subsystem`
@@ -355,6 +360,7 @@ Shared MER provenance fields:
 
 - `instrument_id`
 - `instrument_serial`
+- `mermaid_records_version`
 - `source_container`
 - `source_file` (basename only in normalized JSONL outputs; full paths remain in manifest/run artifacts)
 

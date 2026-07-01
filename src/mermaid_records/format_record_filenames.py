@@ -7,6 +7,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Mapping
 
+from . import __version__
+
 
 def validate_instrument_serial(instrument_serial: str) -> str:
     """Return a normalized non-empty serial suitable for JSONL filenames."""
@@ -46,21 +48,31 @@ def record_family_name(path: Path) -> str:
     return path.name.removesuffix(".jsonl").split(".", maxsplit=1)[0]
 
 
-def with_instrument_serial(
+def with_record_metadata(
     record: dict[str, object],
     instrument_serial: str,
 ) -> dict[str, object]:
-    """Return a record with instrument_serial ordered after instrument_id."""
+    """Return a record with canonical package and instrument metadata."""
 
     serial = validate_instrument_serial(instrument_serial)
     if "instrument_id" not in record:
-        return {"instrument_serial": serial, **record}
+        return {
+            "instrument_serial": serial,
+            "mermaid_records_version": __version__,
+            **record,
+        }
     return {
         "instrument_id": record["instrument_id"],
         "instrument_serial": serial,
+        "mermaid_records_version": __version__,
         **{
             key: value
             for key, value in record.items()
-            if key not in {"instrument_id", "instrument_serial"}
+            if key
+            not in {
+                "instrument_id",
+                "instrument_serial",
+                "mermaid_records_version",
+            }
         },
     }

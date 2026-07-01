@@ -51,6 +51,7 @@ These fields appear on every single-line family:
 | --- | --- | --- | --- | --- | --- |
 | `instrument_id` | string | no | Canonical station/instrument identifier. | n/a | Pipeline context or fallback from LOG path. |
 | `instrument_serial` | string | no | Full hardware/dataset serial used in output filenames. | n/a | Pipeline context or fallback from LOG path. |
+| `mermaid_records_version` | string | no | Package version that emitted the normalized row. | n/a | Canonical `mermaid_records.__version__`. |
 | `source_file` | string | no | Basename of the source LOG file. | n/a | `entry.source_file.name`; never a full path. |
 | `source_container` | string | no | Source container kind. Always `log`. | n/a | Constant. |
 | `record_time` | string | no | UTC ISO8601 timestamp with six fractional digits and `Z`. | UTC time | Parsed from raw LOG timestamp. |
@@ -72,6 +73,7 @@ per-line event objects.
 | --- | --- | --- | --- | --- | --- |
 | `instrument_id` | string | no | Canonical station/instrument identifier. | n/a | Pipeline context or fallback from LOG path. |
 | `instrument_serial` | string | no | Full hardware/dataset serial used in output filenames. | n/a | Pipeline context or fallback from LOG path. |
+| `mermaid_records_version` | string | no | Package version that emitted the normalized row. | n/a | Canonical `mermaid_records.__version__`. |
 | `source_file` | string | no | Basename of the source LOG file. | n/a | Source LOG path basename. |
 | `episode_index` | integer | no | Zero-based episode number within the source file and family. | n/a | Incremented by grouped parser. |
 | `line_start_index` | integer | no | 1-based source line number for the first timestamped line in the episode. | lines | First grouped line with parsed time. |
@@ -91,7 +93,7 @@ preserves the distinction between state transitions and state assertions.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_acq.LOG","source_container":"log","record_time":"2023-11-14T22:13:20.000000Z","log_epoch_time":"1700000000","subsystem":"MRMAID","code":"0002","message":"acq started","source_line_number":1,"acquisition_state":"started","acquisition_evidence_kind":"transition","raw_line":"1700000000:[MRMAID,0002]acq started"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_acq.LOG","source_container":"log","record_time":"2023-11-14T22:13:20.000000Z","log_epoch_time":"1700000000","subsystem":"MRMAID","code":"0002","message":"acq started","source_line_number":1,"acquisition_state":"started","acquisition_evidence_kind":"transition","raw_line":"1700000000:[MRMAID,0002]acq started"}
 ```
 
 Field table: common single-line fields plus:
@@ -142,7 +144,7 @@ Purpose / scope: explicit ascent-request outcomes only.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_ascent.LOG","source_container":"log","record_time":"2023-11-14T22:13:20.000000Z","log_epoch_time":"1700000000","subsystem":"MRMAID","code":"0583","message":"ascent request accepted","source_line_number":1,"ascent_request_state":"accepted","raw_line":"1700000000:[MRMAID,0583]ascent request accepted"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_ascent.LOG","source_container":"log","record_time":"2023-11-14T22:13:20.000000Z","log_epoch_time":"1700000000","subsystem":"MRMAID","code":"0583","message":"ascent request accepted","source_line_number":1,"ascent_request_state":"accepted","raw_line":"1700000000:[MRMAID,0583]ascent request accepted"}
 ```
 
 Field table: common single-line fields plus:
@@ -191,8 +193,8 @@ VIT-like voltage/minimum-voltage summaries.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_battery.LOG","source_container":"log","record_time":"2023-11-14T22:13:23.000000Z","log_epoch_time":"1700000003","subsystem":"MONITR","code":"0461","message":"battery 14685mV,   12688uA","source_line_number":4,"battery_record_kind":"voltage_current","voltage_mv":14685,"current_ua":12688,"minimum_voltage_mv":null,"raw_line":"1700000003:[MONITR,0461]battery 14685mV,   12688uA"}
-{"instrument_id":"P0026","instrument_serial":"452.020-P-0026","source_file":"0026_5D48EAB8.LOG","source_container":"log","record_time":"2019-08-07T02:57:30.000000Z","log_epoch_time":"1565146650","subsystem":"MAIN","code":"498","message":"Vbat 14681mV (min 13967mV)","source_line_number":1,"battery_record_kind":"vbat_summary","voltage_mv":14681,"current_ua":null,"minimum_voltage_mv":13967,"raw_line":"1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_battery.LOG","source_container":"log","record_time":"2023-11-14T22:13:23.000000Z","log_epoch_time":"1700000003","subsystem":"MONITR","code":"0461","message":"battery 14685mV,   12688uA","source_line_number":4,"battery_record_kind":"voltage_current","voltage_mv":14685,"current_ua":12688,"minimum_voltage_mv":null,"raw_line":"1700000003:[MONITR,0461]battery 14685mV,   12688uA"}
+{"instrument_id":"P0026","instrument_serial":"452.020-P-0026","mermaid_records_version":"<package-version>","source_file":"0026_5D48EAB8.LOG","source_container":"log","record_time":"2019-08-07T02:57:30.000000Z","log_epoch_time":"1565146650","subsystem":"MAIN","code":"498","message":"Vbat 14681mV (min 13967mV)","source_line_number":1,"battery_record_kind":"vbat_summary","voltage_mv":14681,"current_ua":null,"minimum_voltage_mv":13967,"raw_line":"1565146650:[MAIN  ,498]Vbat 14681mV (min 13967mV)"}
 ```
 
 Field table: common single-line fields plus:
@@ -246,7 +248,7 @@ not group lines into a fix or compute derived coordinates.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_gps.LOG","source_container":"log","record_time":"2023-11-14T22:13:21.000000Z","log_epoch_time":"1700000001","subsystem":"SURF","code":"0082","message":"N35deg19.262mn, E139deg39.043mn","source_line_number":2,"gps_record_kind":"fix_position","raw_values":{"latitude":"N35deg19.262mn","longitude":"E139deg39.043mn"},"raw_line":"1700000001:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_gps.LOG","source_container":"log","record_time":"2023-11-14T22:13:21.000000Z","log_epoch_time":"1700000001","subsystem":"SURF","code":"0082","message":"N35deg19.262mn, E139deg39.043mn","source_line_number":2,"gps_record_kind":"fix_position","raw_values":{"latitude":"N35deg19.262mn","longitude":"E139deg39.043mn"},"raw_line":"1700000001:[SURF  ,0082]N35deg19.262mn, E139deg39.043mn"}
 ```
 
 Field table: common single-line fields plus:
@@ -307,7 +309,7 @@ share a known parameter prefix. These lines are not tagged LOG entries.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_params.LOG","episode_index":0,"line_start_index":2,"line_end_index":5,"source_line_numbers":[2,3,4,5],"start_record_time":"2023-11-14T22:13:21.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000001","end_log_epoch_time":"1700000001","raw_lines":["1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)","1700000001:    valve 60000ms 12750 (60000ms 12750 stored)","1700000001:    stage[0] 150000mbar (+/-5000mbar) 60000s (<60000s)","1700000001:    stage[1] 150000mbar (+/-5000mbar) 648000s (<708000s)"]}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_params.LOG","episode_index":0,"line_start_index":2,"line_end_index":5,"source_line_numbers":[2,3,4,5],"start_record_time":"2023-11-14T22:13:21.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000001","end_log_epoch_time":"1700000001","raw_lines":["1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)","1700000001:    valve 60000ms 12750 (60000ms 12750 stored)","1700000001:    stage[0] 150000mbar (+/-5000mbar) 60000s (<60000s)","1700000001:    stage[1] 150000mbar (+/-5000mbar) 648000s (<708000s)"]}
 ```
 
 Field table: common grouped-episode fields only.
@@ -363,7 +365,7 @@ observations in the units used by the source LOG line.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_press.LOG","source_container":"log","record_time":"2023-11-14T22:13:22.000000Z","log_epoch_time":"1700000002","subsystem":"PRESS","code":"0038","message":"P+20179mbar,T+32767mdegC","source_line_number":3,"pressure_mbar":20179,"temperature_mdegc":32767,"raw_line":"1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_press.LOG","source_container":"log","record_time":"2023-11-14T22:13:22.000000Z","log_epoch_time":"1700000002","subsystem":"PRESS","code":"0038","message":"P+20179mbar,T+32767mdegC","source_line_number":3,"pressure_mbar":20179,"temperature_mdegc":32767,"raw_line":"1700000002:[PRESS ,0038]P+20179mbar,T+32767mdegC"}
 ```
 
 Field table: common single-line fields plus:
@@ -438,7 +440,7 @@ present.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_ctd.LOG","episode_index":0,"line_start_index":1,"line_end_index":2,"source_line_numbers":[1,2],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000001","raw_lines":["1700000000:[SBE61 ,0396]P +468,T+150471,S38141","1700000001:[PROFIL,0299]    speed_control=10mbar/s"],"ctd_sample_count":1,"ctd_samples":[{"source_line_number":1,"raw_values":{"P":"+468","T":"+150471","S":"38141"},"pressure_cbar_tenths":468,"temperature_mdegc_tenths":150471,"salinity_psu_thousandths":38141}]}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_ctd.LOG","episode_index":0,"line_start_index":1,"line_end_index":2,"source_line_numbers":[1,2],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:21.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000001","raw_lines":["1700000000:[SBE61 ,0396]P +468,T+150471,S38141","1700000001:[PROFIL,0299]    speed_control=10mbar/s"],"ctd_sample_count":1,"ctd_samples":[{"source_line_number":1,"raw_values":{"P":"+468","T":"+150471","S":"38141"},"pressure_cbar_tenths":468,"temperature_mdegc_tenths":150471,"salinity_psu_thousandths":38141}]}
 ```
 
 Field table: common grouped-episode fields plus:
@@ -505,7 +507,7 @@ entries, console text, and blank lines while the session is active.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_testmode.LOG","episode_index":0,"line_start_index":1,"line_end_index":4,"source_line_numbers":[1,2,3,4],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:24.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000004","raw_lines":["1700000000:[TESTMD,0053]Enter in test mode? yes/no","Command list for MOBY 4000m","Set params","1700000004:[TESTMD,0252]0100>"]}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_testmode.LOG","episode_index":0,"line_start_index":1,"line_end_index":4,"source_line_numbers":[1,2,3,4],"start_record_time":"2023-11-14T22:13:20.000000Z","end_record_time":"2023-11-14T22:13:24.000000Z","start_log_epoch_time":"1700000000","end_log_epoch_time":"1700000004","raw_lines":["1700000000:[TESTMD,0053]Enter in test mode? yes/no","Command list for MOBY 4000m","Set params","1700000004:[TESTMD,0252]0100>"]}
 ```
 
 Field table: common grouped-episode fields only.
@@ -571,7 +573,7 @@ them, render as pre-1970 UTC values in derived datetime fields.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_iridium.LOG","source_container":"log","session_index":0,"session_kind":"explicit_session","line_start_index":1,"line_end_index":7,"source_line_numbers":[1,2,3,4,5,6,7],"start_record_time":"2024-10-29T11:44:16.000000Z","end_record_time":"2024-10-29T11:54:29.000000Z","start_log_epoch_time":"1730202256","end_log_epoch_time":"1730202869","iridium_event_count":7,"iridium_events":[{"source_line_number":1,"record_time":"2024-10-29T11:44:16.000000Z","log_epoch_time":"1730202256","subsystem":"SURF","code":"260","message":"Iridium...","iridium_event_kind":"session_start","raw_line":"1730202256:[SURF  ,260]Iridium..."},{"source_line_number":2,"record_time":"2024-10-29T11:44:53.000000Z","log_epoch_time":"1730202293","subsystem":"SURF","code":"311","message":"connected in 37s, signal quality 5","iridium_event_kind":"connection","connection_duration_s":37,"signal_quality":5,"raw_line":"1730202293:[SURF  ,311]connected in 37s, signal quality 5"},{"source_line_number":3,"record_time":"2024-10-29T11:45:40.000000Z","log_epoch_time":"1730202340","subsystem":"MRMAID","code":"664","message":"$TRIG:3,1;","iridium_event_kind":"command","command_name":"TRIG","command_payload":"3,1","raw_line":"1730202340:[MRMAID,664]$TRIG:3,1;"},{"source_line_number":4,"record_time":"2024-10-29T11:45:42.000000Z","log_epoch_time":"1730202342","subsystem":"MRMAID","code":"664","message":"$UPLOAD_MAX:150;","iridium_event_kind":"command","command_name":"UPLOAD_MAX","command_payload":"150","raw_line":"1730202342:[MRMAID,664]$UPLOAD_MAX:150;"},{"source_line_number":5,"record_time":"2024-10-29T11:45:52.000000Z","log_epoch_time":"1730202352","subsystem":"SURF","code":"328","message":"10 cmd(s) received","iridium_event_kind":"command_summary","received_command_count":10,"raw_line":"1730202352:[SURF  ,328]10 cmd(s) received"},{"source_line_number":6,"record_time":"2024-10-29T11:53:57.000000Z","log_epoch_time":"1730202837","subsystem":"SURF","code":"345","message":"2 file(s) uploaded","iridium_event_kind":"upload_session_summary","uploaded_file_count":2,"raw_line":"1730202837:[SURF  ,345]2 file(s) uploaded"},{"source_line_number":7,"record_time":"2024-10-29T11:54:29.000000Z","log_epoch_time":"1730202869","subsystem":"SURF","code":"366","message":"disconnected after 613s","iridium_event_kind":"disconnect","disconnect_duration_s":613,"raw_line":"1730202869:[SURF  ,366]disconnected after 613s"}],"raw_lines":["1730202256:[SURF  ,260]Iridium...","1730202293:[SURF  ,311]connected in 37s, signal quality 5","1730202340:[MRMAID,664]$TRIG:3,1;","1730202342:[MRMAID,664]$UPLOAD_MAX:150;","1730202352:[SURF  ,328]10 cmd(s) received","1730202837:[SURF  ,345]2 file(s) uploaded","1730202869:[SURF  ,366]disconnected after 613s"]}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_iridium.LOG","source_container":"log","session_index":0,"session_kind":"explicit_session","line_start_index":1,"line_end_index":7,"source_line_numbers":[1,2,3,4,5,6,7],"start_record_time":"2024-10-29T11:44:16.000000Z","end_record_time":"2024-10-29T11:54:29.000000Z","start_log_epoch_time":"1730202256","end_log_epoch_time":"1730202869","iridium_event_count":7,"iridium_events":[{"source_line_number":1,"record_time":"2024-10-29T11:44:16.000000Z","log_epoch_time":"1730202256","subsystem":"SURF","code":"260","message":"Iridium...","iridium_event_kind":"session_start","raw_line":"1730202256:[SURF  ,260]Iridium..."},{"source_line_number":2,"record_time":"2024-10-29T11:44:53.000000Z","log_epoch_time":"1730202293","subsystem":"SURF","code":"311","message":"connected in 37s, signal quality 5","iridium_event_kind":"connection","connection_duration_s":37,"signal_quality":5,"raw_line":"1730202293:[SURF  ,311]connected in 37s, signal quality 5"},{"source_line_number":3,"record_time":"2024-10-29T11:45:40.000000Z","log_epoch_time":"1730202340","subsystem":"MRMAID","code":"664","message":"$TRIG:3,1;","iridium_event_kind":"command","command_name":"TRIG","command_payload":"3,1","raw_line":"1730202340:[MRMAID,664]$TRIG:3,1;"},{"source_line_number":4,"record_time":"2024-10-29T11:45:42.000000Z","log_epoch_time":"1730202342","subsystem":"MRMAID","code":"664","message":"$UPLOAD_MAX:150;","iridium_event_kind":"command","command_name":"UPLOAD_MAX","command_payload":"150","raw_line":"1730202342:[MRMAID,664]$UPLOAD_MAX:150;"},{"source_line_number":5,"record_time":"2024-10-29T11:45:52.000000Z","log_epoch_time":"1730202352","subsystem":"SURF","code":"328","message":"10 cmd(s) received","iridium_event_kind":"command_summary","received_command_count":10,"raw_line":"1730202352:[SURF  ,328]10 cmd(s) received"},{"source_line_number":6,"record_time":"2024-10-29T11:53:57.000000Z","log_epoch_time":"1730202837","subsystem":"SURF","code":"345","message":"2 file(s) uploaded","iridium_event_kind":"upload_session_summary","uploaded_file_count":2,"raw_line":"1730202837:[SURF  ,345]2 file(s) uploaded"},{"source_line_number":7,"record_time":"2024-10-29T11:54:29.000000Z","log_epoch_time":"1730202869","subsystem":"SURF","code":"366","message":"disconnected after 613s","iridium_event_kind":"disconnect","disconnect_duration_s":613,"raw_line":"1730202869:[SURF  ,366]disconnected after 613s"}],"raw_lines":["1730202256:[SURF  ,260]Iridium...","1730202293:[SURF  ,311]connected in 37s, signal quality 5","1730202340:[MRMAID,664]$TRIG:3,1;","1730202342:[MRMAID,664]$UPLOAD_MAX:150;","1730202352:[SURF  ,328]10 cmd(s) received","1730202837:[SURF  ,345]2 file(s) uploaded","1730202869:[SURF  ,366]disconnected after 613s"]}
 ```
 
 Field table: common grouped timing/source fields adapted for sessions plus:
@@ -719,13 +721,13 @@ single-line family and are not consumed by grouped families.
 Representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_misc.LOG","source_container":"log","record_time":"2023-11-14T22:13:24.000000Z","log_epoch_time":"1700000004","subsystem":"SURF","code":"0071","message":"<WARN>timeout","source_line_number":5,"severity":"warn","unclassified_reason":"no_family_match","raw_line":"1700000004:[SURF  ,0071]<WARN>timeout"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_misc.LOG","source_container":"log","record_time":"2023-11-14T22:13:24.000000Z","log_epoch_time":"1700000004","subsystem":"SURF","code":"0071","message":"<WARN>timeout","source_line_number":5,"severity":"warn","unclassified_reason":"no_family_match","raw_line":"1700000004:[SURF  ,0071]<WARN>timeout"}
 ```
 
 Rollover banner representative object:
 
 ```json
-{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","source_file":"0100_misc.LOG","source_container":"log","record_time":"2023-11-14T22:13:24.000000Z","log_epoch_time":"1700000004","subsystem":"ROLLOVER","code":null,"message":"*** switching to 0100/NEXT.LOG ***","source_line_number":5,"switched_to_log_file":"0100_NEXT.LOG","severity":null,"unclassified_reason":"no_family_match","raw_line":"1700000004:*** switching to 0100/NEXT.LOG ***"}
+{"instrument_id":"T0100","instrument_serial":"467.174-T-0100","mermaid_records_version":"<package-version>","source_file":"0100_misc.LOG","source_container":"log","record_time":"2023-11-14T22:13:24.000000Z","log_epoch_time":"1700000004","subsystem":"ROLLOVER","code":null,"message":"*** switching to 0100/NEXT.LOG ***","source_line_number":5,"switched_to_log_file":"0100_NEXT.LOG","severity":null,"unclassified_reason":"no_family_match","raw_line":"1700000004:*** switching to 0100/NEXT.LOG ***"}
 ```
 
 Field table: common single-line fields plus:

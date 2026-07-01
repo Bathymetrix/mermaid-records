@@ -17,7 +17,7 @@ from .format_datetime import format_utc_datetime, parse_source_datetime
 from .format_record_filenames import (
     record_filenames,
     validate_instrument_serial,
-    with_instrument_serial,
+    with_record_metadata,
 )
 from .models import OperationalLogEntry
 from .parse_instrument_name import maybe_parse_instrument_name
@@ -392,7 +392,7 @@ def write_log_jsonl_families(
                             entry,
                             instrument_id=path_instrument_id,
                         )
-                        record = with_instrument_serial(
+                        record = with_record_metadata(
                             assignment.record,
                             path_instrument_serial,
                         )
@@ -469,7 +469,7 @@ def write_log_jsonl_families(
                         instrument_id=path_instrument_id,
                         source_file=path,
                     )
-                    episode_record = with_instrument_serial(
+                    episode_record = with_record_metadata(
                         episode_record,
                         path_instrument_serial,
                     )

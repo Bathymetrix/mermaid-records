@@ -7,6 +7,8 @@ All notable changes from this point forward should be recorded here.
 ### Changed
 
 - Changed `normalize --force-rewrite` to `normalize -f, --force` for targeted family rewrites.
+- Added top-level `mermaid_records_version` package-version provenance to
+  every normalized LOG and MER JSONL record.
 
 ### Added
 

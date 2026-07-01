@@ -19,6 +19,9 @@
 - Code-level naming should therefore prefer “families” for active normalization entrypoints, while historical references may remain when context matters.
 - Never mix parsing and interpretation.
 - Keep record interfaces stable.
+- Every emitted normalized JSONL row in every current and future record family
+  must include top-level `mermaid_records_version`, sourced from the canonical
+  `mermaid_records.__version__`; never hardcode a second package version.
 - Always preserve unknown MER record types.
 - Prefer generators for file parsing where practical.
 - Add or update tests with any real logic change.

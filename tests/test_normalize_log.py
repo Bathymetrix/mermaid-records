@@ -8,6 +8,7 @@ import re
 
 import pytest
 
+from mermaid_records import __version__
 import mermaid_records.normalize_log as normalize_log_module
 from mermaid_records.normalize_log import write_log_jsonl_families
 
@@ -121,10 +122,20 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert ctd_records == []
     assert len(iridium_records) == 1
     assert len(unclassified_records) == 3
+    all_records = [
+        *pressure_temperature_records,
+        *iridium_records,
+        *unclassified_records,
+    ]
+    assert {
+        record["mermaid_records_version"]
+        for record in all_records
+    } == {__version__}
 
     assert list(iridium_records[0]) == [
         "instrument_id",
         "instrument_serial",
+        "mermaid_records_version",
         "source_file",
         "source_container",
         "session_index",
@@ -153,6 +164,7 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     assert list(unclassified_records[0]) == [
         "instrument_id",
         "instrument_serial",
+        "mermaid_records_version",
         "source_file",
         "source_container",
         "record_time",
@@ -399,6 +411,7 @@ def test_write_log_jsonl_families_routes_pressure_rows_out_of_unclassified(
         {
             "instrument_id": "P0026",
             "instrument_serial": "452.020-P-0026",
+            "mermaid_records_version": __version__,
             "source_file": "0026_5D48EAB8.LOG",
             "source_container": "log",
             "record_time": "2019-08-07T02:57:30.000000Z",
@@ -811,6 +824,7 @@ def test_write_log_jsonl_families_groups_parameter_block_into_one_episode(
     assert parameter_records[0] == {
         "instrument_id": "0100",
         "instrument_serial": "0100",
+        "mermaid_records_version": __version__,
         "source_file": log_path.name,
         "episode_index": 0,
         "line_start_index": 2,

@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from mermaid_records import __version__
 import mermaid_records.normalize_mer as normalize_mer_module
 from mermaid_records.normalize_mer import write_mer_jsonl_families
 
@@ -67,6 +68,10 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     environment_records = _read_jsonl(output_dir / "mer_environment_records.jsonl")
     parameter_records = _read_jsonl(output_dir / "mer_parameter_records.jsonl")
     event_records = _read_jsonl(output_dir / "mer_event_records.jsonl")
+    assert {
+        record["mermaid_records_version"]
+        for record in [*environment_records, *parameter_records, *event_records]
+    } == {__version__}
 
     assert summary.environment_records == 9
     assert summary.parameter_records == 9
@@ -137,6 +142,7 @@ def test_write_mer_jsonl_families_preserves_environment_parameter_and_event_rows
     assert list(event_records[0]) == [
         "instrument_id",
         "instrument_serial",
+        "mermaid_records_version",
         "source_file",
         "source_container",
         "block_index",

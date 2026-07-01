@@ -16,7 +16,7 @@ from .format_datetime import format_source_datetime, format_utc_datetime
 from .format_record_filenames import (
     record_filenames,
     validate_instrument_serial,
-    with_instrument_serial,
+    with_record_metadata,
 )
 from .parse_mer import parse_mer_file, parse_mer_file_recoverable
 from .parse_instrument_name import maybe_parse_instrument_name
@@ -237,7 +237,7 @@ def write_mer_jsonl_families(
                         path=path,
                         line=line,
                     )
-                    record = with_instrument_serial(record, path_instrument_serial)
+                    record = with_record_metadata(record, path_instrument_serial)
                     _write_jsonl_line(environment_handle, record)
                     environment_count += 1
                     environment_kind_counter[record["environment_kind"]] += 1
@@ -260,7 +260,7 @@ def write_mer_jsonl_families(
                         path=path,
                         line=line,
                     )
-                    record = with_instrument_serial(record, path_instrument_serial)
+                    record = with_record_metadata(record, path_instrument_serial)
                     _write_jsonl_line(parameter_handle, record)
                     parameter_count += 1
                     parameter_kind_counter[record["parameter_kind"]] += 1
@@ -285,7 +285,7 @@ def write_mer_jsonl_families(
                             data_payload=block.data_payload,
                         )
                     )
-                    record = with_instrument_serial(record, path_instrument_serial)
+                    record = with_record_metadata(record, path_instrument_serial)
                     file_unknown_info_keys.update(block_unknown_info_keys)
                     file_unknown_format_keys.update(block_unknown_format_keys)
                     _write_jsonl_line(event_handle, record)

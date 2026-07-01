@@ -24,6 +24,8 @@ The release-facing contract is intentionally narrow:
 - the installed CLI surface is `mermaid-records normalize`
 - the package-root Python API is metadata-only (`mermaid_records.__version__`, authorship, and license metadata)
 - normalized JSONL outputs are the primary supported output
+- every normalized JSONL row includes `mermaid_records_version`, sourced from
+  the package’s canonical version metadata
 
 `BIN` handling still depends on an external decoder step that produces `LOG` content. `mermaid-records` owns normalization around that seam; it does not reimplement the manufacturer decoder.
 
