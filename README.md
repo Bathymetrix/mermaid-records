@@ -55,7 +55,9 @@ mermaid-records normalize \
 
 Quick usage flags:
 
-- Input selection: `--input-root` for `stateful mode`, or `--input-file` for explicit `stateless mode` runs
+- Input selection: `--input-root` for `stateful mode`, optionally scoped with
+  `--instrument-serial <full-serial>`, or `--input-file` for explicit
+  `stateless mode` runs
 - Output: `--output-dir`; if omitted, the CLI uses `$MERMAID/records` when `MERMAID` is set
 - BIN decoder and preflight: `--decoder-python` and `--decoder-script` (used together), plus `--preflight-mode {strict,cached}`
 - Planning and reporting: `--dry-run`, `--json` (dry-run only), and `--verbose` / `-v`
@@ -71,6 +73,10 @@ See [docs/cli.md](docs/cli.md) for the full CLI reference.
 - `stateless` mode is selected by `--input-file`
 
 `Stateful` mode persists `manifests/` and `state/` per instrument and enables incremental append/rewrite/noop planning. `Stateless` mode does not write manifests, does not use incremental state, and rewrites the targeted package-owned JSONL family outputs for each explicit run.
+
+`--instrument-serial`, used with `--input-root`, narrows a stateful corpus run
+to one full serial such as `452.020-P-0030`. It does not touch manifests,
+outputs, or decoder state for other instruments.
 
 That `stateless` rewrite contract is intentional: rerunning the same explicit `--input-file` set does not silently duplicate JSONL rows.
 

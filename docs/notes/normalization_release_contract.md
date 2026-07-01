@@ -65,9 +65,16 @@ The `normalize` subcommand accepts exactly one input mode selector:
 - `--input-file`
   - stateless mode
 
+Stateful `--input-root` may additionally be scoped with
+`--instrument-serial <full-serial>`. This is not a third execution mode. It
+must isolate discovery, decoding, manifests, diffs, pruning, force cleanup,
+and dry-run planning to the requested serial without touching other instrument
+outputs.
+
 Shared options:
 
 - `--output-dir`
+- `--instrument-serial` (only with `--input-root`)
 - `--decoder-python`
 - `--decoder-script`
 - `--preflight-mode {strict,cached}`

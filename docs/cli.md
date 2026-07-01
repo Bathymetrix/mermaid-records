@@ -24,6 +24,27 @@ Exactly one of these must be supplied:
 
 Supported raw input types are `BIN`, `LOG`, and `MER`.
 
+### Single-instrument stateful selection
+
+`--instrument-serial <FULL-SERIAL>` may be used only with `--input-root` to
+limit a stateful corpus run to one instrument:
+
+```bash
+mermaid-records normalize \
+  --input-root /path/to/full/corpus \
+  --instrument-serial 452.020-P-0030 \
+  --output-dir /path/to/records
+```
+
+The value must be a full canonical serial, not an instrument ID or raw file
+prefix. The selected run retains normal stateful manifest and incremental
+behavior, while discovery results, decoder requirements, pruning, `--force`,
+and dry-run planning are confined to that serial. If neither current raw
+sources nor prior state exist for the requested serial, the command fails
+without creating the output directory.
+
+`--instrument-serial` is incompatible with `--input-file`.
+
 ## Output resolution
 
 - `-o`, `--output-dir <PATH>`

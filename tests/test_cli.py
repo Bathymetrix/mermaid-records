@@ -571,6 +571,183 @@ def test_explicit_cli_decoder_args_override_env(
     assert rows[0]["message"] == "decoded from cli"
 
 
+def test_normalize_cli_limits_input_root_to_one_instrument_serial(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    input_root = tmp_path / "inputs"
+    target_root = input_root / "452.020-P-0030"
+    other_root = input_root / "467.174-T-0030"
+    target_root.mkdir(parents=True)
+    other_root.mkdir(parents=True)
+    (target_root / "0030_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]target\n",
+        encoding="utf-8",
+    )
+    (other_root / "0030_sample.BIN").write_bytes(b"unrelated-bin")
+    output_dir = tmp_path / "output"
+
+    result = main(
+        [
+            "normalize",
+            "--input-root",
+            str(input_root),
+            "--instrument-serial",
+            "452.020-P-0030",
+            "--output-dir",
+            str(output_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert "Selecting instrument serial 452.020-P-0030" in captured.err
+    assert "raw files processed: 1" in captured.out
+    assert (output_dir / "452.020-P-0030").is_dir()
+    assert not (output_dir / "467.174-T-0030").exists()
+    rows = _jsonl_lines(
+        output_dir / "452.020-P-0030" / "log_unclassified_records.jsonl"
+    )
+    assert [row["message"] for row in rows] == ["target"]
+
+
+def test_instrument_serial_requires_input_root_and_full_serial(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    log_path = tmp_path / "0030_sample.LOG"
+    log_path.write_text("1700000000:[MAIN  ,0007]target\n", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as excinfo:
+        main(
+            [
+                "normalize",
+                "--input-file",
+                str(log_path),
+                "--instrument-serial",
+                "452.020-P-0030",
+                "--output-dir",
+                str(tmp_path / "output"),
+            ]
+        )
+    assert excinfo.value.code == 2
+    assert "--instrument-serial requires --input-root" in capsys.readouterr().err
+
+    with pytest.raises(SystemExit) as excinfo:
+        main(
+            [
+                "normalize",
+                "--input-root",
+                str(tmp_path),
+                "--instrument-serial",
+                "P0030",
+                "--output-dir",
+                str(tmp_path / "output"),
+            ]
+        )
+    assert excinfo.value.code == 2
+    assert "Unsupported instrument serial name" in capsys.readouterr().err
+
+
+def test_missing_instrument_serial_fails_without_creating_output(
+    tmp_path: Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    instrument_root = input_root / "452.020-P-0030"
+    instrument_root.mkdir(parents=True)
+    (instrument_root / "0030_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]target\n",
+        encoding="utf-8",
+    )
+    output_dir = tmp_path / "output"
+
+    with pytest.raises(
+        ValueError,
+        match="Instrument serial not found under input root: 467.174-T-0200",
+    ):
+        main(
+            [
+                "normalize",
+                "--input-root",
+                str(input_root),
+                "--instrument-serial",
+                "467.174-T-0200",
+                "--output-dir",
+                str(output_dir),
+            ]
+        )
+
+    assert not output_dir.exists()
+
+
+def test_selected_bin_instrument_requires_decoder(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    input_root = tmp_path / "inputs"
+    instrument_root = input_root / "452.020-P-0030"
+    instrument_root.mkdir(parents=True)
+    (instrument_root / "0030_sample.BIN").write_bytes(b"raw-bin")
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_PYTHON", raising=False)
+    monkeypatch.delenv("MERMAID_RECORDS_DECODER_SCRIPT", raising=False)
+
+    with pytest.raises(
+        SystemExit,
+        match="Provide --decoder-python or set MERMAID_RECORDS_DECODER_PYTHON",
+    ):
+        main(
+            [
+                "normalize",
+                "--input-root",
+                str(input_root),
+                "--instrument-serial",
+                "452.020-P-0030",
+                "--output-dir",
+                str(tmp_path / "output"),
+            ]
+        )
+
+
+def test_instrument_serial_dry_run_reports_only_target_and_writes_nothing(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    input_root = tmp_path / "inputs"
+    for serial, prefix in (
+        ("452.020-P-0030", "0030"),
+        ("467.174-T-0200", "0200"),
+    ):
+        instrument_root = input_root / serial
+        instrument_root.mkdir(parents=True)
+        (instrument_root / f"{prefix}_sample.LOG").write_text(
+            f"1700000000:[MAIN  ,0007]{serial}\n",
+            encoding="utf-8",
+        )
+    output_dir = tmp_path / "output"
+
+    result = main(
+        [
+            "normalize",
+            "--input-root",
+            str(input_root),
+            "--instrument-serial",
+            "452.020-P-0030",
+            "--output-dir",
+            str(output_dir),
+            "--dry-run",
+            "--json",
+        ]
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+
+    assert result == 0
+    assert len(payload["instruments"]) == 1
+    assert payload["instruments"][0]["instrument_serial"] == "452.020-P-0030"
+    assert not output_dir.exists()
+
+
 def test_bin_free_runs_do_not_require_decoder_env_or_args(
     tmp_path: Path,
     capsys,

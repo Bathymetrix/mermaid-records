@@ -75,6 +75,44 @@ def test_build_run_specs_marks_missing_decoder_pairs_as_skipped_for_bin_inputs(t
     assert all(spec.expects_success is False for spec in env_both_specs)
 
 
+def test_audit_scenario_propagates_instrument_serial_to_stateful_commands(
+    tmp_path: Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    instrument_root = input_root / "452.020-P-0030"
+    instrument_root.mkdir(parents=True)
+    (instrument_root / "0030_sample.LOG").write_text(
+        "1700000000:[MAIN  ,0007]target\n",
+        encoding="utf-8",
+    )
+    discovered = discover_inputs(input_root)
+    scenarios, _ = build_input_scenarios(
+        discovered,
+        inputs_dir=tmp_path / "artifacts",
+        include_input_file_mode=False,
+        arg_max_buffer=0,
+        instrument_serial="452.020-P-0030",
+    )
+
+    specs = build_run_specs(
+        scenarios,
+        runs_dir=tmp_path / "runs",
+        cli_command=f"{sys.executable} -m mermaid_records.cli",
+        decoder_python=None,
+        decoder_script=None,
+        mermaid_root=None,
+        include_invalid=False,
+        matrix="semantic",
+    )
+
+    assert specs
+    assert all(
+        "--instrument-serial" in spec.command
+        and "452.020-P-0030" in spec.command
+        for spec in specs
+    )
+
+
 def test_semantic_flag_presets_are_reduced_and_exhaustive_has_all_boolean_combinations() -> None:
     semantic = build_flag_presets("semantic")
     exhaustive = build_flag_presets("exhaustive")

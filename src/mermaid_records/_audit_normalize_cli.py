@@ -17,6 +17,8 @@ import sys
 import time
 from typing import Literal
 
+from .normalize_pipeline import instrument_has_bin_inputs
+
 from .format_datetime import format_utc_datetime
 
 
@@ -60,6 +62,7 @@ class InputScenario:
     input_files: tuple[Path, ...]
     has_bin: bool
     manifest_path: Path | None
+    instrument_serial: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,6 +144,11 @@ def build_argument_parser() -> argparse.ArgumentParser:
         type=Path,
         required=True,
         help="Directory that will receive audit artifacts, reports, and per-run output sandboxes.",
+    )
+    parser.add_argument(
+        "--instrument-serial",
+        default=None,
+        help="Optionally scope stateful --input-root audit runs to one full instrument serial.",
     )
     parser.add_argument(
         "--cli-command",
@@ -232,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
         matrix=args.matrix,
         arg_max_buffer=args.arg_max_buffer,
         max_runs=args.max_runs,
+        instrument_serial=args.instrument_serial,
     )
     print(_format_console_summary(report))
     return 0 if report["unexpected_failure_count"] == 0 else 1
@@ -250,6 +259,7 @@ def run_audit(
     matrix: str,
     arg_max_buffer: int,
     max_runs: int | None,
+    instrument_serial: str | None = None,
 ) -> dict[str, object]:
     """Execute the normalize matrix and persist reports."""
 
@@ -270,6 +280,7 @@ def run_audit(
         inputs_dir=inputs_dir,
         include_input_file_mode=include_input_file_mode,
         arg_max_buffer=arg_max_buffer,
+        instrument_serial=instrument_serial,
     )
     specs = build_run_specs(
         scenarios,
@@ -345,6 +356,7 @@ def build_input_scenarios(
     inputs_dir: Path,
     include_input_file_mode: bool,
     arg_max_buffer: int,
+    instrument_serial: str | None = None,
 ) -> tuple[list[InputScenario], list[dict[str, object]]]:
     """Create stateful/stateless input selections and any skip records."""
 
@@ -361,8 +373,16 @@ def build_input_scenarios(
             input_mode=INPUT_ROOT_MODE,
             input_root=discovered.input_root,
             input_files=(),
-            has_bin=discovered.has_bin,
+            has_bin=(
+                instrument_has_bin_inputs(
+                    discovered.input_root,
+                    instrument_serial=instrument_serial,
+                )
+                if instrument_serial is not None
+                else discovered.has_bin
+            ),
             manifest_path=None,
+            instrument_serial=instrument_serial,
         )
     ]
     skipped: list[dict[str, object]] = []
@@ -656,6 +676,8 @@ def compose_command(
 
     if scenario.input_mode == INPUT_ROOT_MODE:
         command.extend(["-i", scenario.input_root.as_posix()])
+        if scenario.instrument_serial is not None:
+            command.extend(["--instrument-serial", scenario.instrument_serial])
     else:
         command.append("--input-file")
         command.extend(path.as_posix() for path in scenario.input_files)

@@ -12,6 +12,9 @@ All notable changes from this point forward should be recorded here.
 
 ### Added
 
+- Added `normalize --instrument-serial <full-serial>` to scope stateful
+  `--input-root` normalization, decoder work, manifests, force cleanup, and
+  dry-run planning to one instrument.
 - Warn during stateful CLI normalization when an input root contains no `.BIN`, `.LOG`, or `.MER` source files.
 - Initialized this changelog for forward-looking release notes.
 

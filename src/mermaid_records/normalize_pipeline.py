@@ -34,6 +34,7 @@ from .parse_instrument_name import (
     InstrumentName,
     instrument_name_from_vit_path,
     maybe_parse_instrument_name,
+    parse_instrument_name,
 )
 
 type ExecutionMode = str
@@ -136,12 +137,31 @@ class RunMetrics:
     log_missing_assignments: int = 0
 
 
+def instrument_has_bin_inputs(
+    input_root: Path,
+    *,
+    instrument_serial: str,
+) -> bool:
+    """Return whether one selected instrument has authoritative BIN inputs."""
+
+    target = parse_instrument_name(instrument_serial)
+    serial_map = _instrument_names_from_vit(input_root)
+    selected = _select_target_instrument_sources(
+        list(iter_bin_files(input_root)),
+        target=target,
+        input_root=input_root,
+        serial_map=serial_map,
+    )
+    return bool(selected)
+
+
 def run_normalization_pipeline(
     input_root: Path | None = None,
     *,
     output_dir: Path,
     config: Bin2LogConfig | None = None,
     input_files: list[Path] | None = None,
+    instrument_serial: str | None = None,
     dry_run: bool = False,
     force_rewrite: bool = False,
     progress: ProgressCallback | None = None,
@@ -150,12 +170,20 @@ def run_normalization_pipeline(
 
     _emit_progress(progress, "Starting normalization")
     mode = _detect_mode(input_root=input_root, input_files=input_files)
+    if instrument_serial is not None and mode != "stateful":
+        raise ValueError("instrument_serial requires stateful input_root mode")
+    target_instrument = (
+        parse_instrument_name(instrument_serial)
+        if instrument_serial is not None
+        else None
+    )
     if mode == "stateful":
         assert input_root is not None
         return _run_stateful(
             input_root=input_root,
             output_dir=output_dir,
             config=config,
+            target_instrument=target_instrument,
             dry_run=dry_run,
             force_rewrite=force_rewrite,
             progress=progress,
@@ -176,27 +204,63 @@ def _run_stateful(
     input_root: Path,
     output_dir: Path,
     config: Bin2LogConfig | None,
+    target_instrument: InstrumentName | None,
     dry_run: bool,
     force_rewrite: bool,
     progress: ProgressCallback | None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     _emit_progress(progress, f"Discovering inputs under {input_root}")
     serial_map = _instrument_names_from_vit(input_root)
-    discovered_sources = _group_paths(
-        [*sorted(iter_bin_files(input_root)), *sorted(iter_log_files(input_root)), *sorted(iter_mer_files(input_root))]
-    )
+    discovered_paths = [
+        *sorted(iter_bin_files(input_root)),
+        *sorted(iter_log_files(input_root)),
+        *sorted(iter_mer_files(input_root)),
+    ]
+    if target_instrument is not None:
+        _emit_progress(
+            progress,
+            f"Selecting instrument serial {target_instrument.serial}",
+        )
+        discovered_paths = _select_target_instrument_sources(
+            discovered_paths,
+            target=target_instrument,
+            input_root=input_root,
+            serial_map=serial_map,
+        )
+        serial_map[target_instrument.raw_file_prefix] = target_instrument
+    discovered_sources = _group_paths(discovered_paths)
     grouped_sources = {
         group_key: _select_authoritative_sources(paths)
         for group_key, paths in discovered_sources.items()
     }
-    if not grouped_sources:
+    if not grouped_sources and target_instrument is None:
         _emit_progress(
             progress,
             f"WARNING: no expected source files found under {input_root} (expected .BIN, .LOG, or .MER)",
         )
+    previous_outputs = _previous_outputs_by_instrument_id(output_dir) if output_dir.exists() else {}
+    if target_instrument is not None:
+        canonical_output = output_dir / target_instrument.serial
+        previous_output = (
+            canonical_output
+            if latest_source_state(canonical_output) is not None
+            else previous_outputs.get(target_instrument.raw_file_prefix)
+        )
+        if previous_output is not None and previous_output.name != target_instrument.serial:
+            previous_name = maybe_parse_instrument_name(previous_output.name)
+            if previous_name is not None and previous_name.serial != target_instrument.serial:
+                previous_output = None
+        previous_outputs = (
+            {target_instrument.raw_file_prefix: previous_output}
+            if previous_output is not None
+            else {}
+        )
+        if not grouped_sources and not previous_outputs:
+            raise ValueError(
+                f"Instrument serial not found under input root: {target_instrument.serial}"
+            )
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
-    previous_outputs = _previous_outputs_by_instrument_id(output_dir) if output_dir.exists() else {}
     all_group_keys = sorted(set(grouped_sources) | set(previous_outputs))
     normalization_version = _normalization_version()
     planned_instruments: list[PlannedInstrumentRun] = []
@@ -822,6 +886,55 @@ def _group_paths(paths: list[Path]) -> dict[str, list[Path]]:
     for path in sorted(paths):
         grouped.setdefault(_raw_file_prefix(path), []).append(path)
     return grouped
+
+
+def _select_target_instrument_sources(
+    paths: list[Path],
+    *,
+    target: InstrumentName,
+    input_root: Path,
+    serial_map: dict[str, InstrumentName],
+) -> list[Path]:
+    """Select raw sources belonging to one explicitly requested serial."""
+
+    selected: list[Path] = []
+    mapped_name = serial_map.get(target.raw_file_prefix)
+    for path in paths:
+        if _raw_file_prefix(path) != target.raw_file_prefix:
+            continue
+
+        contextual_name = _instrument_name_from_path_context(path, input_root=input_root)
+        if contextual_name is not None:
+            if contextual_name.serial == target.serial:
+                selected.append(path)
+            continue
+
+        if path.suffix.upper() == ".LOG":
+            log_serial = _serial_from_log(path)
+            if log_serial is not None:
+                if log_serial == target.serial:
+                    selected.append(path)
+                continue
+
+        if mapped_name is None or mapped_name.serial == target.serial:
+            selected.append(path)
+    return selected
+
+
+def _instrument_name_from_path_context(
+    path: Path,
+    *,
+    input_root: Path,
+) -> InstrumentName | None:
+    """Return the nearest full instrument serial encoded in a source path."""
+
+    for ancestor in path.parents:
+        if ancestor == input_root.parent:
+            break
+        parsed = maybe_parse_instrument_name(ancestor.name)
+        if parsed is not None:
+            return parsed
+    return None
 
 
 def _select_authoritative_sources(paths: list[Path]) -> list[Path]:

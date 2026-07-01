@@ -325,6 +325,10 @@ Avoid:
 - The normalization pipeline has two execution modes:
   - `stateful`: directory input, manifests enabled, incremental rerun logic enabled
   - `stateless`: explicit file-list input, no manifests, no incremental logic, no pruning
+- `--instrument-serial <full-serial>` is a stateful `--input-root` scope
+  selector, not a third execution mode. Every discovery, decoder, manifest,
+  diff, pruning, force, and dry-run operation must remain confined to that
+  serial, and non-target instrument outputs must not be touched.
 - Stateless reruns are rewrite-only for targeted instrument outputs; never append in stateless mode, even when the explicit inputs are unchanged.
 - Stateless mode must error if the target output directory already contains manifests.
 - Stateful incremental behavior is binary and conservative:

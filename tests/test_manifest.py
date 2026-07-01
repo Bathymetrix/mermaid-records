@@ -230,6 +230,45 @@ def test_stateful_force_rewrite_removes_stale_package_outputs(tmp_path: Path) ->
     assert (instrument_dir / "state" / "pruned_records.jsonl").exists()
 
 
+def test_targeted_force_rewrite_does_not_touch_other_instrument(
+    tmp_path: Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    target_root = input_root / "452.020-P-0030"
+    other_root = input_root / "467.174-T-0200"
+    target_root.mkdir(parents=True)
+    other_root.mkdir(parents=True)
+    _write_log(target_root / "0030_first.LOG", "target")
+    _write_log(other_root / "0200_first.LOG", "other")
+    output_root = tmp_path / "output"
+
+    run_normalization_pipeline(input_root, output_dir=output_root)
+
+    target_output = output_root / "452.020-P-0030"
+    other_output = output_root / "467.174-T-0200"
+    (target_output / "log_measurement_records.jsonl").write_text(
+        '{"stale": true}\n',
+        encoding="utf-8",
+    )
+    other_stale = other_output / "log_measurement_records.jsonl"
+    other_stale.write_text('{"preserve": true}\n', encoding="utf-8")
+    other_latest_before = (other_output / "manifests" / "latest.json").read_bytes()
+
+    summary = run_normalization_pipeline(
+        input_root,
+        output_dir=output_root,
+        instrument_serial="452.020-P-0030",
+        force_rewrite=True,
+    )
+
+    assert [item.instrument_serial for item in summary.processed_instruments] == [
+        "452.020-P-0030"
+    ]
+    assert not (target_output / "log_measurement_records.jsonl").exists()
+    assert other_stale.read_text(encoding="utf-8") == '{"preserve": true}\n'
+    assert (other_output / "manifests" / "latest.json").read_bytes() == other_latest_before
+
+
 def test_stateful_append_path_appends_only_new_mer_files(tmp_path: Path) -> None:
     input_root = tmp_path / "inputs"
     input_root.mkdir()

@@ -18,7 +18,13 @@ import time
 from . import __version__
 from .bin2log import Bin2LogConfig
 from .discovery import iter_bin_files
-from .normalize_pipeline import DryRunSummary, NormalizationPipelineSummary, run_normalization_pipeline
+from .normalize_pipeline import (
+    DryRunSummary,
+    NormalizationPipelineSummary,
+    instrument_has_bin_inputs,
+    run_normalization_pipeline,
+)
+from .parse_instrument_name import parse_instrument_name
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -53,6 +59,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=None,
         help="Explicit raw source file(s) to normalize in stateless mode. Accepts comma-separated and/or space-separated lists.",
+    )
+    normalize.add_argument(
+        "--instrument-serial",
+        type=_parse_instrument_serial,
+        help="Limit stateful --input-root normalization to one full instrument serial, for example 452.020-P-0030.",
     )
     normalize.add_argument(
         "-o",
@@ -121,6 +132,12 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
 
     if args.command == "normalize" and args.json and not args.dry_run:
         parser.error("--json requires --dry-run")
+    if (
+        args.command == "normalize"
+        and args.instrument_serial is not None
+        and args.input_root is None
+    ):
+        parser.error("--instrument-serial requires --input-root")
 
 
 def _handle_normalize(args: argparse.Namespace) -> int:
@@ -129,7 +146,11 @@ def _handle_normalize(args: argparse.Namespace) -> int:
     started = time.perf_counter()
     output_dir = _resolve_output_dir(args.output_dir)
     input_files = _parse_input_files(args.input_file)
-    decoder_required = _decoder_required(input_root=args.input_root, input_files=input_files)
+    decoder_required = _decoder_required(
+        input_root=args.input_root,
+        input_files=input_files,
+        instrument_serial=args.instrument_serial,
+    )
     config = None
     decoder_python = _resolve_decoder_python(args.decoder_python)
     decoder_script = _resolve_decoder_script(args.decoder_script)
@@ -162,6 +183,7 @@ def _handle_normalize(args: argparse.Namespace) -> int:
         output_dir=output_dir,
         config=config,
         input_files=input_files,
+        instrument_serial=args.instrument_serial,
         dry_run=args.dry_run,
         force_rewrite=args.force_rewrite,
         progress=_cli_progress,
@@ -200,6 +222,15 @@ def _parse_input_files(values: list[list[str]] | None) -> list[Path] | None:
     return paths
 
 
+def _parse_instrument_serial(value: str) -> str:
+    """Validate and return one canonical full instrument serial."""
+
+    try:
+        return parse_instrument_name(value).serial
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+
+
 def _resolve_output_dir(output_dir: Path | None) -> Path:
     if output_dir is not None:
         return output_dir
@@ -230,8 +261,14 @@ def _decoder_required(
     *,
     input_root: Path | None,
     input_files: list[Path] | None,
+    instrument_serial: str | None,
 ) -> bool:
     if input_root is not None:
+        if instrument_serial is not None:
+            return instrument_has_bin_inputs(
+                input_root,
+                instrument_serial=instrument_serial,
+            )
         return any(True for _ in iter_bin_files(input_root))
     return any(path.suffix.upper() == ".BIN" for path in input_files or [])
 
