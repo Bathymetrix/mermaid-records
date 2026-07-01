@@ -15,6 +15,10 @@ All notable changes from this point forward should be recorded here.
 
 ### Fixed
 
+- Prevent duplicate or conflicting LOG-derived rows by treating a BIN-decoded
+  LOG as authoritative over an existing same-stem LOG. Shadowed native LOGs
+  are excluded from normalization and source-state planning without being
+  deleted or modified.
 - Preserve signed negative LOG epoch timestamps as source timestamps, including in grouped Iridium session timing.
 
 ## 2.0.0

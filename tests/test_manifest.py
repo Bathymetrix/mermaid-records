@@ -358,6 +358,83 @@ def test_decoder_state_invalidates_only_bin_dependent_instrument(tmp_path: Path,
     assert diff_rows[0]["source_file"] == "0100_first.BIN"
 
 
+def test_same_stem_bin_shadows_native_log_for_state_and_normalization(
+    tmp_path: Path,
+) -> None:
+    input_root = tmp_path / "inputs"
+    input_root.mkdir()
+    bin_path = input_root / "0100_first.BIN"
+    bin_path.write_bytes(b"raw-bin")
+    shadowed_log = input_root / "0100_first.LOG"
+    _write_log(shadowed_log, "native log must not be normalized")
+    _write_log(input_root / "0100_log_only.LOG", "native log-only source")
+
+    decoder = _write_decoder(tmp_path / "decoder.py", "authoritative decoded log")
+    config = Bin2LogConfig(
+        python_executable=Path(sys.executable),
+        decoder_script=decoder,
+    )
+    output_root = tmp_path / "output"
+
+    first_summary = run_normalization_pipeline(
+        input_root,
+        output_dir=output_root,
+        config=config,
+    )
+
+    instrument_dir = output_root / "0100"
+    rows = _jsonl_lines(instrument_dir / "log_unclassified_records.jsonl")
+    latest = _read_json(instrument_dir / "manifests" / "latest.json")
+    source_state = _read_json(instrument_dir / latest["source_state_manifest"])
+
+    assert first_summary.processed_instruments[0].bin_count == 1
+    assert first_summary.processed_instruments[0].log_count == 1
+    assert {row["message"] for row in rows} == {
+        "authoritative decoded log",
+        "native log-only source",
+    }
+    assert {Path(row["source_file"]).name for row in source_state["raw_sources"]} == {
+        "0100_first.BIN",
+        "0100_log_only.LOG",
+    }
+
+    _write_log(shadowed_log, "changed native log must remain ignored")
+    second_summary = run_normalization_pipeline(
+        input_root,
+        output_dir=output_root,
+        config=config,
+    )
+
+    assert second_summary.processed_instruments[0].log_action == "noop"
+    assert _jsonl_lines(instrument_dir / "log_unclassified_records.jsonl") == rows
+
+
+def test_same_stem_bin_shadows_native_log_in_stateless_mode(
+    tmp_path: Path,
+) -> None:
+    bin_path = tmp_path / "0100_first.BIN"
+    bin_path.write_bytes(b"raw-bin")
+    native_log = tmp_path / "0100_first.LOG"
+    _write_log(native_log, "native log must not be normalized")
+    decoder = _write_decoder(tmp_path / "decoder.py", "authoritative decoded log")
+    output_root = tmp_path / "output"
+
+    summary = run_normalization_pipeline(
+        output_dir=output_root,
+        input_files=[native_log, bin_path],
+        config=Bin2LogConfig(
+            python_executable=Path(sys.executable),
+            decoder_script=decoder,
+        ),
+    )
+
+    rows = _jsonl_lines(output_root / "0100" / "log_unclassified_records.jsonl")
+
+    assert summary.processed_instruments[0].bin_count == 1
+    assert summary.processed_instruments[0].log_count == 0
+    assert [row["message"] for row in rows] == ["authoritative decoded log"]
+
+
 def test_decoder_state_tolerates_database_file_removed_after_listing(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

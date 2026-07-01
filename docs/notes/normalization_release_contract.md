@@ -37,6 +37,17 @@ Out of scope:
 - DET / REQ logic
 - `CYCLE` / `CYCLE.h`
 
+## Critical Source Authority: BIN-Decoded LOG Wins
+
+When a `BIN` and an existing `LOG` have the same filename stem, the LOG
+decoded from the BIN is the sole authoritative normalization source. The
+existing same-stem LOG must be excluded before manifests, source diffs,
+incremental planning, normalization, and audits are built.
+
+An existing LOG remains authoritative when no same-stem BIN exists, preserving
+support for earlier LOG-only instruments. Source precedence never authorizes
+deleting or modifying either raw file.
+
 ## Public CLI
 
 Installed CLI surface:

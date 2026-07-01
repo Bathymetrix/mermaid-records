@@ -182,9 +182,13 @@ def _run_stateful(
 ) -> NormalizationPipelineSummary | DryRunSummary:
     _emit_progress(progress, f"Discovering inputs under {input_root}")
     serial_map = _instrument_names_from_vit(input_root)
-    grouped_sources = _group_paths(
+    discovered_sources = _group_paths(
         [*sorted(iter_bin_files(input_root)), *sorted(iter_log_files(input_root)), *sorted(iter_mer_files(input_root))]
     )
+    grouped_sources = {
+        group_key: _select_authoritative_sources(paths)
+        for group_key, paths in discovered_sources.items()
+    }
     if not grouped_sources:
         _emit_progress(
             progress,
@@ -423,7 +427,10 @@ def _run_stateless(
             "stateless mode cannot write into an output directory that already contains manifests"
         )
 
-    grouped_sources = _group_paths(input_files)
+    grouped_sources = {
+        group_key: _select_authoritative_sources(paths)
+        for group_key, paths in _group_paths(input_files).items()
+    }
     _emit_progress(progress, f"Discovering explicit input files ({len(input_files)})")
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -815,6 +822,24 @@ def _group_paths(paths: list[Path]) -> dict[str, list[Path]]:
     for path in sorted(paths):
         grouped.setdefault(_raw_file_prefix(path), []).append(path)
     return grouped
+
+
+def _select_authoritative_sources(paths: list[Path]) -> list[Path]:
+    """Discard native LOG inputs shadowed by same-stem BIN inputs."""
+
+    bin_stems = {
+        path.stem.casefold()
+        for path in paths
+        if path.suffix.upper() == ".BIN"
+    }
+    return [
+        path
+        for path in paths
+        if not (
+            path.suffix.upper() == ".LOG"
+            and path.stem.casefold() in bin_stems
+        )
+    ]
 
 
 def _raw_file_prefix(path: Path) -> str:

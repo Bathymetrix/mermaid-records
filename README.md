@@ -6,6 +6,16 @@
 
 `mermaid-records` normalizes raw MERMAID `BIN`, `LOG`, and `MER` artifacts into structured JSONL record families. It is a parsing and normalization layer only. It does not perform coordinate conversion, interval inference, waveform analysis, or higher-level interpretation.
 
+## CRITICAL SOURCE-AUTHORITY RULE: BIN-DECODED LOG WINS
+
+When a `BIN` and an existing `LOG` have the same filename stem, only the LOG
+decoded from that `BIN` is normalized. The existing same-stem LOG is excluded
+from normalization, manifests, diffs, and incremental planning, but is never
+deleted or modified.
+
+Existing LOG files remain authoritative when no same-stem BIN exists. This is
+required for earlier instruments that transmitted LOG data without BIN data.
+
 ## Current contract
 
 The release-facing contract is intentionally narrow:

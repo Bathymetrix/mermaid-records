@@ -1,5 +1,18 @@
 # AGENTS
 
+## CRITICAL SOURCE-AUTHORITY RULE — BIN-DERIVED LOG WINS
+
+- When a raw `BIN` and an existing `LOG` have the same filename stem, the
+  `BIN`-decoded `LOG` is the sole authoritative normalization source.
+- Discard the same-stem existing `LOG` from normalization, manifests, diffs,
+  incremental planning, audits, and all future workflows in this repository.
+- Continue accepting existing `LOG` files when no same-stem `BIN` exists;
+  older instruments may provide LOG-only source data.
+- Never delete or modify the existing raw `LOG` or `BIN`. “Discard” means
+  exclude the shadowed `LOG` from the workflow only.
+- Apply this precedence before source-state and incremental-action planning so
+  changes to a shadowed `LOG` cannot trigger append, rewrite, or duplicate rows.
+
 ## Persistent Rules
 
 - “prototype” terminology in normalization code/docs refers to earlier development-phase design work; for v1, normalization families and rules are treated as stable.
