@@ -15,6 +15,9 @@ deleted or modified.
 
 Existing LOG files remain authoritative when no same-stem BIN exists. This is
 required for earlier instruments that transmitted LOG data without BIN data.
+LOG-family `source_file` values record the authoritative input basename:
+the native `.LOG` basename for LOG-only inputs and the `.BIN` basename for
+BIN-derived content.
 
 ## Current contract
 

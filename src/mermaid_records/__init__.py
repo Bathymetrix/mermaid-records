@@ -6,7 +6,7 @@
 
 """Conservative top-level package metadata for mermaid_records."""
 
-__version__ = "2.1.0.dev1"
+__version__ = "2.1.0.dev2"
 __author__ = "Joel D. Simon"
 __license__ = "MIT"
 __copyright__ = "© 2026 Bathymetrix, LLC"

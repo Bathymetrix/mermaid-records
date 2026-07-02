@@ -337,7 +337,7 @@ Avoid:
   - decoder-state changes invalidate only BIN-derived outputs for BIN-dependent floats
   - explicit force mode may override incremental append/noop decisions and force targeted family rewrites
 - JSONL outputs use deterministic processing order, not time-order.
-- Normalized JSONL outputs should use basename-only `source_file`; richer full-path provenance belongs in manifests and other run-side artifacts.
+- Normalized JSONL outputs should use basename-only `source_file`; richer full-path provenance belongs in manifests and other run-side artifacts. For LOG-family rows, this basename is the authoritative original `.LOG` or `.BIN` input, never a temporary decoded LOG.
 - LOG source-line assignment accounting must use full source paths internally so same-named source files in different locations do not collapse into false duplicates; emitted JSONL `source_file` remains basename-only.
 - CLI LOG assignment status reports should accumulate the `write_log_jsonl_families` summary produced during writing; do not reread generated LOG JSONL solely to rebuild assignment counts.
 - Do not mutate existing JSONL outputs in place; append and full rewrite are the only safe modification paths.

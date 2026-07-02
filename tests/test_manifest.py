@@ -53,12 +53,15 @@ def test_stateful_run_writes_per_instrument_outputs_and_manifests(tmp_path: Path
     assert {item["instrument_id"] for item in diff_rows} == {"P0006"}
     assert {item["instrument_serial"] for item in diff_rows} == {"452.020-P-06"}
     unclassified_rows = _jsonl_lines(instrument_dir / "log_unclassified_records.jsonl")
+    environment_rows = _jsonl_lines(instrument_dir / "mer_environment_records.jsonl")
     all_record_rows = [
         row
         for path in sorted(instrument_dir.glob("*.jsonl"))
         for row in _jsonl_lines(path)
     ]
     assert unclassified_rows[0]["instrument_id"] == "P0006"
+    assert unclassified_rows[0]["source_file"] == "06_first.LOG"
+    assert environment_rows[0]["source_file"] == "06_first.MER"
     assert unclassified_rows[0]["instrument_serial"] == "452.020-P-06"
     assert unclassified_rows[0]["instrument_id"] != unclassified_rows[0]["instrument_serial"]
     assert all(row["instrument_serial"] == "452.020-P-06" for row in all_record_rows)
@@ -432,6 +435,13 @@ def test_same_stem_bin_shadows_native_log_for_state_and_normalization(
         "authoritative decoded log",
         "native log-only source",
     }
+    assert {
+        row["message"]: row["source_file"]
+        for row in rows
+    } == {
+        "authoritative decoded log": "0100_first.BIN",
+        "native log-only source": "0100_log_only.LOG",
+    }
     assert {Path(row["source_file"]).name for row in source_state["raw_sources"]} == {
         "0100_first.BIN",
         "0100_log_only.LOG",
@@ -472,6 +482,7 @@ def test_same_stem_bin_shadows_native_log_in_stateless_mode(
     assert summary.processed_instruments[0].bin_count == 1
     assert summary.processed_instruments[0].log_count == 0
     assert [row["message"] for row in rows] == ["authoritative decoded log"]
+    assert [row["source_file"] for row in rows] == ["0100_first.BIN"]
 
 
 def test_decoder_state_tolerates_database_file_removed_after_listing(

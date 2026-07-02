@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-from typing import Iterable
+from typing import Iterable, Mapping
 
 from .format_datetime import format_utc_datetime, parse_source_datetime
 from .format_record_filenames import (
@@ -299,11 +299,17 @@ def write_log_jsonl_families(
     *,
     instrument_id: str | None = None,
     instrument_serial: str | None = None,
+    authoritative_source_files: Mapping[Path, Path] | None = None,
     run_id: str | None = None,
     malformed_log_lines: list[dict[str, object]] | None = None,
     skipped_log_files: list[dict[str, object]] | None = None,
 ) -> LogJsonlSummary:
-    """Write conservative LOG-derived JSONL streams."""
+    """Write conservative LOG-derived JSONL streams.
+
+    ``log_paths`` identifies the LOG content to read. An optional authoritative
+    source mapping keeps emitted provenance tied to an original BIN when the
+    readable LOG is a temporary decoder artifact.
+    """
 
     output_dir.mkdir(parents=True, exist_ok=True)
     sorted_paths = sorted(Path(path) for path in log_paths)
@@ -354,7 +360,14 @@ def write_log_jsonl_families(
             for family, path in output_paths.items()
         }
         for path in sorted_paths:
-            path_instrument_id = instrument_id or _fallback_instrument_id(path)
+            authoritative_source = (
+                authoritative_source_files.get(path, path)
+                if authoritative_source_files is not None
+                else path
+            )
+            path_instrument_id = instrument_id or _fallback_instrument_id(
+                authoritative_source
+            )
             path_instrument_serial = output_instrument_serial
 
             def _record_malformed_line(
@@ -369,7 +382,7 @@ def write_log_jsonl_families(
                         "run_id": run_id,
                         "instrument_id": path_instrument_id,
                         "instrument_serial": path_instrument_serial,
-                        "source_file": path.as_posix(),
+                        "source_file": authoritative_source.as_posix(),
                         "line_number": line_number,
                         "raw_line": raw_line,
                         "error": error,
@@ -387,6 +400,7 @@ def write_log_jsonl_families(
                             entry,
                             source_file_indexes=source_file_indexes,
                         )
+                        entry.source_file = authoritative_source
                         ordinary_line_keys.update(source_keys)
                         assignment = _classify_log_line(
                             entry,
@@ -467,7 +481,7 @@ def write_log_jsonl_families(
                     episode_record = _build_grouped_episode_record(
                         item,
                         instrument_id=path_instrument_id,
-                        source_file=path,
+                        source_file=authoritative_source,
                     )
                     episode_record = with_record_metadata(
                         episode_record,
@@ -525,7 +539,7 @@ def write_log_jsonl_families(
                         "run_id": run_id,
                         "instrument_id": path_instrument_id,
                         "instrument_serial": path_instrument_serial,
-                        "source_file": path.as_posix(),
+                        "source_file": authoritative_source.as_posix(),
                         "error": str(exc),
                         "skipped_at": _iso_now(),
                     }

@@ -213,6 +213,42 @@ def test_write_log_jsonl_families_preserves_unclassified_records(
     _assert_log_source_line_assignments_exact_once(output_dir)
 
 
+def test_write_log_jsonl_families_uses_authoritative_bin_for_direct_and_grouped_records(
+    tmp_path: Path,
+) -> None:
+    decoded_log_path = tmp_path / "0100_sample.LOG"
+    decoded_log_path.write_text(
+        "\n".join(
+            [
+                "1700000000:[MRMAID,0002]acq started",
+                "1700000001:    bypass 20000ms 120000ms (10000ms 200000ms stored)",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    authoritative_bin_path = tmp_path / "0100_sample.BIN"
+    output_dir = tmp_path / "jsonl"
+
+    write_log_jsonl_families(
+        [decoded_log_path],
+        output_dir,
+        authoritative_source_files={
+            decoded_log_path: authoritative_bin_path,
+        },
+    )
+
+    records = [
+        record
+        for path in output_dir.glob("log_*.jsonl")
+        for record in _read_jsonl(path)
+    ]
+    assert len(records) == 2
+    assert {record["source_file"] for record in records} == {
+        authoritative_bin_path.name
+    }
+
+
 def test_write_log_jsonl_families_classifies_extended_pressure_temperature_patterns(
     tmp_path: Path,
 ) -> None:

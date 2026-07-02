@@ -24,6 +24,9 @@ All notable changes from this point forward should be recorded here.
   LOG as authoritative over an existing same-stem LOG. Shadowed native LOGs
   are excluded from normalization and source-state planning without being
   deleted or modified.
+- Preserve the authoritative raw input basename in LOG-family `source_file`:
+  native `.LOG` inputs retain their basename and BIN-derived records name the
+  originating `.BIN` instead of a temporary decoded LOG.
 - Preserve signed negative LOG epoch timestamps as source timestamps, including in grouped Iridium session timing.
 
 ## 2.0.0

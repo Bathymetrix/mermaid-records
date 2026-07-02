@@ -692,6 +692,7 @@ def _execute_log_family(
     with tempfile.TemporaryDirectory(prefix="mermaid-log-family-") as tmpdir:
         temp_dir = Path(tmpdir)
         rendered_paths = list(log_paths)
+        authoritative_source_files = {path: path for path in log_paths}
         if bin_paths:
             assert config is not None
             _emit_progress(progress, f"Running BIN decode for instrument {instrument_id}")
@@ -707,7 +708,14 @@ def _execute_log_family(
                 for path in bin_paths:
                     shutil.copy2(path, workdir / path.name)
                 prepare_decode_workspace(workdir, config=decode_config, refresh_database=True)
-                rendered_paths.extend(decode_workspace_logs(workdir, config=decode_config))
+                decoded_log_paths = decode_workspace_logs(workdir, config=decode_config)
+                rendered_paths.extend(decoded_log_paths)
+                authoritative_source_files.update(
+                    _map_decoded_logs_to_bin_sources(
+                        decoded_log_paths,
+                        bin_paths=bin_paths,
+                    )
+                )
             except Exception as exc:
                 paths_text = ", ".join(path.as_posix() for path in bin_paths)
                 raise ValueError(
@@ -718,6 +726,7 @@ def _execute_log_family(
             temp_dir,
             instrument_id=instrument_id,
             instrument_serial=instrument_serial,
+            authoritative_source_files=authoritative_source_files,
             run_id=run_id,
             malformed_log_lines=malformed_log_lines,
             skipped_log_files=skipped_log_files,
@@ -953,6 +962,34 @@ def _select_authoritative_sources(paths: list[Path]) -> list[Path]:
             and path.stem.casefold() in bin_stems
         )
     ]
+
+
+def _map_decoded_logs_to_bin_sources(
+    decoded_log_paths: list[Path],
+    *,
+    bin_paths: list[Path],
+) -> dict[Path, Path]:
+    """Map readable decoder LOG artifacts to their authoritative BIN inputs."""
+
+    bins_by_stem: dict[str, list[Path]] = {}
+    for bin_path in bin_paths:
+        bins_by_stem.setdefault(bin_path.stem.casefold(), []).append(bin_path)
+
+    source_files: dict[Path, Path] = {}
+    for log_path in decoded_log_paths:
+        candidates = bins_by_stem.get(log_path.stem.casefold(), [])
+        if len(candidates) == 1:
+            source_files[log_path] = candidates[0]
+            continue
+        if not candidates and len(bin_paths) == 1:
+            source_files[log_path] = bin_paths[0]
+            continue
+        candidate_names = ", ".join(path.name for path in candidates) or "none"
+        raise ValueError(
+            "Cannot resolve authoritative BIN source for decoded LOG "
+            f"{log_path.name}; matching BIN inputs: {candidate_names}"
+        )
+    return source_files
 
 
 def _raw_file_prefix(path: Path) -> str:

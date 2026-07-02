@@ -11,6 +11,12 @@ whenever LOG family filenames, emitted fields, grouping behavior, classifier
 hit rules, or exclusivity behavior change. The documented `Hits:` examples are
 covered by tests so classifier drift should fail loudly.
 
+For every LOG-family record, `source_file` is the basename of the authoritative
+original input artifact. It may therefore name either a `.LOG` file or a `.BIN`
+file. When a `.BIN` and same-stem `.LOG` are both present, the `.BIN` is
+authoritative and its basename is recorded; the temporary decoded LOG filename
+is not exposed as record provenance.
+
 ## Shared LOG Parsing Contract
 
 Ordinary LOG family classification starts only after a raw line parses as one of
@@ -52,7 +58,7 @@ These fields appear on every single-line family:
 | `instrument_id` | string | no | Canonical station/instrument identifier. | n/a | Pipeline context or fallback from LOG path. |
 | `instrument_serial` | string | no | Full hardware/dataset serial used in output filenames. | n/a | Pipeline context or fallback from LOG path. |
 | `mermaid_records_version` | string | no | Package version that emitted the normalized row. | n/a | Canonical `mermaid_records.__version__`. |
-| `source_file` | string | no | Basename of the source LOG file. | n/a | `entry.source_file.name`; never a full path. |
+| `source_file` | string | no | Basename of the authoritative source file from which this record was produced. For LOG-family records this may be either a `.LOG` file or a `.BIN` file. When both a `.BIN` and same-stem `.LOG` are present, the `.BIN` is authoritative and its basename is recorded here. | n/a | Authoritative input basename; never a full path or temporary decoded LOG name. |
 | `source_container` | string | no | Source container kind. Always `log`. | n/a | Constant. |
 | `record_time` | string | no | UTC ISO8601 timestamp with six fractional digits and `Z`. | UTC time | Parsed from raw LOG timestamp. |
 | `log_epoch_time` | string | no | Original raw LOG timestamp text. | source literal | Raw text before the first timestamp separator. |
@@ -74,7 +80,7 @@ per-line event objects.
 | `instrument_id` | string | no | Canonical station/instrument identifier. | n/a | Pipeline context or fallback from LOG path. |
 | `instrument_serial` | string | no | Full hardware/dataset serial used in output filenames. | n/a | Pipeline context or fallback from LOG path. |
 | `mermaid_records_version` | string | no | Package version that emitted the normalized row. | n/a | Canonical `mermaid_records.__version__`. |
-| `source_file` | string | no | Basename of the source LOG file. | n/a | Source LOG path basename. |
+| `source_file` | string | no | Basename of the authoritative source file from which this record was produced. For LOG-family records this may be either a `.LOG` file or a `.BIN` file. When both a `.BIN` and same-stem `.LOG` are present, the `.BIN` is authoritative and its basename is recorded here. | n/a | Authoritative input basename; never a full path or temporary decoded LOG name. |
 | `episode_index` | integer | no | Zero-based episode number within the source file and family. | n/a | Incremented by grouped parser. |
 | `line_start_index` | integer | no | 1-based source line number for the first timestamped line in the episode. | lines | First grouped line with parsed time. |
 | `line_end_index` | integer | no | 1-based source line number for the last timestamped line in the episode. | lines | Last grouped line with parsed time. |

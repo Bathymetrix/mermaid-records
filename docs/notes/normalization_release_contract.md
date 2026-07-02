@@ -52,6 +52,11 @@ An existing LOG remains authoritative when no same-stem BIN exists, preserving
 support for earlier LOG-only instruments. Source precedence never authorizes
 deleting or modifying either raw file.
 
+Normalized LOG-family `source_file` values name the basename of that
+authoritative original input: the native `.LOG` for LOG-only input, or the
+`.BIN` for BIN-derived LOG content. Temporary decoded LOG filenames are never
+recorded as authoritative provenance.
+
 ## Public CLI
 
 Installed CLI surface:
@@ -235,7 +240,8 @@ LOG record families are mutually exclusive. Each ordinary LOG source line is rep
 
 Shared direct LOG record fields:
 
-- `source_file` is basename-only in normalized JSONL outputs
+- `source_file` is the basename-only authoritative raw input (`.LOG` or `.BIN`);
+  same-stem BIN+LOG input records the `.BIN`
 - `source_line_number`
 - `record_time`
 - `log_epoch_time`
