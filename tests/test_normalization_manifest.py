@@ -45,6 +45,42 @@ def test_identical_corpora_have_same_snapshot_across_location_and_creation_order
     assert [item["path"] for item in first["files"]] == sorted(entries)
 
 
+def test_fresh_normalizations_of_relocated_identical_inputs_have_same_snapshot(
+    tmp_path: Path,
+) -> None:
+    input_roots = [tmp_path / "machine-a" / "inputs", tmp_path / "machine-b" / "inputs"]
+    output_roots = [tmp_path / "machine-a" / "records", tmp_path / "machine-b" / "records"]
+    for input_root in input_roots:
+        input_root.mkdir(parents=True)
+        (input_root / "467.174-T-0100.vit").write_text("", encoding="utf-8")
+        (input_root / "0100_first.LOG").write_text(
+            "1700000000:[MAIN  ,0007]first\n",
+            encoding="utf-8",
+        )
+
+    for input_root, output_root in zip(input_roots, output_roots, strict=True):
+        assert main(
+            [
+                "normalize",
+                "-i",
+                input_root.as_posix(),
+                "-o",
+                output_root.as_posix(),
+            ]
+        ) == 0
+
+    manifests = [
+        json.loads(
+            (output_root / NORMALIZATION_MANIFEST_FILENAME).read_text(encoding="utf-8")
+        )
+        for output_root in output_roots
+    ]
+    assert manifests[0]["input_root"] != manifests[1]["input_root"]
+    assert manifests[0]["generation_command"] != manifests[1]["generation_command"]
+    assert manifests[0]["snapshot_id"] == manifests[1]["snapshot_id"]
+    assert manifests[0]["files"] == manifests[1]["files"]
+
+
 def test_filesystem_timestamp_changes_do_not_change_snapshot(tmp_path: Path) -> None:
     output_root = tmp_path / "output"
     data_path = output_root / "0100" / "log_unclassified_records.0100.jsonl"
