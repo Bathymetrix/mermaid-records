@@ -75,7 +75,7 @@ See [docs/cli.md](docs/cli.md) for the full CLI reference.
 - `stateful` mode is selected by `--input-root`
 - `stateless` mode is selected by `--input-file`
 
-`Stateful` mode persists `manifests/` and `state/` per instrument and enables incremental append/rewrite/noop planning. `Stateless` mode does not write manifests, does not use incremental state, and rewrites the targeted package-owned JSONL family outputs for each explicit run.
+`Stateful` mode persists `manifests/` and `state/` per instrument and enables incremental append/rewrite/noop planning. `Stateless` mode does not write those per-instrument bookkeeping directories, does not use incremental state, and rewrites the targeted package-owned JSONL family outputs for each explicit run. Both modes write the root `normalization_manifest.json` after successful non-dry-run normalization.
 
 `--instrument-serial`, used with `--input-root`, narrows a stateful corpus run
 to one full serial such as `452.020-P-0030`. It does not touch manifests,
@@ -93,6 +93,7 @@ Typical per-instrument outputs look like:
 
 ```text
 <output-dir>/
+  normalization_manifest.json
   452.020-P-06/
     log_acquisition_records.452.020-P-06.jsonl
     log_ascent_request_records.452.020-P-06.jsonl
@@ -114,6 +115,12 @@ Typical per-instrument outputs look like:
 
 Every per-instrument output directory materializes the canonical top-level JSONL file set even when some families are empty.
 
+`normalization_manifest.json` inventories the normalized JSONL corpus with
+per-file byte sizes and SHA-256 checksums and publishes a deterministic
+content-addressed snapshot identifier. See
+[docs/normalization_manifest.md](docs/normalization_manifest.md) for the
+schema and independent verification recipe.
+
 `instrument_id` is the station/instrument identifier analogous to `kstnm`, for example `P0006`. `instrument_serial` is the full hardware/dataset serial, for example `452.020-P-06`. For stateless explicit-file runs, the pipeline uses the same path/log-derived serial resolution as stateful mode when available and otherwise falls back to the raw file prefix.
 
 ## Fixture coverage
@@ -133,6 +140,7 @@ These fixtures are representative test anchors for the implemented behavior. The
 ## Documentation map
 
 - [docs/cli.md](docs/cli.md) — CLI flags, execution modes, and safe usage patterns
+- [docs/normalization_manifest.md](docs/normalization_manifest.md) — content-addressed corpus manifest schema and digest recipe
 - [docs/limitations.md](docs/limitations.md) — preservation limits, mode-dependent artifacts, and allowed transformations
 - [docs/ethos.md](docs/ethos.md) — scope discipline and design philosophy
 - [docs/notes/normalization_release_contract.md](docs/notes/normalization_release_contract.md) — detailed behavioral reference

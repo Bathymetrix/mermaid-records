@@ -3,6 +3,9 @@
 ## Manifest and state artifacts depend on mode
 
 `Stateful` and `stateless` runs do not persist the same side artifacts.
+Both successful non-dry-run modes write the root
+`normalization_manifest.json`, which inventories normalized corpus data but
+does not provide incremental state.
 
 Stateful mode:
 
@@ -13,7 +16,7 @@ Stateful mode:
 
 Stateless mode:
 
-- writes no `manifests/`
+- writes no `manifests/` directory
 - writes no `state/`
 - does not persist malformed/skipped-source recovery artifacts separately from the normalized JSONL outputs
 - cannot target an output tree that already contains `manifests/`
@@ -58,7 +61,10 @@ No additional interpretation-oriented transformations are part of the current co
 
 `Stateful` mode can append, rewrite, noop, and prune because it has persisted source state.
 
-`Stateless` mode cannot do that safely because it has no manifests. Its rerun contract is therefore intentionally narrower:
+`Stateless` mode cannot do that safely because it has no per-instrument run
+manifests or source state. Its root normalization manifest is a
+content-addressed corpus inventory, not incremental planning state. The
+stateless rerun contract is therefore intentionally narrower:
 
 - reruns rewrite the targeted package-owned family outputs
 - reruns do not append to prior stateless JSONL files

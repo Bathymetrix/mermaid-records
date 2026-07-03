@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import shlex
 import sys
 import time
 
@@ -120,8 +121,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Run the CLI."""
 
+    invocation_args = list(sys.argv[1:] if argv is None else argv)
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(invocation_args)
+    args.generation_command = shlex.join(["mermaid-records", *invocation_args])
     _validate_args(parser, args)
     handler = getattr(args, "handler")
     return handler(args)
@@ -187,6 +190,7 @@ def _handle_normalize(args: argparse.Namespace) -> int:
         dry_run=args.dry_run,
         force_rewrite=args.force_rewrite,
         progress=_cli_progress,
+        generation_command=args.generation_command,
     )
     elapsed_s = time.perf_counter() - started
     payload = summary.to_dict()

@@ -13,11 +13,49 @@ import secrets
 import subprocess
 from typing import TYPE_CHECKING
 
+from . import __version__
 from .format_datetime import format_utc_datetime
 from .format_record_filenames import validate_instrument_serial
 
 if TYPE_CHECKING:
     from .bin2log import Bin2LogConfig
+
+
+NORMALIZATION_MANIFEST_FILENAME = "normalization_manifest.json"
+
+
+def write_normalization_manifest(
+    *,
+    output_root: Path,
+    input_root: Path | None,
+    generation_command: str | None,
+) -> dict[str, object]:
+    """Atomically write the content-addressed normalized-corpus manifest."""
+
+    files = _normalized_file_inventory(output_root)
+    snapshot_hasher = hashlib.sha256()
+    for item in files:
+        snapshot_hasher.update(
+            (
+                f"{item['path']}\t{item['byte_size']}\t{item['sha256']}\n"
+            ).encode("utf-8")
+        )
+    git_commit, git_dirty = _package_git_state()
+    payload: dict[str, object] = {
+        "schema_version": 1,
+        "mermaid_records_version": __version__,
+        "git_commit": git_commit,
+        "git_dirty": git_dirty,
+        "generation_command": generation_command,
+        "generated_at": _iso_now(),
+        "input_root": input_root.as_posix() if input_root is not None else None,
+        "checksum_algorithm": "sha256",
+        "snapshot_id": f"sha256:{snapshot_hasher.hexdigest()}",
+        "file_count": len(files),
+        "files": files,
+    }
+    _write_json_atomic(output_root / NORMALIZATION_MANIFEST_FILENAME, payload)
+    return payload
 
 
 def begin_instrument_run(
@@ -292,15 +330,55 @@ def _python_version(python_executable: Path) -> str | None:
 
 
 def _git_commit(cwd: Path) -> str | None:
-    result = subprocess.run(
-        ["git", "-C", str(cwd), "rev-parse", "HEAD"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(cwd), "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
     if result.returncode != 0:
         return None
     return result.stdout.strip() or None
+
+
+def _package_git_state() -> tuple[str | None, bool | None]:
+    package_dir = Path(__file__).resolve().parent
+    commit = _git_commit(package_dir)
+    if commit is None:
+        return None, None
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(package_dir), "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return commit, None
+    if result.returncode != 0:
+        return commit, None
+    return commit, bool(result.stdout)
+
+
+def _normalized_file_inventory(output_root: Path) -> list[dict[str, object]]:
+    files: list[dict[str, object]] = []
+    for path in output_root.rglob("*.jsonl"):
+        if not path.is_file():
+            continue
+        relative_path = path.relative_to(output_root)
+        if {"manifests", "state"} & set(relative_path.parts[:-1]):
+            continue
+        files.append(
+            {
+                "path": relative_path.as_posix(),
+                "byte_size": path.stat().st_size,
+                "sha256": _hash_file(path),
+            }
+        )
+    return sorted(files, key=lambda item: str(item["path"]))
 
 
 def _run_status(instrument_output_dir: Path, error: BaseException | None) -> str:
@@ -353,6 +431,20 @@ def _has_materialized_outputs(instrument_output_dir: Path) -> bool:
 
 def _write_json(path: Path, payload: dict[str, object]) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = path.with_name(f".{path.name}.{secrets.token_hex(6)}.tmp")
+    try:
+        temporary_path.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary_path, path)
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
 
 
 def _write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:

@@ -160,45 +160,53 @@ When a full serial is unavailable, the pipeline falls back conservatively to the
 
 ## Output Layout
 
-Per instrument:
+At the normalized output root and per instrument:
 
 ```text
-<output_root>/<instrument-serial>/
-  log_acquisition_records.<instrument-serial>.jsonl
-  log_ascent_request_records.<instrument-serial>.jsonl
-  log_gps_records.<instrument-serial>.jsonl
-  log_pressure_temperature_records.<instrument-serial>.jsonl
-  log_battery_records.<instrument-serial>.jsonl
-  log_parameter_records.<instrument-serial>.jsonl
-  log_testmode_records.<instrument-serial>.jsonl
-  log_ctd_records.<instrument-serial>.jsonl
-  log_iridium_records.<instrument-serial>.jsonl
-  log_unclassified_records.<instrument-serial>.jsonl
-  mer_environment_records.<instrument-serial>.jsonl
-  mer_parameter_records.<instrument-serial>.jsonl
-  mer_event_records.<instrument-serial>.jsonl
-  preflight_status.json  # only when the current run's BIN decode preflight ran
-  manifests/
-    latest.json
-    runs/
-      <run_id>/
-        run.json
-        outputs.json
-        source_state.json
-        input_file_diffs.jsonl
-        malformed_log_lines.jsonl
-        skipped_log_files.jsonl
-        malformed_mer_blocks.jsonl
-        skipped_mer_files.jsonl
-        preflight_status.json
-  state/
-    pruned_records.jsonl
+<output_root>/
+  normalization_manifest.json
+  <instrument-serial>/
+    log_acquisition_records.<instrument-serial>.jsonl
+    log_ascent_request_records.<instrument-serial>.jsonl
+    log_gps_records.<instrument-serial>.jsonl
+    log_pressure_temperature_records.<instrument-serial>.jsonl
+    log_battery_records.<instrument-serial>.jsonl
+    log_parameter_records.<instrument-serial>.jsonl
+    log_testmode_records.<instrument-serial>.jsonl
+    log_ctd_records.<instrument-serial>.jsonl
+    log_iridium_records.<instrument-serial>.jsonl
+    log_unclassified_records.<instrument-serial>.jsonl
+    mer_environment_records.<instrument-serial>.jsonl
+    mer_parameter_records.<instrument-serial>.jsonl
+    mer_event_records.<instrument-serial>.jsonl
+    preflight_status.json  # only when the current run's BIN decode preflight ran
+    manifests/
+      latest.json
+      runs/
+        <run_id>/
+          run.json
+          outputs.json
+          source_state.json
+          input_file_diffs.jsonl
+          malformed_log_lines.jsonl
+          skipped_log_files.jsonl
+          malformed_mer_blocks.jsonl
+          skipped_mer_files.jsonl
+          preflight_status.json
+    state/
+      pruned_records.jsonl
 ```
 
 Notes:
 
+- `normalization_manifest.json` is written atomically after a successful
+  non-dry-run pipeline and content-addresses all normalized JSONL files under
+  the output root. See `docs/normalization_manifest.md` for its schema and
+  exact digest recipe.
 - JSONL field ordering is frozen semantically: provenance/identity, then time, then family metadata, then payload/accounting, then raw fallback fields.
-- `manifests/` and `state/` are stateful-mode artifacts; stateless mode writes neither.
+- Per-instrument `manifests/` and `state/` directories are stateful-mode
+  artifacts; stateless mode writes neither. Both modes write the root
+  `normalization_manifest.json`.
 - `preflight_status.json` at instrument root is present only when the current run performed BIN preflight with a durable output directory.
 - `latest.json` points to the most recent run for that instrument.
 - `latest.json` includes `preflight_status` only when the current run produced that artifact.

@@ -24,6 +24,7 @@ from .manifest import (
     latest_source_state,
     output_dir_contains_manifests,
     record_pruned_sources,
+    write_normalization_manifest,
 )
 from .normalize_log import output_filenames as log_output_filenames
 from .normalize_log import LogJsonlSummary
@@ -165,6 +166,7 @@ def run_normalization_pipeline(
     dry_run: bool = False,
     force_rewrite: bool = False,
     progress: ProgressCallback | None = None,
+    generation_command: str | None = None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     """Run the normalization pipeline in stateful or stateless mode."""
 
@@ -187,6 +189,7 @@ def run_normalization_pipeline(
             dry_run=dry_run,
             force_rewrite=force_rewrite,
             progress=progress,
+            generation_command=generation_command,
         )
     assert input_files is not None
     return _run_stateless(
@@ -196,6 +199,7 @@ def run_normalization_pipeline(
         dry_run=dry_run,
         force_rewrite=force_rewrite,
         progress=progress,
+        generation_command=generation_command,
     )
 
 
@@ -208,6 +212,7 @@ def _run_stateful(
     dry_run: bool,
     force_rewrite: bool,
     progress: ProgressCallback | None,
+    generation_command: str | None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     _emit_progress(progress, f"Discovering inputs under {input_root}")
     serial_map = _instrument_names_from_vit(input_root)
@@ -467,6 +472,11 @@ def _run_stateful(
         )
         processed_instruments.append(summary)
 
+    write_normalization_manifest(
+        output_root=output_dir,
+        input_root=input_root,
+        generation_command=generation_command,
+    )
     return NormalizationPipelineSummary(
         mode="stateful",
         input_root=input_root.as_posix(),
@@ -485,6 +495,7 @@ def _run_stateless(
     dry_run: bool,
     force_rewrite: bool,
     progress: ProgressCallback | None,
+    generation_command: str | None,
 ) -> NormalizationPipelineSummary | DryRunSummary:
     if output_dir_contains_manifests(output_dir):
         raise ValueError(
@@ -651,6 +662,11 @@ def _run_stateless(
             metrics=metrics,
         )
 
+    write_normalization_manifest(
+        output_root=output_dir,
+        input_root=None,
+        generation_command=generation_command,
+    )
     return NormalizationPipelineSummary(
         mode="stateless",
         input_root=None,
