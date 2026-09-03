@@ -6,6 +6,7 @@ All notable changes from this point forward should be recorded here.
 
 ### Changed
 
+- Documented CLI and utility option defaults in their `--help` output.
 - Changed `normalize --force-rewrite` to `normalize -f, --force` for targeted family rewrites.
 - Added top-level `mermaid_records_version` package-version provenance to
   every normalized LOG and MER JSONL record.
@@ -33,6 +34,7 @@ All notable changes from this point forward should be recorded here.
 
 ### Release preparation
 
+- Advanced the package version to `2.1.0-rc5`.
 - Advanced the package version to `2.1.0-rc4`.
 - Advanced the package version to `2.1.0-rc3`.
 - Advanced the package version to `2.1.0-rc1`.

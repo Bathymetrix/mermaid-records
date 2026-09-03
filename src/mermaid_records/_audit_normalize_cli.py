@@ -155,6 +155,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
         default=f"{shlex.quote(sys.executable)} -m mermaid_records.cli",
         help=(
             "Base command used to invoke the CLI before the fixed normalize subcommand. "
+            "Defaults to the current Python executable with -m mermaid_records.cli. "
             "Examples: 'mermaid-records', 'mermaid', or 'python -m mermaid_records.cli'."
         ),
     )
@@ -191,26 +192,35 @@ def build_argument_parser() -> argparse.ArgumentParser:
         default="semantic",
         help=(
             "semantic runs one representative set of meaningful flag combinations; "
-            "exhaustive expands every boolean permutation."
+            "exhaustive expands every boolean permutation. Defaults to semantic."
         ),
     )
     parser.add_argument(
         "--include-invalid",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Include intentionally invalid output/decoder resolution combinations and log their errors.",
+        help=(
+            "Include intentionally invalid output/decoder resolution combinations and log "
+            "their errors. Defaults to true."
+        ),
     )
     parser.add_argument(
         "--include-input-file-mode",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Attempt stateless --input-file combinations in addition to the exact -i/--input-root flow.",
+        help=(
+            "Attempt stateless --input-file combinations in addition to the exact "
+            "-i/--input-root flow. Defaults to true."
+        ),
     )
     parser.add_argument(
         "--arg-max-buffer",
         type=int,
         default=32768,
-        help="Safety margin subtracted from the detected argv limit before enabling --input-file runs.",
+        help=(
+            "Safety margin subtracted from the detected argv limit before enabling "
+            "--input-file runs. Defaults to 32768."
+        ),
     )
     parser.add_argument(
         "--max-runs",

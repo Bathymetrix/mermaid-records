@@ -36,7 +36,10 @@ def main() -> int:
         "--family-root",
         type=Path,
         default=REPO_ROOT / "data" / "fixtures" / "467.174-T-0100",
-        help="Fixture family root containing bin/ and log/ directories.",
+        help=(
+            "Fixture family root containing bin/ and log/ directories. Defaults to "
+            "data/fixtures/467.174-T-0100."
+        ),
     )
     parser.add_argument(
         "--decoder-python",
@@ -54,7 +57,10 @@ def main() -> int:
         "--preflight-mode",
         choices=("strict", "cached"),
         default="strict",
-        help="BIN decode preflight policy: strict requires successful live refresh; cached warns and continues on cached decoder state.",
+        help=(
+            "BIN decode preflight policy: strict requires successful live refresh; "
+            "cached warns and continues on cached decoder state. Defaults to strict."
+        ),
     )
     args = parser.parse_args()
 

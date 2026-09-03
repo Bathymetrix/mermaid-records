@@ -80,19 +80,25 @@ def build_argument_parser() -> argparse.ArgumentParser:
         "--sample-per-family",
         type=int,
         default=3,
-        help="Maximum number of sampled files to inspect for each non-empty family.",
+        help=(
+            "Maximum number of sampled files to inspect for each non-empty family. "
+            "Defaults to 3."
+        ),
     )
     parser.add_argument(
         "--seed",
         type=int,
         default=20260421,
-        help="Random seed used for reproducible bounded sampling.",
+        help="Random seed used for reproducible bounded sampling. Defaults to 20260421.",
     )
     parser.add_argument(
         "--json",
         action=argparse.BooleanOptionalAction,
         default=False,
-        help="Emit the full report as JSON instead of the console summary.",
+        help=(
+            "Emit the full report as JSON instead of the console summary. "
+            "Defaults to false."
+        ),
     )
     return parser
 

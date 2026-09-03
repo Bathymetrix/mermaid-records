@@ -18,6 +18,22 @@ def test_cli_help_exposes_only_normalize_subcommand() -> None:
     assert "inspect-mer" not in help_text
 
 
+def test_normalize_help_describes_resolved_defaults() -> None:
+    parser = build_parser()
+    subparsers_action = next(
+        action for action in parser._actions if action.dest == "command"
+    )
+    help_text = " ".join(subparsers_action.choices["normalize"].format_help().split())
+
+    assert (
+        "Defaults to $MERMAID/records when MERMAID is set; otherwise required."
+        in help_text
+    )
+    assert "Defaults to MERMAID_RECORDS_DECODER_PYTHON when set." in help_text
+    assert "Defaults to MERMAID_RECORDS_DECODER_SCRIPT when set." in help_text
+    assert "Defaults to strict." in help_text
+
+
 def test_cli_version_option_reports_package_version(capsys) -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(["--version"])

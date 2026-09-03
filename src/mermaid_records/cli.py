@@ -71,19 +71,28 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output-dir",
         type=Path,
-        help="Directory where normalized JSONL outputs will be written.",
+        help=(
+            "Directory where normalized JSONL outputs will be written. Defaults to "
+            "$MERMAID/records when MERMAID is set; otherwise required."
+        ),
     )
     normalize.add_argument(
         "--decoder-python",
         type=Path,
         default=None,
-        help="Python executable for the external manufacturer decoder environment.",
+        help=(
+            "Python executable for the external manufacturer decoder environment. "
+            "Defaults to MERMAID_RECORDS_DECODER_PYTHON when set."
+        ),
     )
     normalize.add_argument(
         "--decoder-script",
         type=Path,
         default=None,
-        help="Path to external preprocess.py decoder script.",
+        help=(
+            "Path to external preprocess.py decoder script. Defaults to "
+            "MERMAID_RECORDS_DECODER_SCRIPT when set."
+        ),
     )
     normalize.add_argument(
         "--decoder-environment-fingerprint",
@@ -95,7 +104,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--preflight-mode",
         choices=("strict", "cached"),
         default="strict",
-        help="BIN decode preflight policy: strict requires successful live refresh; cached warns and continues on cached decoder state.",
+        help=(
+            "BIN decode preflight policy: strict requires successful live refresh; "
+            "cached warns and continues on cached decoder state. Defaults to strict."
+        ),
     )
     normalize.add_argument(
         "--dry-run",
