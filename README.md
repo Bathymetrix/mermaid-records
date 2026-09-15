@@ -150,4 +150,8 @@ These fixtures are representative test anchors for the implemented behavior. The
 - [docs/ethos.md](docs/ethos.md) — scope discipline and design philosophy
 - [docs/notes/normalization_release_contract.md](docs/notes/normalization_release_contract.md) — detailed behavioral reference
 
+Developed and maintained by [Bathymetrix®](https://bathymetrix.com).
+
 © 2026 Bathymetrix, LLC
+
+Licensed under the MIT License.

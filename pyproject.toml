@@ -8,6 +8,9 @@ dynamic = ["version"]
 description = "Canonical normalization of raw MERMAID BIN, LOG, and MER data into JSONL record families."
 readme = "README.md"
 requires-python = ">=3.12"
+authors = [
+  { name = "Joel D. Simon", email = "jdsimon@bathymetrix.com" }
+]
 license = "MIT"
 keywords = ["mermaid", "records", "parsing", "cli"]
 classifiers = [
@@ -17,6 +20,11 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://bathymetrix.com"
+Repository = "https://github.com/Bathymetrix/mermaid-records"
+Issues = "https://github.com/Bathymetrix/mermaid-records/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

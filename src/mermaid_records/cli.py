@@ -1,4 +1,4 @@
-# Bathymetrix™
+# Bathymetrix®
 # https://bathymetrix.com
 # © 2026 Bathymetrix, LLC
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
@@ -33,7 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="mermaid-records",
-        description="Bathymetrix™ CLI for the MERMAID normalization pipeline.",
+        description="Bathymetrix® CLI for the MERMAID normalization pipeline.",
     )
     parser.add_argument(
         "-v",
